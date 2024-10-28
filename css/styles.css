@@ -1,0 +1,10 @@
+html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;  /* Ensure no scrollbars */
+}
+canvas {
+    display: block;     /* Remove default inline block space */
+    width: 100vw;       /* Set canvas to full viewport width */
+    height: 100vh;      /* Set canvas to full viewport height */
+}
