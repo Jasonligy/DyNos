@@ -1,3 +1,4 @@
+import generateGraph from "./generateRandom.js";
 const canvas = document.getElementById('glCanvas');
 const gl = canvas.getContext('webgl');
 
@@ -54,8 +55,66 @@ let edges = new Float32Array([
     nodes[2],  nodes[3],  nodes[4], nodes[5]   // Edge from Node 2 to Node 3
 ]);
 
-let circleVertices=getNodesCircle(nodes);
-let circle=new Float32Array(circleVertices);
+
+const graph = generateGraph();
+function getNodeEdge(graph, timeframe){
+    const totalFrame=Math.floor(10000/16);
+    // nodeList=[];
+    let edges=graph.edges;
+    const nodePosition=graph.nodeAttributes['nodePosition'];
+    let segment = new Map();
+    nodePosition.forEach((block,id) =>
+     {segment.set(id,[block.rightValue[0]-block.leftValue[0],block.rightValue[1]-block.leftValue[1]]);
+        
+    });
+    let currentPosition= new Map();
+    nodePosition.forEach((block,id) =>
+    {
+        currentPosition.set(id,[block.leftValue[0]+timeframe*segment.get(id)[0]/totalFrame,block.leftValue[1]+timeframe*segment.get(id)[1]/totalFrame])
+    }
+    )
+    let nodes =[];
+    currentPosition.forEach((p,id) =>
+    {
+        nodes.push(p[0]);
+        nodes.push(p[1]);
+    })
+    console.log(nodes)
+    nodes = new Float32Array(nodes);
+
+    let nodelink=[];
+    for(const edge of edges){
+        const [first,second] = edge.split('-').map(v=>parseInt(v));
+        // console.log(currentPosition);
+        // const lineSegment=currentPosition.get(first).concat(currentPosition.get(second))
+        // nodelink.concat(lineSegment);
+        nodelink.push(currentPosition.get(first)[0]);
+        nodelink.push(currentPosition.get(first)[1]);
+        nodelink.push(currentPosition.get(second)[0]);
+        nodelink.push(currentPosition.get(second)[1]);
+    }
+    nodelink = new Float32Array(nodelink)
+    return{
+        position:nodes,
+        edges: nodelink
+    }
+}
+const nodeEdge=getNodeEdge(graph,0);
+
+nodes=nodeEdge.position;
+edges=nodeEdge.edges;
+
+
+
+
+
+
+
+
+
+
+// let circleVertices=getNodesCircle(nodes);
+// let circle=new Float32Array(circleVertices);
 
 // Create buffer for nodes
 const nodeBuffer = gl.createBuffer();
@@ -67,9 +126,9 @@ const edgeBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, edgeBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, edges, gl.STATIC_DRAW);
 
-const circleBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, circleBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, circle, gl.STATIC_DRAW);
+// const circleBuffer = gl.createBuffer();
+// gl.bindBuffer(gl.ARRAY_BUFFER, circleBuffer);
+// gl.bufferData(gl.ARRAY_BUFFER, circle, gl.STATIC_DRAW);
 
 // Get attribute location
 const position = gl.getAttribLocation(shaderProgram, 'aPosition');
@@ -157,6 +216,25 @@ function updateNodePositions() {
 
 }
 
+
+function updateNodePositions2(count) {
+    const nodeEdge=getNodeEdge(graph,count);
+
+    nodes=nodeEdge.position;
+    edges=nodeEdge.edges;
+    console.log(nodeEdge)
+    // circleVertices=getNodesCircle(nodes);
+    // circle=new Float32Array(circleVertices);
+    gl.bindBuffer(gl.ARRAY_BUFFER, nodeBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, nodes, gl.STATIC_DRAW);  // Update buffer with new positions
+    gl.bindBuffer(gl.ARRAY_BUFFER, edgeBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, edges, gl.STATIC_DRAW);
+    // gl.bindBuffer(gl.ARRAY_BUFFER, circleBuffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, circle, gl.STATIC_DRAW);
+
+}
+
+
 // Animation loop
 // function animate() {
 //     gl.clearColor(1.0, 1.0, 1.0, 1.0);  // White background
@@ -178,9 +256,11 @@ function updateNodePositions() {
 
 let lastUpdate = 0;
 const updateInterval = 1000;  // Update every 1000ms (1 second)
-const animationDuration = 5000;  // Stop after 10 seconds (10,000 ms)
+const animationDuration = 3000;  // Stop after 10 seconds (10,000 ms)
 let startTime = null;
 
+
+let count=0;
 function animate(timestamp) {
     // Set the start time on the first frame
     if (!startTime) startTime = timestamp;
@@ -195,16 +275,16 @@ function animate(timestamp) {
     gl.clear(gl.COLOR_BUFFER_BIT);
     
     // Update positions only if the interval has passed
-    if (timestamp - lastUpdate > updateInterval) {
-        updateNodePositions();  // Update node positions every second
-        lastUpdate = timestamp;
-        console.log(nodes);
-    }
-
+    
+    updateNodePositions2(count);  // Update node positions every second
+    lastUpdate = timestamp;
+    // console.log(edges);
+    
+    count+=1;
     drawNodes();            // Draw nodes
     drawEdges();            // Draw edges
-    drawCircle();
-
+    // drawCircle();
+    console.log(count)
     // Request the next frame
     requestAnimationFrame(animate);
 }

@@ -1,33 +1,40 @@
 // Class representing a Node
-class Node {
+export class Node {
     constructor(id, value = null) {
         this.id = id;      // Unique identifier for the node
         
     }
 }
+export class Edge {
+    constructor(sourceID,targetID, value = null) {
+        this.nodePair=new Set([sourceID,targetID])
+    }
+}
 
 // Class representing a Graph with Nodes and Edges
-class DyGraph {
-    constructor() {
-        this.nodeAttributes = new Object();
-        this.edgeAttributes = new Object();
-        this.nodes = new Map();     // Store nodes using a Map with the node ID as the key
-        this.edges = new Set();     // Store edges as a Set of pairs of node IDs
-        addDefaultNodeAttributes();
-        addDefaultEdgeAttributes();
-    }
+export class DyGraph {
     addDefaultNodeAttributes(){
-        this.nodeAttributes['apperance']=new Map();
+        this.nodeAttributes['appearance']=new Map();
         this.nodeAttributes['label']=new Map();
         this.nodeAttributes['nodePosition']=new Map();
         this.nodeAttributes['color']=new Map();
     }
     addDefaultEdgeAttributes(){
-        this.edgeAttributes['apperance']=new Map();
+        this.edgeAttributes['appearance']=new Map();
         this.nodeAttributes['color']=new Map();
         this.nodeAttributes['strength']=new Map();
         
     }
+    constructor() {
+
+        this.nodeAttributes = new Object();
+        this.edgeAttributes = new Object();
+        this.nodes = new Map();     // Store nodes using a Map with the node ID as the key
+        this.edges = new Set();     // Store edges as a Set of pairs of node IDs
+        this.addDefaultNodeAttributes();
+        this.addDefaultEdgeAttributes();
+    }
+
     addNodeAttribute(attributeName){
         this.nodeAttributes[attributeName]=new Map();
         return this.nodeAttributes[attributeName]
@@ -106,17 +113,19 @@ class DyGraph {
 }
 
 // Example Usage
-const graph = new DyGraph();
+// const graph = new DyGraph();
 
-// Adding nodes
-graph.addNode(1, 'Node A');
-graph.addNode(2, 'Node B');
-graph.addNode(3, 'Node C');
+// // Adding nodes
+// graph.addNode(1, 'Node A');
+// graph.addNode(2, 'Node B');
+// graph.addNode(3, 'Node C');
 
-// Adding edges
-graph.addEdge(1, 2);
-graph.addEdge(2, 3);
-graph.addEdge(1, 3);
+// // Adding edges
+// graph.addEdge(1, 2);
+// graph.addEdge(2, 3);
+// graph.addEdge(1, 3);
 
-// Display the graph
-graph.displayGraph();
+// // Display the graph
+// graph.displayGraph();
+
+// export default {DyGraph, Node, Edge}
