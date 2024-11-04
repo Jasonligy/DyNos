@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import readFile from './src/samples/VanDeBunt.js';
+import generateCube from './src/generateCube.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -23,6 +24,11 @@ app.get('/tt', (req, res) => {
     console.log('test')
     // res.sendFile(path.join(__dirname, 'index.html'));
   });
+app.get('/check', (req, res) => {
+  generateCube();
+  console.log('test')
+  // res.sendFile(path.join(__dirname, 'index.html'));
+});
 // Example API endpoint
 app.get('/api/data', (req, res) => {
   res.json({ message: 'Hello from Node.js!' });

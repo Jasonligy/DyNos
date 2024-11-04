@@ -40,8 +40,9 @@ export class TimeSpaceCube{
     addMirrorLine(nodes){
         for(const [id,node] of nodes.entries()){
             // appears is a list, ststing the appeared slots for the node
-            const appears=this.dyGraph.nodeAttributea['appearance'].get(node)
-            const intervals=this.dyGraph.nodeAttributea['nodePosition'].get(node);
+            const appears=this.dyGraph.nodeAttributes['appearance'].get(node.id)
+            const intervals=this.dyGraph.nodeAttributes['nodePosition'].get(node.id);
+            console.log(typeof appears)
             for(const appearSlot of appears){
                 let line=new MirrorLine(node,appearSlot);
                 //biuld trajectory using mirrorLine, creating bends in the mirrorlines
@@ -60,6 +61,7 @@ export class TimeSpaceCube{
                     }
 
                 }
+                this.nodeMirrorMap.set(node, line);
             }
 
         }
@@ -69,15 +71,16 @@ export class TimeSpaceCube{
         //here edges is a list
         for(const edge of edges){
             // appears is a list, ststing the appeared slots for the node
-            const appears=this.dyGraph.edgeAttributea['appearance'].get(node)
+            const appears=this.dyGraph.edgeAttributea['appearance'].get(edge)
             // const intervals=this.dyGraph.nodeAttributea['nodePosition'].get(node);
             for(const appearSlot of appears){
                 const connection = new MirrorConeection(edge,appearSlot);
                 //need cautious and update later, now it is pasuodocode
-                const source=edge[0];
-                const target=edge[1];
+                const source=edge.sourceNode;
+                const target=edge.targetNode;
                 connection.addSource(source);
                 connection.addTarget(target);
+                this.edgeMirrorMap.set(edge,connection);
 
             }
 

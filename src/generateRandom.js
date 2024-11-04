@@ -11,7 +11,7 @@ export default function generateGraph(){
             p[j]=Math.random() * 2 - 1;
         }
         const block=graph.createIntervalBlock(0,10,[p[0],p[1]],[p[2],p[3]]);
-        graph.nodeAttributes['nodePosition'].set(i,block);
+        graph.nodeAttributes['nodePosition'].set(i,[block]);
     }
     let i=0;
     while(i<15){
@@ -27,6 +27,7 @@ export default function generateGraph(){
                 const target=graph.nodes.get(t);
                 const edge =new Edge(source,target);
                 graph.edges.add(edge);  // Add edge if not present
+                graph.edgeAttributes['appearance'].set(edge,[0,10])
                 i++;                    // Increment only when an edge is added
             }
         }
