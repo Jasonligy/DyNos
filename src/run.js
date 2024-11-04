@@ -1,4 +1,5 @@
 import generateGraph from "./generateRandom.js";
+// import mat4  from 'gl-matrix';
 const canvas = document.getElementById('glCanvas');
 const gl = canvas.getContext('webgl');
 
@@ -71,7 +72,9 @@ function getNodeEdge(graph, timeframe){
 
     let nodelink=[];
     for(const edge of edges){
-        const [first,second] = edge.split('-').map(v=>parseInt(v));
+        // const [first,second] = edge.split('-').map(v=>parseInt(v));
+        const first = parseInt(edge.sourceNode.id);
+        const second = parseInt(edge.targetNode.id);
         // console.log(currentPosition);
         // const lineSegment=currentPosition.get(first).concat(currentPosition.get(second))
         // nodelink.concat(lineSegment);

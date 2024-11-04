@@ -1,4 +1,5 @@
 import {DyGraph, Node, Edge} from "./dygraph/Dygraph.js"
+// import mat4  from 'gl-matrix';
 export default function generateGraph(){
     let graph= new DyGraph();
     for(let i=0;i<10;i++){
@@ -18,10 +19,13 @@ export default function generateGraph(){
         const t = Math.floor(Math.random() * 10);
         if (s !== t) {
             // Create a string representation of the edge in sorted order
-            const edge = s < t ? `${s}-${t}` : `${t}-${s}`;
-
+            // const edge = graph.edges;
+            const checkEdge= new Set([...graph.edges].filter(edge => edge.checkConnection(s,t)));
             // Check for duplicate
-            if (!graph.edges.has(edge)) {
+            if (checkEdge.size==0) {
+                const source=graph.nodes.get(s);
+                const target=graph.nodes.get(t);
+                const edge =new Edge(source,target);
                 graph.edges.add(edge);  // Add edge if not present
                 i++;                    // Increment only when an edge is added
             }

@@ -1,14 +1,28 @@
 // Class representing a Node
 export class Node {
     constructor(id, value = null) {
-        this.id = id;      // Unique identifier for the node
+        this.id = id;      // Unique identifier for the node, default string type
         
     }
 }
 export class Edge {
-    constructor(sourceID,targetID, value = null) {
-        this.nodePair=new Set([sourceID,targetID])
+    
+    constructor(sourceNode,targetNode, value = null) {
+        this.sourceNode=sourceNode;
+        this.targetNode=targetNode;
     }
+    checkConnection(node1,node2){
+        if(node1 instanceof Node && node2 instanceof Node){
+            return (this.sourceNode==node1&&this.targetNode==node2)||(this.sourceNode==node2&&this.targetNode==node1);
+        }
+        else{
+            return (node1==this.sourceNode.id && node2==this.targetNode.id) || (node2==this.sourceNode.id && node1==this.targetNode.id);
+
+        }
+       
+        
+        }
+
 }
 
 // Class representing a Graph with Nodes and Edges
@@ -85,8 +99,8 @@ export class DyGraph {
     // Add an edge between two nodes (by their IDs)
     addEdge(nodeId1, nodeId2) {
         if (this.nodes.has(nodeId1) && this.nodes.has(nodeId2)) {
-            const edge = [nodeId1, nodeId2].sort();  // Sort to avoid duplicate edges (A->B, B->A)
-            this.edges.add(edge.join('-')); // Store edge as a string "nodeId1-nodeId2"
+            const edge = new Edge(this.nodes.get(nodeId1),this.nodes.get(nodeId2));  // Sort to avoid duplicate edges (A->B, B->A)
+            this.edges.add(edge); // Store edge as a string "nodeId1-nodeId2"
         } else {
             console.log(`One or both nodes do not exist: ${nodeId1}, ${nodeId2}`);
         }

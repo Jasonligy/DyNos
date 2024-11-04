@@ -66,12 +66,19 @@ export class TimeSpaceCube{
 
     }
     addMirrorConnection(edges){
-        for(const [id,node] of nodes.entries()){
+        //here edges is a list
+        for(const edge of edges){
             // appears is a list, ststing the appeared slots for the node
             const appears=this.dyGraph.edgeAttributea['appearance'].get(node)
-            const intervals=this.dyGraph.nodeAttributea['nodePosition'].get(node);
+            // const intervals=this.dyGraph.nodeAttributea['nodePosition'].get(node);
             for(const appearSlot of appears){
-               
+                const connection = new MirrorConeection(edge,appearSlot);
+                //need cautious and update later, now it is pasuodocode
+                const source=edge[0];
+                const target=edge[1];
+                connection.addSource(source);
+                connection.addTarget(target);
+
             }
 
         }
