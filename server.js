@@ -25,7 +25,7 @@ app.get('/tt', (req, res) => {
     // res.sendFile(path.join(__dirname, 'index.html'));
   });
 app.get('/check', (req, res) => {
-  generateCube();
+  // generateCube();
   console.log('test')
   // res.sendFile(path.join(__dirname, 'index.html'));
 });

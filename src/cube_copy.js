@@ -121,16 +121,6 @@ const edgeColors = new Float32Array([
     0.0, 1.0, 0.0, 1.0, // Vertex 2 of edge
     0.0, 1.0, 0.0, 1.0, // Vertex 1 of edge
     0.0, 1.0, 0.0, 1.0, // Vertex 2 of edge
-
-    0.0, 1.0, 0.0, 1.0, // Vertex 1 of edge
-    0.0, 1.0, 0.0, 1.0, // Vertex 2 of edge
-    0.0, 1.0, 0.0, 1.0, // Vertex 1 of edge
-    0.0, 1.0, 0.0, 1.0, // Vertex 2 of edge
-
-    0.0, 1.0, 0.0, 1.0, // Vertex 1 of edge
-    0.0, 1.0, 0.0, 1.0, // Vertex 2 of edge
-    0.0, 1.0, 0.0, 1.0, // Vertex 1 of edge
-    0.0, 1.0, 0.0, 1.0, // Vertex 2 of edge
 ]);
 
 
@@ -200,26 +190,25 @@ gl.drawElements(gl.LINES, edgeIndices.length, gl.UNSIGNED_SHORT, 0);
 
 
 // Define vertices for (n+1) points, where each pair defines an edge
-// let edge = new Float32Array([
-//     // Define vertices sequentially; add more as needed
-//     -0.5, 2,  -1,   // Vertex 1
-//      -0.3, 1.5,  -1, // Vertex 2
-//      -0.7, 1.2,  -1, // Vertex 3
-//      -0.6, 0.3,  -0.8,  // Vertex 4 (for example, a 3-edge shape)
+let edge = new Float32Array([
+    // Define vertices sequentially; add more as needed
+    -0.5, 2,  -0.5,   // Vertex 1
+     -0.3, 1.5,  -0.5, // Vertex 2
+     -0.7, 1.2,  -0.3, // Vertex 3
+     -0.6, 0.3,  -0.8,  // Vertex 4 (for example, a 3-edge shape)
 
-//      0.5, 1,  -0.5,   // Vertex 1
-//      0.3, 1.5,  -0.5, // Vertex 2
-//      0.7, 1.2,  -0.3, // Vertex 3
-//      0.6, 0.3,  -0.8,  // Vertex 4 (for example, a 3-edge shape)
-//     // Add more vertices here if needed
-// ]);
-// let indexs=[];
+     0.5, 1,  -0.5,   // Vertex 1
+     0.3, 1.5,  -0.5, // Vertex 2
+     0.7, 1.2,  -0.3, // Vertex 3
+     0.6, 0.3,  -0.8,  // Vertex 4 (for example, a 3-edge shape)
+    // Add more vertices here if needed
+]);
+let indexs=[];
 
-// console.log(edge)
-// console.log(edge)
-let [edge,indexs]=generateCube()
-edge=new Float32Array(edge)
-console.log(edge.length)
+
+
+// [edge,indexs]=generateCube()
+
 
 
 
@@ -259,20 +248,16 @@ gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
 
 // Draw lines between each consecutive vertex pair
 
-// gl.drawArrays(gl.LINE_STRIP, 0,4); // n+1 vertices -> n edges
-// gl.drawArrays(gl.LINE_STRIP, 4, 4); // n+1 vertices -> n edges
+gl.drawArrays(gl.LINE_STRIP, 0, 4); // n+1 vertices -> n edges
+gl.drawArrays(gl.LINE_STRIP, 4, 4); // n+1 vertices -> n edges
 
 
 
-//注意color要匹配顶点个数
-let index=0;
-for(let i=0;i<indexs.length;i++){
-    // if(i<6){
-    //     index+=indexs[i];
-    //     continue
-    // }
-    console.log(indexs[i])
-    gl.drawArrays(gl.LINE_STRIP, index, 2); // n+1 vertices -> n edges
-    index+=indexs[i];
-}
-// const colorLocation = gl.getUniformLocation(shaderProgram, 'uColor');
+
+// let index=0;
+// for(let i=0;i<indexs.length;i++){
+
+//     gl.drawArrays(gl.LINE_STRIP, index, index+indexs[i]); // n+1 vertices -> n edges
+//     index+=index+indexs[i];
+// }
+// // const colorLocation = gl.getUniformLocation(shaderProgram, 'uColor');

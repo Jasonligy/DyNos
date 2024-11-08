@@ -61,7 +61,11 @@ export class TimeSpaceCube{
                     }
 
                 }
-                this.nodeMirrorMap.set(node, line);
+                if(!this.nodeMirrorMap.has(node)){
+                    this.nodeMirrorMap.set(node, [line]);}
+                else{
+                    this.nodeMirrorMap.get(node).push(line);
+                }
             }
 
         }
@@ -87,4 +91,46 @@ export class TimeSpaceCube{
         }
         
     }
+    outputMatrix(){
+        let lines=[];
+        let mirrorIndex=[];
+        for(const [id,nodeLines] of this.nodeMirrorMap.entries()){
+            for(const nodeline of nodeLines){
+                let coordinateList=nodeline.coordinateList;
+                const index=coordinateList.length;
+                mirrorIndex.push(index);
+                lines.push(...this.convertCoordinate(coordinateList))
+            }
+        }
+        return [lines,mirrorIndex];
+    }
+    //coordinates is a 2D array from the mirror, store the 3D coordinates of each node
+    //may adjust the coordinate in the future
+    convertCoordinate(coordinates){
+        let convertedCoordinates=[]
+        for(let coordinate of coordinates){
+            const convertedCoordinate=this.fmap3DCoordinates(coordinate,[-1,-1,0],[1,1,10]);
+            
+            convertedCoordinates.push(...convertedCoordinate);
+        }
+        // console.log(convertedCoordinates)
+        return convertedCoordinates;
+    }
+    fmap3DCoordinates(coord,  minVals, maxVals) {
+        const [x, y, z] = coord;
+    
+        // Normalize each axis to 0-1 range
+        const normalizedX = (x - minVals[0]) / (maxVals[0] - minVals[0]);
+        const normalizedY = (y - minVals[1]) / (maxVals[1] - minVals[1]);
+        const normalizedZ = (z - minVals[2]) / (maxVals[2] - minVals[2]);
+    
+        // Map to the target ranges
+        const mappedX = normalizedX * 2 -1;
+        const mappedY = normalizedY * 2 -1;
+        const mappedZ = normalizedZ * 3 -1;
+    
+        return [mappedX, mappedY, mappedZ];
+    }
+    
+
 }
