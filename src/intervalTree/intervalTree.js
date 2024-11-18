@@ -96,8 +96,11 @@
       }
   
       // Linear interpolation formula
-      const y = interval.valueStart + ((x - interval.start) / (interval.end - interval.start)) * (interval.valueEnd - interval.valueStart);
-      return y;
+      let y =[0,0]
+      y[0] = interval.valueStart[0] + ((x - interval.start) / (interval.end - interval.start)) * (interval.valueEnd[0] - interval.valueStart[0]);
+      y[1] = interval.valueStart[1] + ((x - interval.start) / (interval.end - interval.start)) * (interval.valueEnd[1] - interval.valueStart[1]);
+
+       return y;
     }
   
     // Query intervals that overlap with a given point (x)
@@ -122,6 +125,79 @@
   
       return results;
     }
+    delete(interval) {
+        this.root = this._deleteNode(this.root, interval);
+    }
+    
+    _deleteNode(node, interval) {
+        if (!node) return null;
+    
+        // Locate the node to delete
+        if (interval.start < node.start) {
+            node.left = this._deleteNode(node.left, interval);
+        } else if (interval.start > node.start) {
+            node.right = this._deleteNode(node.right, interval);
+        } else if (interval.end === node.end && interval.valueStart === node.valueStart && interval.valueEnd === node.valueEnd) {
+            // Node found and matches the interval
+    
+            // Case 1: Node has no children
+            if (!node.left && !node.right) {
+                return null;
+            }
+    
+            // Case 2: Node has one child
+            if (!node.left) return node.right;
+            if (!node.right) return node.left;
+    
+            // Case 3: Node has two children
+            let minLargerNode = this._getMin(node.right);
+            node.start = minLargerNode.start;
+            node.end = minLargerNode.end;
+            node.valueStart = minLargerNode.valueStart;
+            node.valueEnd = minLargerNode.valueEnd;
+            node.right = this._deleteNode(node.right, minLargerNode);
+        } else {
+            node.right = this._deleteNode(node.right, interval);
+        }
+    
+        // Update maxEnd after deletion
+        node.maxEnd = Math.max(
+            node.end,
+            node.left ? node.left.maxEnd : -Infinity,
+            node.right ? node.right.maxEnd : -Infinity
+        );
+    
+        return node;
+    }
+    
+    _getMin(node) {
+        while (node.left) {
+            node = node.left;
+        }
+        return node;
+    }
+
+    getAllIntervals(root) {
+        let intervals = [];
+        this._inOrderTraversal(root, intervals);
+        return intervals;
+    }
+    
+    // Helper function for in-order traversal
+    _inOrderTraversal(node, intervals) {
+        if (!node) return;
+    
+        // Traverse left subtree
+        this._inOrderTraversal(node.left, intervals);
+        
+        // Visit current node
+        intervals.push(node);
+        
+        // Traverse right subtree
+        this._inOrderTraversal(node.right, intervals);
+    }
+    
+    
   }
 
 

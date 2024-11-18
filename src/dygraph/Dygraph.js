@@ -1,6 +1,7 @@
 // Class representing a Node
+import {Interval,IntervalTree}from "../intervalTree/intervalTree.js"
 export class Node {
-    constructor(id, value = null) {
+    constructor(id=null, value = null) {
         this.id = id;      // Unique identifier for the node, default string type
         
     }
@@ -58,20 +59,16 @@ export class DyGraph {
         return this.edgeAttributes[attributeName]
     }
     createIntervalBlock(leftBound,rightBound,leftValue,rightValue){
-        return {
-            leftBound:leftBound,
-            rightBound:rightBound,
-            leftValue:leftValue,
-            rightValue:rightValue
-        }
+        return new Interval(leftBound,rightBound,leftValue,rightValue)
     }
     addNodeBent(node,timeStamp,coordinate){
         if(!this.nodeAttributes['nodePosition'].has(node)){
             console.log("not assign position to node "+node.id)
             throw new Error('position not exist')
         }
-        intervalList=this.nodeAttributes['nodePosition'].node;
-        const selectedInterval=intervalList.filter(e=>e.leftBound<timeStamp&&e.rightBound>timeStamp);
+        const intervalList=this.nodeAttributes['nodePosition'].node;
+
+        const selectedInterval=intervalList.query(timeStamp);
         if(selectedInterval.length==0){
             console.log('the time is not included in node'+node.id);
             throw new Error('time stamp not contain in node')
@@ -79,9 +76,19 @@ export class DyGraph {
         const interval=selectedInterval[0];
         newLeftInterval=this.createIntervalBlock(interval.leftBound,timeStamp,interval.leftValue,coordinate);
         newRightInterval=this.createIntervalBlock(timeStamp,interval.rightBound,coordinate,interval.leftValue);
-        intervalList.add(newLeftInterval);
-        intervalList.add(newRightInterval);
-        intervalList.sort((a,b)=>a.leftBound-b.leftBound)
+        intervalList.insert(newLeftInterval);
+        intervalList.insert(newRightInterval);
+        // const selectedInterval=intervalList.filter(e=>e.leftBound<timeStamp&&e.rightBound>timeStamp);
+        // if(selectedInterval.length==0){
+        //     console.log('the time is not included in node'+node.id);
+        //     throw new Error('time stamp not contain in node')
+        // }
+        // const interval=selectedInterval[0];
+        // newLeftInterval=this.createIntervalBlock(interval.leftBound,timeStamp,interval.leftValue,coordinate);
+        // newRightInterval=this.createIntervalBlock(timeStamp,interval.rightBound,coordinate,interval.leftValue);
+        // intervalList.add(newLeftInterval);
+        // intervalList.add(newRightInterval);
+        // intervalList.sort((a,b)=>a.leftBound-b.leftBound)
     }
     
 

@@ -1,16 +1,22 @@
+import{Node,Edge}from "../dygraph/Dygraph.js"
 export class MirrorLine{
     constructor(node,appearInterval){
         this.node = node;
         this.interval=appearInterval;
         //the bends of coordinate in the trajectory
         this.coordinateList=[];
+        this.mirrorNodeList=[];
+        //all the node in that trajectory, need implement the correspond to coordinatelist
+        this.nodeList=[];
     }
     addBend(coordinat){
         this.coordinateList.push(coordinat);
+        
+        
     }
 }
 //mirrorConnection only made a reference to the end points and its interval
-export class MirrorConeection{
+export class MirrorConnection{
     constructor(edge,appearInterval){
         this.edge = edge;
         this.interval=appearInterval;
@@ -24,6 +30,10 @@ export class MirrorConeection{
 }
 export class TimeSpaceCube{
     constructor(dyGraph,tau){
+        this.nodes=new Set();
+        this.edges=new Set();
+        this.addDefaultNodeAttributes();
+        this.addDefaultEdgeAttributes();
         this.tau=tau
         this.dyGraph=dyGraph;
         this.nodeMirrorMap=new Map();
@@ -33,6 +43,19 @@ export class TimeSpaceCube{
         const edges=dyGraph.edges;
 
 
+    }
+    addDefaultNodeAttributes(){
+        this.nodeAttributes['appearance']=new Map();
+        this.nodeAttributes['label']=new Map();
+        this.nodeAttributes['nodePosition']=new Map();
+        this.nodeAttributes['color']=new Map();
+        this.nodeAttributes['force']=new Map();
+    }
+    addDefaultEdgeAttributes(){
+        this.edgeAttributes['appearance']=new Map();
+        this.nodeAttributes['color']=new Map();
+        this.nodeAttributes['strength']=new Map();
+        
     }
     updateCube(){
 
@@ -46,19 +69,33 @@ export class TimeSpaceCube{
             for(const appearSlot of appears){
                 let line=new MirrorLine(node,appearSlot);
                 //biuld trajectory using mirrorLine, creating bends in the mirrorlines
-                for(const interval of intervals){
+                for(const interval of intervals.getAllIntervals(intervals.root)){
+                    console.log('checkall')
                     // need to check if the right bound of upper level is equal to the left bound of next level.
                     // convert the time to space, assuming the node position is continous and the appearslot value is equal to the interval bound values
-                    if(appearSlot[0]==interval.leftBound){
-                        line.addBend(interval.leftValue.concat(interval.leftBound*this.tau));
+                    
+                    if(appearSlot[0]==interval.start){
+                        line.addBend(interval.valueStart.concat(interval.start*this.tau));
                     }
-                    if(appearSlot[1]==interval.rightBound){
-                        line.addBend(interval.rightValue.concat(interval.rightBound*this.tau));
+                    if(appearSlot[1]==interval.end){
+                        line.addBend(interval.valueEnd.concat(interval.end*this.tau));
                         break;
                     }
-                    if(appearSlot[1]>interval.rightBound){
-                        line.addBend(interval.rightValue.concat(interval.rightBound*this.tau));
+                    if(appearSlot[1]>interval.end){
+                        line.addBend(interval.valueEnd.concat(interval.end*this.tau));
                     }
+
+
+                    // if(appearSlot[0]==interval.leftBound){
+                    //     line.addBend(interval.leftValue.concat(interval.leftBound*this.tau));
+                    // }
+                    // if(appearSlot[1]==interval.rightBound){
+                    //     line.addBend(interval.rightValue.concat(interval.rightBound*this.tau));
+                    //     break;
+                    // }
+                    // if(appearSlot[1]>interval.rightBound){
+                    //     line.addBend(interval.rightValue.concat(interval.rightBound*this.tau));
+                    // }
 
                 }
                 if(!this.nodeMirrorMap.has(node)){
@@ -70,6 +107,30 @@ export class TimeSpaceCube{
 
         }
 
+    }
+    updateForce(){
+        for(const node of this.nodes){
+            this.nodeAttributes['force'].set(node,[0,0,0]);
+        }
+    }
+    getMirrorNode(){
+        for(const [id,line] of this.nodeMirrorMap.entries()){
+            let prev=null;
+            for(let coordinate of line.coordinateList){
+                let node=new Node();
+                this.nodes.add(node);
+                this.nodeAttributes['nodePosition'].set(node,coordinate);
+                line.nodeList.push(node);
+                if(prev==null){
+                    prev=node;
+                }
+                else{
+                    const edge=new Edge(prev,node);
+                    this.edges.add(edge);
+                    prev=node;
+                }
+            }
+        }
     }
     addMirrorConnection(edges){
         //here edges is a list

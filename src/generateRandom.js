@@ -1,4 +1,5 @@
 import {DyGraph, Node, Edge} from "./dygraph/Dygraph.js"
+import {Interval,IntervalTree}from "./intervalTree/intervalTree.js"
 // import mat4  from 'gl-matrix';
 export default function generateGraph(){
     let graph= new DyGraph();
@@ -11,7 +12,12 @@ export default function generateGraph(){
             p[j]=Math.random() * 2 - 1;
         }
         const block=graph.createIntervalBlock(0,10,[p[0],p[1]],[p[2],p[3]]);
-        graph.nodeAttributes['nodePosition'].set(i,[block]);
+        if(!graph.nodeAttributes['nodePosition'].has(i)){
+            const tree=new IntervalTree();
+            tree.insert(block)
+            graph.nodeAttributes['nodePosition'].set(i,tree);
+        }
+        
     }
     let i=0;
     while(i<15){
@@ -32,6 +38,6 @@ export default function generateGraph(){
             }
         }
     }
-    return graph
+    return graph;
 }
 // export default generateGraph
