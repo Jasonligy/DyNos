@@ -59,19 +59,30 @@ export class TimeStraightning{
             force.set(node,shift);
         }
     }
-    computeStraightningComponent(forces, allBends){
+    computeStraightningComponent(force, allBends){
         const pos=this.cube.nodeAttributes['nodePosition'];
         for(let i=0;i<allBends.length;i++ ){
             for(let j=i+1;i<allBends.length;i++ ){
+                
                 const source=allBends[i];
                 const target=allBends[j];
+                if(!force.has(source)){
+                    force.set(source,[0,0,0])
+                }
+                if(!force.has(target)){
+                    force.set(target,[0,0,0])
+                }
                 const posSource=pos.get(source);
                 const posTarget=pos.get(target);
                 const vector3D=posTarget.map((value,index) =>value-posSource[index])
                 const vector2D=[vector3D[0],vector3D[1],0];
+
                 //need implement the filter when the vector3D is almost zero
+                
                 const angle=Math.max(betweenAngle(vector2D,vector3D),0.01);
-                const shift=
+                const shift=vector2D.map((value,index)=>value*(Math.PI/2-angle)/angle);
+                force.set(source,force.get(source).map((value,index)=>value+shift[index]));
+                force.set(target,force.get(target).map((value,index)=>value-shift[index]));
             }
         }
     }

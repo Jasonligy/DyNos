@@ -20,3 +20,22 @@ export function avgVectors(vector1,vector2){
 export function magnitude(vector){
     return Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
 }
+export function getIntersection(vector1,vector2){
+    if(vector1.length!=2 &&vector2.length!=2){
+        throw new Error("Not a valid interval")
+    }
+    const [start1, end1] = vector1;
+    const [start2, end2] = vector2;
+    
+    // Calculate the overlapping range
+    const start = Math.max(start1, start2); // Higher start
+    const end = Math.min(end1, end2);       // Lower end
+    
+    // Check if there is an actual overlap
+    if (start < end) {
+        return [start, end]; // Overlapping interval
+    } else {
+        return null; // No overlap
+    }
+
+}
