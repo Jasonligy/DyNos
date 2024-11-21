@@ -109,22 +109,30 @@ export class DyGraph {
     }
 
     // Add an edge between two nodes (by their IDs),attributes are str
-    addEdge(nodeId1, nodeId2) {
-        if(nodeId1.constructor!=nodeId2.constructor){
+    addEdge(node1, node2) {
+        if(node1.constructor!=node2.constructor){
             throw new Error("the 2 node type is not the same")
         }
-        if(typeof nodeId1=="string"){
-            if (this.nodes.has(nodeId1) && this.nodes.has(nodeId2)) {
-                const edge = new Edge(this.nodes.get(nodeId1),this.nodes.get(nodeId2));  // Sort to avoid duplicate edges (A->B, B->A)
+        if(typeof node1=="string"){
+            if (this.nodes.has(node1) && this.nodes.has(node2)) {
+                const edge = new Edge(this.nodes.get(node1),this.nodes.get(node2));  // Sort to avoid duplicate edges (A->B, B->A)
                 this.edges.add(edge); // Store edge as a string "nodeId1-nodeId2"
-                const key=this.createKey(nodeId1,nodeId2);
+                const key=this.createKey(node1,node2);
                 this.nodeEdgeMap.set(key,edge);
+                return edge
             } else {
-                throw new Error(`One or both nodes do not exist: ${nodeId1}, ${nodeId2}`);
+                throw new Error(`One or both nodes do not exist: ${node1}, ${node2}`);
             }
         }
-        else if(nodeId1 instanceof Node){
-            
+        else if(node1 instanceof Node){
+            if (this.nodes.has(node1.id) && this.nodes.has(node2.id)) {
+                const edge = new Edge(node1,node2);  // Sort to avoid duplicate edges (A->B, B->A)
+                this.edges.add(edge); // Store edge as a string "nodeId1-nodeId2"
+                const key=this.createKey(node1.id,node2.id);
+                this.nodeEdgeMap.set(key,edge);
+            } else {
+                throw new Error(`One or both nodes do not exist: ${node1}, ${node2}`);
+            }
         }
     }
 

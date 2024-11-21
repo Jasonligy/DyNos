@@ -1,3 +1,8 @@
+ /*
+TODO: adapt the interval tree to other value type including the boolean
+
+ */
+ 
  export class Interval {
     constructor(start, end, valueStart=null, valueEnd=null) {
       this.start = start;         // The start of the interval
@@ -11,9 +16,9 @@
   }
   
   export class IntervalTree {
-    constructor(defaultInterval=null) {
+    constructor(defaultValue=null) {
       this.root = null;
-      this.defaultValue=defaultInterval;
+      this.defaultValue=defaultValue;
     }
   
     // Rotate the tree left

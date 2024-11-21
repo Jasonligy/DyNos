@@ -2,6 +2,7 @@ import fs from 'fs';
 import readline from 'readline';
 import path from 'path';
 import { DyGraph,Node,Edge } from '../dygraph/Dygraph';
+import { IntervalTree,Interval } from '../intervalTree/intervalTree';
 // const fs = require('fs');
 // const readline = require('readline');
 function readFile(){
@@ -30,9 +31,10 @@ function readFile(){
                     fileData.students.push(line);
                 });
             }
+
             else if(file.startsWith("VRND32T") && file.endsWith(".DAT")){
                 const period=file[7];
-                fileData.relations=new Map();
+                // fileData.relations=new Map();
                 const num= file.replace("VRND32T","").replace(".DAT","");
                 let values = [];
                 rl.on('line', (line) => {
@@ -52,7 +54,7 @@ function readFile(){
                         console.log(fileData.relations)
                     }
                 });
-                fileData.relations.set(period,values);
+                // fileData.relations.set(period,values);
                
             }
 
@@ -66,8 +68,31 @@ function readFile(){
 export function getDyGraph(fileData){
     const dyGraph=new DyGraph();
     for(let i=0;i<fileData.students.length;i++){
-        dyGraph.addNode(i);
+        const node=dyGraph.addNode(i);
+        dyGraph.nodeAttributes['nodePosition'].set(node,new IntervalTree([0,0]));
+        dyGraph.nodeAttributes['appearance'].set(node,new IntervalTree(true))
+        //the interval from origin code 
+        dyGraph.nodeAttributes['appearance'].get(node).insert(new Interval(-1,7))
 
+    }
+    for(const [id,value] of fileData.relations.entries()){
+        for(let i=0;i<7;i++){
+            for(let j=i+1;j<value[i].length;j++){
+                // node strength is not applicable
+                // const strength
+                if((value[i][j]=='3'||value[i][j]=='4')&&(value[j][i]=='3'||value[j][i]=='4')){
+                    const node1=dyGraph.nodes.get(i);
+                    const node2=dyGraph.nodes.get(j);
+                    if(!dyGraph.queryEdge(node1,node2)){
+                        const edge=dyGraph.addEdge(node1,node2);
+                        dyGraph.edgeAttributes['appearance'].set(edge,new IntervalTree(true))
+                        
+                    }
+                    const edge=dyGraph.queryEdge(node1,node2);
+                    dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(id-0.5.id+0.5))
+                }
+            }
+        }
     }
 
 }
