@@ -1,5 +1,5 @@
  export class Interval {
-    constructor(start, end, valueStart, valueEnd) {
+    constructor(start, end, valueStart=null, valueEnd=null) {
       this.start = start;         // The start of the interval
       this.end = end;             // The end of the interval
       this.valueStart = valueStart; // The value at the start of the interval
@@ -11,8 +11,9 @@
   }
   
   export class IntervalTree {
-    constructor() {
+    constructor(defaultInterval=null) {
       this.root = null;
+      this.defaultValue=defaultInterval;
     }
   
     // Rotate the tree left

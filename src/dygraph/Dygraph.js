@@ -40,16 +40,20 @@ export class DyGraph {
         this.nodeAttributes['strength']=new Map();
         
     }
+
     constructor() {
 
         this.nodeAttributes = new Object();
         this.edgeAttributes = new Object();
         this.nodes = new Map();     // Store nodes using a Map with the node ID as the key
         this.edges = new Set();     // Store edges as a Set of pairs of node IDs
+        this.nodeEdgeMap=new Map();
         this.addDefaultNodeAttributes();
         this.addDefaultEdgeAttributes();
     }
-
+    createKey(value1, value2) {
+        return JSON.stringify([value1, value2].sort()); // Sort to ignore order
+    }
     addNodeAttribute(attributeName){
         this.nodeAttributes[attributeName]=new Map();
         return this.nodeAttributes[attributeName]
@@ -101,21 +105,45 @@ export class DyGraph {
         } else {
             console.log(`Node with id ${id} already exists.`);
         }
+        return this.nodes.get(id);
     }
 
-    // Add an edge between two nodes (by their IDs)
+    // Add an edge between two nodes (by their IDs),attributes are str
     addEdge(nodeId1, nodeId2) {
-        if (this.nodes.has(nodeId1) && this.nodes.has(nodeId2)) {
-            const edge = new Edge(this.nodes.get(nodeId1),this.nodes.get(nodeId2));  // Sort to avoid duplicate edges (A->B, B->A)
-            this.edges.add(edge); // Store edge as a string "nodeId1-nodeId2"
-        } else {
-            console.log(`One or both nodes do not exist: ${nodeId1}, ${nodeId2}`);
+        if(nodeId1.constructor!=nodeId2.constructor){
+            throw new Error("the 2 node type is not the same")
+        }
+        if(typeof nodeId1=="string"){
+            if (this.nodes.has(nodeId1) && this.nodes.has(nodeId2)) {
+                const edge = new Edge(this.nodes.get(nodeId1),this.nodes.get(nodeId2));  // Sort to avoid duplicate edges (A->B, B->A)
+                this.edges.add(edge); // Store edge as a string "nodeId1-nodeId2"
+                const key=this.createKey(nodeId1,nodeId2);
+                this.nodeEdgeMap.set(key,edge);
+            } else {
+                throw new Error(`One or both nodes do not exist: ${nodeId1}, ${nodeId2}`);
+            }
+        }
+        else if(nodeId1 instanceof Node){
+            
         }
     }
 
     // Get all edges of the graph
     getEdges() {
         return [...this.edges].map(edgeStr => edgeStr.split('-'));
+    }
+    queryEdge(node1,node2){
+        if(node1.constructor!=node2.constructor){
+            throw new Error("the 2 node type is not the same")
+        }
+        
+        if(typeof node1 == "string"){
+            return this.nodeEdgeMap.has(node1,node2);
+        }
+        if(node1 instanceof Node){
+            return this.nodeEdgeMap.has(this.createKey(node1.id.node2.id));
+        }
+
     }
   
 

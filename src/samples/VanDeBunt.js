@@ -1,12 +1,14 @@
 import fs from 'fs';
 import readline from 'readline';
 import path from 'path';
+import { DyGraph,Node,Edge } from '../dygraph/Dygraph';
 // const fs = require('fs');
 // const readline = require('readline');
 function readFile(){
     console.log('first')
     const folderPath = 'data/van_De_Bunt/van_De_Bunt'; 
     const fileData=new Object();
+    fileData.relations=new Map();
     fs.readdir(folderPath, (err, files) => {
 
         files.forEach(file=>{
@@ -29,6 +31,7 @@ function readFile(){
                 });
             }
             else if(file.startsWith("VRND32T") && file.endsWith(".DAT")){
+                const period=file[7];
                 fileData.relations=new Map();
                 const num= file.replace("VRND32T","").replace(".DAT","");
                 let values = [];
@@ -49,16 +52,25 @@ function readFile(){
                         console.log(fileData.relations)
                     }
                 });
+                fileData.relations.set(period,values);
                
             }
 
         })
+        return fileData
 
     })
 }
 
-export default readFile
 
+export function getDyGraph(fileData){
+    const dyGraph=new DyGraph();
+    for(let i=0;i<fileData.students.length;i++){
+        dyGraph.addNode(i);
+
+    }
+
+}
 // // Create a readable stream from the file
 // const fileStream = fs.createReadStream(filePath);
 
