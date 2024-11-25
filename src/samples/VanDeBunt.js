@@ -1,11 +1,14 @@
 import fs from 'fs';
 import readline from 'readline';
 import path from 'path';
-import { DyGraph,Node,Edge } from '../dygraph/Dygraph';
-import { IntervalTree,Interval } from '../intervalTree/intervalTree';
+import { DyGraph,Node,Edge } from '../dygraph/Dygraph.js';
+import { IntervalTree,Interval } from '../intervalTree/intervalTree.js';
 // const fs = require('fs');
 // const readline = require('readline');
-function readFile(){
+
+
+/*
+export function readFile(){
     console.log('first')
     const folderPath = 'data/van_De_Bunt/van_De_Bunt'; 
     const fileData=new Object();
@@ -63,6 +66,70 @@ function readFile(){
 
     })
 }
+*/
+
+
+export async function readFile() {
+    console.log('first');
+    const folderPath = 'data/van_De_Bunt/van_De_Bunt';
+    const fileData = {
+        students: [],
+        relations: new Map(),
+    };
+
+    // Wrap fs.readdir in a Promise
+    const files = await new Promise((resolve, reject) => {
+        fs.readdir(folderPath, (err, files) => {
+            if (err) return reject(err);
+            resolve(files);
+        });
+    });
+
+    // Process all files with Promises
+    await Promise.all(
+        files.map((file) => {
+            const filePath = path.join(folderPath, file);
+
+            return new Promise((resolve, reject) => {
+                const fileStream = fs.createReadStream(filePath);
+                const rl = readline.createInterface({
+                    input: fileStream,
+                    crlfDelay: Infinity,
+                });
+
+                if (file === 'VARS.DAT') {
+                    rl.on('line', (line) => {
+                        fileData.students.push(line);
+                    });
+
+                    rl.on('close', resolve);
+                    rl.on('error', reject);
+                } else if (file.startsWith('VRND32T') && file.endsWith('.DAT')) {
+                    const num = file.replace('VRND32T', '').replace('.DAT', '');
+                    const values = [];
+
+                    rl.on('line', (line) => {
+                        const relation = line.replace(/\s+/g, '').split('');
+                        const numerical = relation.map((item) => parseInt(item));
+                        values.push(numerical);
+                    });
+
+                    rl.on('close', () => {
+                        fileData.relations.set(num, values);
+                        resolve();
+                    });
+
+                    rl.on('error', reject);
+                } else {
+                    // Skip irrelevant files
+                    resolve();
+                }
+            });
+        })
+    );
+
+    return fileData;
+}
 
 
 export function getDyGraph(fileData){
@@ -94,7 +161,16 @@ export function getDyGraph(fileData){
             }
         }
     }
+    scatterNode(dyGraph,5);
+    return dyGraph
+    // console.log(fileData.students)
 
+}
+function scatterNode(graph,desired){
+    const pos=graph.nodeAttributes['nodePosition'];
+    for(const[id,node] of graph.nodes.entries()){
+        pos.set(node,new IntervalTree([Math.random()*desired,Math.random()*desired]));
+    }
 }
 // // Create a readable stream from the file
 // const fileStream = fs.createReadStream(filePath);

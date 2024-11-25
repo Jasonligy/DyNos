@@ -1,10 +1,11 @@
 import express from 'express';
 import path from 'path';
-import readFile from './src/samples/VanDeBunt.js';
+import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
 import {IntervalTree,Interval} from './src/intervalTree/intervalTree.js';
 import generateCube from './src/generateCube.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { DynosRunner } from './src/runDyNos.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,10 +22,32 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 app.get('/tt', (req, res) => {
-    readFile();  
-    console.log('test')
+
+  let graph;
+  readFile()
+  .then((fileData) => {
+      graph=getDyGraph(fileData); // Pass the object to the new function
+      // console.log(graph);
+      const runner=new DynosRunner(graph,100,5);
+      runner.iterate();
+  })
+ 
+    // const data=readFile();  
+    // console.log(data.relations)
+    // getDyGraph(data);
+    // console.log('test')
     // res.sendFile(path.join(__dirname, 'index.html'));
   });
+
+
+
+
+
+
+
+
+
+
 app.get('/check', (req, res) => {
   // generateCube();
   console.log('test')

@@ -96,42 +96,18 @@ export class Interval {
     }
   
     // Interpolation function to get value within an interval
-    // interpolate(interval, x) {
-    //   if (x < interval.start || x > interval.end) {
-    //     throw new Error('x is out of the interval bounds');
-    //   }
-  
-    //   // Linear interpolation formula
-    //   let y =[0,0]
-    //   y[0] = interval.valueStart[0] + ((x - interval.start) / (interval.end - interval.start)) * (interval.valueEnd[0] - interval.valueStart[0]);
-    //   y[1] = interval.valueStart[1] + ((x - interval.start) / (interval.end - interval.start)) * (interval.valueEnd[1] - interval.valueStart[1]);
-
-    //    return y;
-    // }
-
     interpolate(interval, x) {
-        if (x < interval.start || x > interval.end) {
-            throw new Error('x is out of the interval bounds');
-        }
-    
-        // Ensure valueStart and valueEnd are arrays
-        const valueStart = Array.isArray(interval.valueStart) ? interval.valueStart : [interval.valueStart];
-        const valueEnd = Array.isArray(interval.valueEnd) ? interval.valueEnd : [interval.valueEnd];
-    
-        // Ensure both arrays are the same length
-        if (valueStart.length !== valueEnd.length) {
-            throw new Error('valueStart and valueEnd must have the same length');
-        }
-    
-        // Perform linear interpolation for each dimension
-        const y = valueStart.map((start, i) => {
-            const end = valueEnd[i];
-            return start + ((x - interval.start) / (interval.end - interval.start)) * (end - start);
-        });
-    
-        return y.length === 1 ? y[0] : y; // Return a single value if 1D, or array for multi-dimensions
+      if (x < interval.start || x > interval.end) {
+        throw new Error('x is out of the interval bounds');
+      }
+  
+      // Linear interpolation formula
+      let y =[0,0]
+      y[0] = interval.valueStart[0] + ((x - interval.start) / (interval.end - interval.start)) * (interval.valueEnd[0] - interval.valueStart[0]);
+      y[1] = interval.valueStart[1] + ((x - interval.start) / (interval.end - interval.start)) * (interval.valueEnd[1] - interval.valueStart[1]);
+
+       return y;
     }
-    
   
     // Query intervals that overlap with a given point (x)
     query(root, x) {
@@ -152,20 +128,8 @@ export class Interval {
       if (root.right && x >= root.start) {
         results = results.concat(this.query(root.right, x));
       }
-    //   if(results.length==0){
-    //     return this.defaultValue
-    //   }
+  
       return results;
-    }
-    valueAt(x){
-        const results=this.query(this.root,x);
-        console.log(results)
-        if(results.length==0){
-            return this.defaultValue;
-        }
-        else{
-            return results[0].interpolatedValue;
-        }
     }
     delete(interval) {
         this.root = this._deleteNode(this.root, interval);
@@ -245,38 +209,20 @@ export class Interval {
 
 
   
-  // Example usage
-  const tree = new IntervalTree();
+//   // Example usage
+//   const tree = new IntervalTree();
   
-  // Insert intervals with start, end, and boundary values
-  tree.insert(new Interval(1, 5, 10, 20)); // Interval [1, 5] with values 10 at the start and 20 at the end
-  tree.insert(new Interval(6, 10, 25, 30)); // Interval [6, 10] with values 25 at the start and 30 at the end
+//   // Insert intervals with start, end, and boundary values
+//   tree.insert(new Interval(1, 5, 10, 20)); // Interval [1, 5] with values 10 at the start and 20 at the end
+//   tree.insert(new Interval(6, 10, 25, 30)); // Interval [6, 10] with values 25 at the start and 30 at the end
   
-  // Query for interpolated values
-  const x = 3; // Query point
-  const results = tree.query(tree.root, x);
+//   // Query for interpolated values
+//   const x = 3; // Query point
+//   const results = tree.query(tree.root, x);
   
-  console.log(`Interpolated values at x = ${x}:`);
-  results.forEach(result => {
-    const interpolatedValue = result.interpolatedValue;
-    console.log(`Interval [${result.interval.start}, ${result.interval.end}] has value: ${interpolatedValue}`);
-  });
+//   console.log(`Interpolated values at x = ${x}:`);
+//   results.forEach(result => {
+//     const interpolatedValue = result.interpolatedValue;
+//     console.log(`Interval [${result.interval.start}, ${result.interval.end}] has value: ${interpolatedValue}`);
+//   });
   
-// const tree = new IntervalTree();
-  
-// // Insert intervals with start, end, and boundary values
-// const firstInterval=new Interval(1, 5, [10,10], [20,20]);
-// tree.insert(firstInterval); // Interval [1, 5] with values 10 at the start and 20 at the end
-// tree.insert(new Interval(2, 4, [100,100], [200,200]));
-// // tree.insert(new Interval(6, 10, 25, 30)); // Interval [6, 10] with values 25 at the start and 30 at the end
-// // tree.delete(firstInterval);
-// console.log(tree.getAllIntervals(tree.root))
-// // Query for interpolated values
-// const x = 3; // Query point
-// const results = tree.query(tree.root, x);
-
-// console.log(`Interpolated values at x = ${x}:`);
-// results.forEach(result => {
-//   const interpolatedValue = result.interpolatedValue;
-//   console.log(`Interval [${result.interval.start}, ${result.interval.end}] has value: ${interpolatedValue}`);
-// });

@@ -39,7 +39,7 @@ export function getIntersection(vector1,vector2){
     }
 
 }
-export function getclosestPointOnLineSegment(point, lineStart, lineEnd) {
+export function getclosestPoint(point, lineStart, lineEnd) {
     // Decompose the inputs
     const [px, py, pz] = point;
     const [x1, y1, z1] = lineStart;
@@ -84,6 +84,31 @@ export function getclosestPointOnLineSegment(point, lineStart, lineEnd) {
             closestPoint:closestPoint,
             isIncluded:isProjectedInclude,
     };
+}
+export function betweenAngle(vectorA, vectorB) {
+    if (vectorA.length !== 3 || vectorB.length !== 3) {
+        throw new Error("Both vectors must have exactly 3 elements.");
+    }
+
+    // Dot product of vectorA and vectorB
+    const dotProduct = vectorA[0] * vectorB[0] + vectorA[1] * vectorB[1] + vectorA[2] * vectorB[2];
+
+    // Magnitudes of vectorA and vectorB
+    const magnitudeA = Math.sqrt(vectorA[0] ** 2 + vectorA[1] ** 2 + vectorA[2] ** 2);
+    const magnitudeB = Math.sqrt(vectorB[0] ** 2 + vectorB[1] ** 2 + vectorB[2] ** 2);
+
+    // Prevent division by zero
+    if (magnitudeA === 0 || magnitudeB === 0) {
+        throw new Error("Magnitude of one of the vectors is zero. Cannot calculate angle.");
+    }
+
+    // Calculate the angle in radians
+    const angleRadians = Math.acos(dotProduct / (magnitudeA * magnitudeB));
+
+    // Convert to degrees if needed
+    const angleDegrees = (angleRadians * 180) / Math.PI;
+
+    return { radians: angleRadians, degrees: angleDegrees };
 }
 
 // Example usage:

@@ -3,7 +3,9 @@ import {TimeSpaceCube} from "./cube/TimeSpaceCube.js";
 export default function generateCube(){
     console.log('begin')
     const graph=generateGraph();
+    console.log(graph.edges.size);
     const cube = new TimeSpaceCube(graph,1);
+    console.log(cube.nodeMirrorMap.size)
     console.log('finish')
     const [lines,mirrorIndex]=cube.outputMatrix();
     console.log(lines);

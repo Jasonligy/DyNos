@@ -1,4 +1,4 @@
-import {avgVectors,getUnitVector,magnitude} from "../utils/vectorOps.js"
+import {avgVectors,getUnitVector,magnitude,betweenAngle} from "../utils/vectorOps.js"
 export class TimeStraightning{
     constructor(cube,desired){
         this.cube=cube;
@@ -8,18 +8,18 @@ export class TimeStraightning{
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
         let sumPosition=[0,0];
-        for([dyNode,mirrors] of this.cube.nodeMirrorMap ){
+        for(const [dyNode,mirrors] of this.cube.nodeMirrorMap ){
             //the implement is different from java
             for(const mirrorLine of mirrors){
                 let allBends=[];
-                allBends.push(...mirrorLine.nodeSet);
-                computeSmoothingComponent(force,allBends);
-                computeStraightningComponent(force, allBends);
+                allBends.push(...mirrorLine.nodeList);
+                this.computeSmoothingComponent(force,allBends);
+                this.computeStraightningComponent(force, allBends);
                 
             }
            
         }
-        for([id,value] of overallForce.entries()){
+        for(const[id,value] of overallForce.entries()){
             if(force.has(id)){
                 overallForce.set(id,overallForce.get(id)+force.get(id));
             }
@@ -35,13 +35,17 @@ export class TimeStraightning{
             if(!force.has(node)){
                 force.set(node,[0,0,0])
             }
-            if (i == 0 || i == allBends.size() - 1) {
+            if (i == 0 || i == allBends.length - 1) {
                 const other = i != 0 ? allBends[i-1] : allBends[1];
+                console.log('other')
+                
                 const posOther = pos.get(other);
+                console.log(posOther)
                 desired=avgVectors(pos.get(node),posOther);
                 desired[2]=pos.get(node)[2];
                 desired=desired.map((value,index) => (value-pos.get(node)[index]));
-
+                console.log(desired)
+                console.log(pos.get(node))
             }
             else{
                 const posCurrent=pos.get(node);
@@ -54,9 +58,12 @@ export class TimeStraightning{
                 
             }
             const vectorMag=magnitude(desired);
-            const unit=getUnitVector(desired);
-            const shift=unit.map((value,index) => Math.pow(vectorMag/this.desired,2)*value);
-            force.set(node,shift);
+            //when vectormag equals to 0, means the trajectory is perpendicular with time
+            if(vectorMag>0){
+                const unit=getUnitVector(desired);
+                const shift=unit.map((value,index) => Math.pow(vectorMag/this.desired,2)*value);
+                force.set(node,shift);
+            }
         }
     }
     computeStraightningComponent(force, allBends){
@@ -78,6 +85,9 @@ export class TimeStraightning{
                 const vector2D=[vector3D[0],vector3D[1],0];
 
                 //need implement the filter when the vector3D is almost zero
+                if(magnitude(vector2D)==0 || vector3D[2]==0){
+                    continue
+                }
                 
                 const angle=Math.max(betweenAngle(vector2D,vector3D),0.01);
                 const shift=vector2D.map((value,index)=>value*(Math.PI/2-angle)/angle);

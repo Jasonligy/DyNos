@@ -1,13 +1,16 @@
 import{Node,Edge}from "../dygraph/Dygraph.js"
 export class MirrorLine{
-    constructor(node,appearInterval){
-        this.node = node;
+    constructor(dynode,appearInterval){
+        this.dynode = dynode;
+        // this.startNode=[];
+        // this.
         this.interval=appearInterval;
         //the bends of coordinate in the trajectory
         this.coordinateList=[];
         this.mirrorNodeList=[];
         //all the node in that trajectory, need implement the correspond to coordinatelist
         this.nodeList=[];
+        this.segmentList=[];
     }
     addBend(coordinat){
         this.coordinateList.push(coordinat);
@@ -32,6 +35,8 @@ export class TimeSpaceCube{
     constructor(dyGraph,tau){
         this.nodes=new Set();
         this.edges=new Set();
+        this.nodeAttributes = new Object();
+        this.edgeAttributes = new Object();
         this.addDefaultNodeAttributes();
         this.addDefaultEdgeAttributes();
         this.tau=tau
@@ -39,8 +44,13 @@ export class TimeSpaceCube{
         this.nodeMirrorMap=new Map();
         this.edgeMirrorMap=new Map();
         const nodes=dyGraph.nodes;
-        this.addMirrorLine(nodes);
         const edges=dyGraph.edges;
+        //create the mirrorline and update the coordinate list as the bend positions
+        this.addMirrorLine(nodes);
+        this.addMirrorConnection(edges);
+        //create mirrornode inside mirrorline and update the node list from coordinate list
+        this.getMirrorNode()
+        // const edges=dyGraph.edges;
 
 
     }
@@ -58,46 +68,68 @@ export class TimeSpaceCube{
         
     }
     updateCube(){
+        const pos=this.nodeAttributes['nodePosition'];
+        for(const node of this.nodes){
+            const force=this.nodeAttributes['force'].get(node);
+            pos.set(node,force.map((value,index)=>value+pos.get(node)[index]));
+        }
 
     }
     addMirrorLine(nodes){
         for(const [id,node] of nodes.entries()){
             // appears is a list, ststing the appeared slots for the node
-            const appears=this.dyGraph.nodeAttributes['appearance'].get(node.id)
-            const intervals=this.dyGraph.nodeAttributes['nodePosition'].get(node.id);
-            console.log(typeof appears)
-            for(const appearSlot of appears){
+            const appears=this.dyGraph.nodeAttributes['appearance'].get(node)
+            const intervals=this.dyGraph.nodeAttributes['nodePosition'].get(node);
+            console.log(node)
+            for(const appearSlot of appears.getAllIntervals(appears.root)){
                 let line=new MirrorLine(node,appearSlot);
                 //biuld trajectory using mirrorLine, creating bends in the mirrorlines
-                for(const interval of intervals.getAllIntervals(intervals.root)){
-                    console.log('checkall')
-                    // need to check if the right bound of upper level is equal to the left bound of next level.
-                    // convert the time to space, assuming the node position is continous and the appearslot value is equal to the interval bound values
+                // for(const interval of intervals.getAllIntervals(intervals.root)){
+                //     console.log('checkall')
+                //     // need to check if the right bound of upper level is equal to the left bound of next level.
+                //     // convert the time to space, assuming the node position is continous and the appearslot value is equal to the interval bound values
                     
-                    if(appearSlot[0]==interval.start){
-                        line.addBend(interval.valueStart.concat(interval.start*this.tau));
-                    }
-                    if(appearSlot[1]==interval.end){
-                        line.addBend(interval.valueEnd.concat(interval.end*this.tau));
-                        break;
-                    }
-                    if(appearSlot[1]>interval.end){
-                        line.addBend(interval.valueEnd.concat(interval.end*this.tau));
-                    }
+                //     if(appearSlot[0]==interval.start){
+                //         line.addBend(interval.valueStart.concat(interval.start*this.tau));
+                //     }
+                //     if(appearSlot[1]==interval.end){
+                //         line.addBend(interval.valueEnd.concat(interval.end*this.tau));
+                //         break;
+                //     }
+                //     if(appearSlot[1]>interval.end){
+                //         line.addBend(interval.valueEnd.concat(interval.end*this.tau));
+                //     }
 
 
-                    // if(appearSlot[0]==interval.leftBound){
-                    //     line.addBend(interval.leftValue.concat(interval.leftBound*this.tau));
-                    // }
-                    // if(appearSlot[1]==interval.rightBound){
-                    //     line.addBend(interval.rightValue.concat(interval.rightBound*this.tau));
-                    //     break;
-                    // }
-                    // if(appearSlot[1]>interval.rightBound){
-                    //     line.addBend(interval.rightValue.concat(interval.rightBound*this.tau));
-                    // }
+                //     // if(appearSlot[0]==interval.leftBound){
+                //     //     line.addBend(interval.leftValue.concat(interval.leftBound*this.tau));
+                //     // }
+                //     // if(appearSlot[1]==interval.rightBound){
+                //     //     line.addBend(interval.rightValue.concat(interval.rightBound*this.tau));
+                //     //     break;
+                //     // }
+                //     // if(appearSlot[1]>interval.rightBound){
+                //     //     line.addBend(interval.rightValue.concat(interval.rightBound*this.tau));
+                //     // }
 
+                // }
+
+
+                const startPos=intervals.valueAt(appearSlot.start);
+                console.log(appearSlot.start)
+                console.log(startPos)
+                line.addBend(startPos.concat(appearSlot.start*this.tau));
+
+                for(const interval of intervals.getAllIntervals(intervals.root)){
+                    if(appearSlot.start<interval.end && appearSlot.end>interval.end){
+                        const bendPos=interval.valueEnd;
+                        line.addBend(bendPos.concat(interval.valueEnd*this.tau));
+                    }
                 }
+
+                const endPos=intervals.valueAt(appearSlot.end);
+                line.addBend(endPos.concat(appearSlot.end*this.tau));
+                console.log('check add node')
                 if(!this.nodeMirrorMap.has(node)){
                     this.nodeMirrorMap.set(node, [line]);}
                 else{
@@ -114,22 +146,26 @@ export class TimeSpaceCube{
         }
     }
     getMirrorNode(){
-        for(const [id,line] of this.nodeMirrorMap.entries()){
+        for(const [id,lines] of this.nodeMirrorMap.entries()){
             let prev=null;
-            for(let coordinate of line.coordinateList){
-                let node=new Node();
-                this.nodes.add(node);
-                this.nodeAttributes['nodePosition'].set(node,coordinate);
-                line.nodeList.push(node);
-                if(prev==null){
-                    prev=node;
+            console.log(lines)
+            for(const line of lines){
+                for(let coordinate of line.coordinateList){
+                    let node=new Node();
+                    this.nodes.add(node);
+                    this.nodeAttributes['nodePosition'].set(node,coordinate);
+                    line.nodeList.push(node);
+                    if(prev==null){
+                        prev=node;
+                    }
+                    else{
+                        const edge=new Edge(prev,node);
+                        this.edges.add(edge);
+                        line.segmentList.push(edge);
+                        prev=node;
+                    }
                 }
-                else{
-                    const edge=new Edge(prev,node);
-                    this.edges.add(edge);
-                    prev=node;
-                }
-            }
+         }
         }
     }
     addMirrorConnection(edges){
@@ -160,6 +196,8 @@ export class TimeSpaceCube{
                 let coordinateList=nodeline.coordinateList;
                 const index=coordinateList.length;
                 mirrorIndex.push(index);
+                // console.log('co')
+                // console.log(coordinateList)
                 lines.push(...this.convertCoordinate(coordinateList))
             }
         }

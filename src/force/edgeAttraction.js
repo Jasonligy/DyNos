@@ -28,6 +28,7 @@ export class EdgeAttraction{
     computeForce(force,connection,source,target){
         const connectionInterval=connection.interval;
         for(const a of source.segmentList){
+            console.log('has segment')
             const aInterval=this.segmentInterval(a);      
             const aIntersection=getIntersection(aInterval,connectionInterval);
             if(aIntersection!=null){

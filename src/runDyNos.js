@@ -5,8 +5,9 @@ import {TimeStraightning} from "./force/timeStraightning.js";
 export class DynosRunner{
     constructor(dyGraph,number,desired){
 
-        this.dygraph=dygraph
-        this.cube=new TimeSpaceCube(dyGraph);
+        this.dygraph=dyGraph
+        console.log(dyGraph)
+        this.cube=new TimeSpaceCube(dyGraph,10);
         this.iteration=number;
         this.forceList=[];
         this.getForceList();
@@ -17,12 +18,13 @@ export class DynosRunner{
     }
     getForceList(){
         const gravity=new Gravity(this.cube);
-        const timeStraightning = new TimeStraightning(this.desired);
+        const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
         this.forceList=[gravity,timeStraightning,edgeAttraction];
     }
     iterate(){
         for(let i=0;i<this.iteration;i++){
+            this.cube.updateForce();
             this.forceList.forEach((force)=>force.computeShift());
             this.cube.updateCube();
             this.temperature=this.iteration-i;

@@ -130,6 +130,7 @@ export class DyGraph {
                 this.edges.add(edge); // Store edge as a string "nodeId1-nodeId2"
                 const key=this.createKey(node1.id,node2.id);
                 this.nodeEdgeMap.set(key,edge);
+                return edge
             } else {
                 throw new Error(`One or both nodes do not exist: ${node1}, ${node2}`);
             }
@@ -146,10 +147,10 @@ export class DyGraph {
         }
         
         if(typeof node1 == "string"){
-            return this.nodeEdgeMap.has(node1,node2);
+            return this.nodeEdgeMap.get(this.createKey(node1,node2));
         }
         if(node1 instanceof Node){
-            return this.nodeEdgeMap.has(this.createKey(node1.id.node2.id));
+            return this.nodeEdgeMap.get(this.createKey(node1.id,node2.id));
         }
 
     }
