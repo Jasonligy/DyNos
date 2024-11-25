@@ -1,8 +1,11 @@
 import express from 'express';
 import path from 'path';
-import readFile from './src/samples/VanDeBunt.js';
+import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
+import {IntervalTree,Interval} from './src/intervalTree/intervalTree.js';
+import generateCube from './src/generateCube.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { DynosRunner } from './src/runDyNos.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -19,10 +22,60 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 app.get('/tt', (req, res) => {
-    readFile();  
-    console.log('test')
+
+  let graph;
+  readFile()
+  .then((fileData) => {
+      graph=getDyGraph(fileData); // Pass the object to the new function
+      // console.log(graph);
+      const runner=new DynosRunner(graph,100,5);
+      runner.iterate();
+  })
+ 
+    // const data=readFile();  
+    // console.log(data.relations)
+    // getDyGraph(data);
+    // console.log('test')
     // res.sendFile(path.join(__dirname, 'index.html'));
   });
+
+
+
+
+
+
+
+
+
+
+app.get('/check', (req, res) => {
+  // generateCube();
+  console.log('test')
+  // res.sendFile(path.join(__dirname, 'index.html'));
+});
+app.get('/interval', (req, res) => {
+  // generateCube();
+  console.log('test')
+  const tree = new IntervalTree();
+  
+  // Insert intervals with start, end, and boundary values
+  const firstInterval=new Interval(1, 5, [10,10], [20,20]);
+  tree.insert(firstInterval); // Interval [1, 5] with values 10 at the start and 20 at the end
+  tree.insert(new Interval(2, 4, [100,100], [200,200]));
+  // tree.insert(new Interval(6, 10, 25, 30)); // Interval [6, 10] with values 25 at the start and 30 at the end
+  // tree.delete(firstInterval);
+  console.log(tree.getAllIntervals(tree.root))
+  // Query for interpolated values
+  const x = 3; // Query point
+  const results = tree.query(tree.root, x);
+  
+  console.log(`Interpolated values at x = ${x}:`);
+  results.forEach(result => {
+    const interpolatedValue = result.interpolatedValue;
+    console.log(`Interval [${result.interval.start}, ${result.interval.end}] has value: ${interpolatedValue}`);
+  });
+  // res.sendFile(path.join(__dirname, 'index.html'));
+});
 // Example API endpoint
 app.get('/api/data', (req, res) => {
   res.json({ message: 'Hello from Node.js!' });
