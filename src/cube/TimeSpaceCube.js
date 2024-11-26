@@ -47,6 +47,10 @@ export class TimeSpaceCube{
         const edges=dyGraph.edges;
         //create the mirrorline and update the coordinate list as the bend positions
         this.addMirrorLine(nodes);
+        // for(const[id,node] of this.){
+        //     console.log(dyGraph.nodeAttributes['nodePosition'].get(node))
+        //     break
+        // }
         this.addMirrorConnection(edges);
         //create mirrornode inside mirrorline and update the node list from coordinate list
         this.getMirrorNode()
@@ -63,8 +67,8 @@ export class TimeSpaceCube{
     }
     addDefaultEdgeAttributes(){
         this.edgeAttributes['appearance']=new Map();
-        this.nodeAttributes['color']=new Map();
-        this.nodeAttributes['strength']=new Map();
+        this.edgeAttributes['color']=new Map();
+        this.edgeAttributes['strength']=new Map();
         
     }
     updateCube(){
@@ -80,7 +84,7 @@ export class TimeSpaceCube{
             // appears is a list, ststing the appeared slots for the node
             const appears=this.dyGraph.nodeAttributes['appearance'].get(node)
             const intervals=this.dyGraph.nodeAttributes['nodePosition'].get(node);
-            console.log(node)
+            // console.log(node)
             for(const appearSlot of appears.getAllIntervals(appears.root)){
                 let line=new MirrorLine(node,appearSlot);
                 //biuld trajectory using mirrorLine, creating bends in the mirrorlines
@@ -116,8 +120,8 @@ export class TimeSpaceCube{
 
 
                 const startPos=intervals.valueAt(appearSlot.start);
-                console.log(appearSlot.start)
-                console.log(startPos)
+                // console.log(appearSlot.start)
+                // console.log(startPos)
                 line.addBend(startPos.concat(appearSlot.start*this.tau));
 
                 for(const interval of intervals.getAllIntervals(intervals.root)){
@@ -129,7 +133,7 @@ export class TimeSpaceCube{
 
                 const endPos=intervals.valueAt(appearSlot.end);
                 line.addBend(endPos.concat(appearSlot.end*this.tau));
-                console.log('check add node')
+                // console.log('check add node')
                 if(!this.nodeMirrorMap.has(node)){
                     this.nodeMirrorMap.set(node, [line]);}
                 else{
@@ -148,7 +152,7 @@ export class TimeSpaceCube{
     getMirrorNode(){
         for(const [id,lines] of this.nodeMirrorMap.entries()){
             let prev=null;
-            console.log(lines)
+            // console.log(lines)
             for(const line of lines){
                 for(let coordinate of line.coordinateList){
                     let node=new Node();
@@ -170,17 +174,42 @@ export class TimeSpaceCube{
     }
     addMirrorConnection(edges){
         //here edges is a list
+        // console.log(edges)
+        
         for(const edge of edges){
             // appears is a list, ststing the appeared slots for the node
-            const appears=this.dyGraph.edgeAttributea['appearance'].get(edge)
+            const appears=this.dyGraph.edgeAttributes['appearance'].get(edge)
+            // console.log(appears)
             // const intervals=this.dyGraph.nodeAttributea['nodePosition'].get(node);
-            for(const appearSlot of appears){
-                const connection = new MirrorConeection(edge,appearSlot);
+            for(const appearSlot of appears.getAllIntervals(appears.root)){
+                const connection = new MirrorConnection(edge,appearSlot);
                 //need cautious and update later, now it is pasuodocode
                 const source=edge.sourceNode;
                 const target=edge.targetNode;
-                connection.addSource(source);
-                connection.addTarget(target);
+                const middlePoint=(appearSlot.start+appearSlot.end)/2;
+
+                const sourceLines=this.nodeMirrorMap.get(source);
+                // console.log(sourceLines.length)
+                // console.log(appearSlot)
+                for(const sourceLine of sourceLines){
+                    // console.log('checks')
+                    if(sourceLine.interval.start<=middlePoint&&sourceLine.interval.end>=middlePoint){
+                        
+                        connection.addSource(sourceLine);
+                        break;
+                    }
+                }
+                const targetLines=this.nodeMirrorMap.get(target);
+                for(const targetLine of targetLines){
+                    
+                    if(targetLine.interval.start<=middlePoint&&targetLine.interval.end>=middlePoint){
+                        
+                        connection.addTarget(targetLine);
+                        break;
+                    }
+                }
+                
+               
                 this.edgeMirrorMap.set(edge,connection);
 
             }

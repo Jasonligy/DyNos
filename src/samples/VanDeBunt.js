@@ -115,7 +115,7 @@ export async function readFile() {
                     });
 
                     rl.on('close', () => {
-                        fileData.relations.set(num, values);
+                        fileData.relations.set(parseInt(num), values);
                         resolve();
                     });
 
@@ -140,9 +140,11 @@ export function getDyGraph(fileData){
         dyGraph.nodeAttributes['appearance'].set(node,new IntervalTree(true))
         //the interval from origin code 
         dyGraph.nodeAttributes['appearance'].get(node).insert(new Interval(-1,7))
+        // console.log(dyGraph.nodeAttributes['appearance'].get(node))
+        // console.log(new Interval(-1,7))
 
     }
-    for(const [id,value] of fileData.relations.entries()){
+    for(let [id,value] of fileData.relations.entries()){
         for(let i=0;i<7;i++){
             for(let j=i+1;j<value[i].length;j++){
                 // node strength is not applicable
@@ -156,12 +158,19 @@ export function getDyGraph(fileData){
                         
                     }
                     const edge=dyGraph.queryEdge(node1,node2);
-                    dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(id-0.5.id+0.5))
+                    // console.log(new Interval(id-0.5.id+0.5))
+                    dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(id-0.5,id+0.5))
+                    // console.log(dyGraph.edgeAttributes['appearance'].get(edge))
                 }
             }
         }
     }
     scatterNode(dyGraph,5);
+    // for(const[id,node] of dyGraph.nodes){
+    //     console.log(dyGraph.nodeAttributes['nodePosition'].get(node))
+    //     break
+    // }
+    
     return dyGraph
     // console.log(fileData.students)
 

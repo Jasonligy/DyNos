@@ -6,7 +6,7 @@ export class DynosRunner{
     constructor(dyGraph,number,desired){
 
         this.dygraph=dyGraph
-        console.log(dyGraph)
+        // console.log(dyGraph)
         this.cube=new TimeSpaceCube(dyGraph,10);
         this.iteration=number;
         this.forceList=[];

@@ -23,7 +23,7 @@ export class Gravity{
         for(const node of this.cube.nodes){
             
             const coordinate=this.cube.nodeAttributes['nodePosition'].get(node);
-            console.log([center[0]-coordinate[0],center[1]-coordinate[1],0])
+            // console.log([center[0]-coordinate[0],center[1]-coordinate[1],0])
             const gravity=getUnitVector([center[0]-coordinate[0],center[1]-coordinate[1],0])
             // console.log(force)
             const result = force.get(node).map((value, index) => value + gravity[index]);

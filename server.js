@@ -64,7 +64,7 @@ app.get('/interval', (req, res) => {
   tree.insert(new Interval(2, 4, [100,100], [200,200]));
   // tree.insert(new Interval(6, 10, 25, 30)); // Interval [6, 10] with values 25 at the start and 30 at the end
   // tree.delete(firstInterval);
-  console.log(tree.getAllIntervals(tree.root))
+  // console.log(tree.getAllIntervals(tree.root))
   // Query for interpolated values
   const x = 3; // Query point
   const results = tree.query(tree.root, x);
