@@ -3,6 +3,9 @@ export class Gravity{
     constructor(cube){
         this.cube=cube;
     }
+    setTemperature(temperature){
+        this.temperature=temperature;
+    }
     computeShift(){
         let sumPosition=[0,0]
         const totalNodes=this.cube.nodes.size;
@@ -28,7 +31,8 @@ export class Gravity{
             // console.log(force)
             const result = force.get(node).map((value, index) => value + gravity[index]);
             force.set(node,result);
+            // console.log(result)
         }
     }
-    setTemperature
+   
 }

@@ -7,6 +7,9 @@ export class EdgeAttraction{
         this.finalExponent = 2;
         this.temperature=temperature;
     }
+    setTemperature(temperature){
+        this.temperature=temperature;
+    }
     computeShift(){
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
@@ -20,7 +23,7 @@ export class EdgeAttraction{
 
         for(const [id,value] of overallForce.entries()){
             if(force.has(id)){
-                overallForce.set(id,overallForce.get(id)+force.get(id));
+                overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]));
             }
         }
 
@@ -29,7 +32,7 @@ export class EdgeAttraction{
         const connectionInterval=[connection.interval.start,connection.interval.end];
         // console.log(source)
         for(const a of source.segmentList){
-            console.log('has segment')
+            // console.log('has segment')
             const aInterval=this.segmentInterval(a);
             // console.log(connectionInterval)      
             const aIntersection=getIntersection(aInterval,connectionInterval);

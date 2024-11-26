@@ -75,6 +75,7 @@ export class TimeSpaceCube{
         const pos=this.nodeAttributes['nodePosition'];
         for(const node of this.nodes){
             const force=this.nodeAttributes['force'].get(node);
+            // console.log(typeof force)
             pos.set(node,force.map((value,index)=>value+pos.get(node)[index]));
         }
 

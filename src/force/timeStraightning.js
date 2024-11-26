@@ -4,6 +4,9 @@ export class TimeStraightning{
         this.cube=cube;
         this.desired=desired;
     }
+    setTemperature(temperature){
+        this.temperature=temperature;
+    }
     computeShift(){
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
@@ -21,7 +24,7 @@ export class TimeStraightning{
         }
         for(const[id,value] of overallForce.entries()){
             if(force.has(id)){
-                overallForce.set(id,overallForce.get(id)+force.get(id));
+                overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]))
             }
         }
 
