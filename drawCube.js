@@ -1,47 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebGL Project</title>
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <canvas id="glCanvas" width="800" height="2500"></canvas>
-    <!-- <script src="src/circle.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js"></script>
-
-    <!-- <script type="module" src="src/run.js"></script>
-    <script  type="module" src="src/run.js"></script> -->
-    <!-- <script  src="src/samples/VanDeBunt.js"></script> -->
-    <script  src="drawCube.js"></script>
-    <script>
-        // Fetch data from the server
-        fetch('/api/data')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Fetched data:', data);
-                draw(data.array,data.index)
-                // Use the data for rendering or logic
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    </script>
-
-    <!-- <script type="module" src="src/cube.js"></script> -->
-
-
-
-
-
-<!-- 
-
-    <script type="module" >
-
 // import generateCube from "./generateCube.js";
-// main.js
-import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";
-import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
-export function draw(data){
+// // main.js
+// import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";
+// import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
+function draw(edge,indexs){
+    for(let i=0;i<edge.length;i++){
+        if(edge[i]<-10){
+            edge[i]=1;
+        }
+    }
+    edge=new Float32Array(edge)
+    console.log(edge)
     const canvas = document.getElementById('glCanvas');
     const gl = canvas.getContext('webgl');
 
@@ -277,11 +245,11 @@ export function draw(data){
     // console.log(edge)
     // let [edge,indexs]=generateCube()
 
-    cubeBefore=new TimeSpaceCube(data,0.2);
-    const [lines,mirrorIndex]=cubeBefore.outputMatrix();
+    // cubeBefore=new TimeSpaceCube(data,0.2);
+    // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
 
-    edge=new Float32Array(edge)
-    console.log(edge.length)
+    // edge=new Float32Array(edge)
+    // console.log(edge.length)
 
 
 
@@ -333,32 +301,18 @@ export function draw(data){
         //     index+=indexs[i];
         //     continue
         // }
+
         console.log(indexs[i])
         gl.drawArrays(gl.LINE_STRIP, index, 2); // n+1 vertices -> n edges
         index+=indexs[i];
     }}
-    fetch('/api/data')
-            .then(response => response.json())
-            .then(data => {
-                console.log('Fetched data:', data);
-                graph=getDyGraph(data);
-                draw(graph)
-                // Use the data for rendering or logic
-            })
-            .catch(error => console.error('Error fetching data:', error));
+    // fetch('/api/data')
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             console.log('Fetched data:', data);
+    //             graph=getDyGraph(data);
+    //             draw(graph)
+    //             // Use the data for rendering or logic
+    //         })
+    //         .catch(error => console.error('Error fetching data:', error));
 // const colorLocation = gl.getUniformLocation(shaderProgram, 'uColor');
-
-    </script>
-    <script>
-        // Fetch data from the server
-        // fetch('/api/data')
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         console.log('Fetched data:', data);
-        //         draw(data)
-        //         // Use the data for rendering or logic
-        //     })
-        //     .catch(error => console.error('Error fetching data:', error));
-    </script>
-</body>
-</html> -->

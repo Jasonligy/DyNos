@@ -1,4 +1,5 @@
 import fs from 'fs';
+// const fs = require('fs');
 import readline from 'readline';
 import path from 'path';
 import { DyGraph,Node,Edge } from '../dygraph/Dygraph.js';

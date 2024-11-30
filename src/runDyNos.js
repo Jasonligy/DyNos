@@ -24,7 +24,7 @@ export class DynosRunner{
     }
     iterate(){
         for(let i=0;i<this.iteration;i++){
-            console.log(i)
+            // console.log(i)
             this.cube.updateForce();
             this.forceList.forEach((force)=>force.computeShift());
             this.cube.updateCube();
@@ -32,5 +32,6 @@ export class DynosRunner{
             this.forceList.forEach((force)=>force.setTemperature(this.temperature));
 
         }
+        return this.cube
     }
 }

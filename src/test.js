@@ -25,14 +25,9 @@ const vertexShaderSource = `
 const fragmentShaderSource = `
     precision mediump float;
     varying vec4 vColor;
-    uniform bool uUseFixedColor;
     void main() {
         
-          if (uUseFixedColor) {
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); // Black color
-    } else {
-        gl_FragColor = vColor; // Use the vertex color
-    }
+        gl_FragColor = vColor; // Blue color
     }
 `;
 
@@ -58,7 +53,6 @@ gl.attachShader(program, vertexShader);
 gl.attachShader(program, fragmentShader);
 gl.linkProgram(program);
 gl.useProgram(program);
-const uUseFixedColor = gl.getUniformLocation(program, 'uUseFixedColor');
 
 // Define vertices for a cube
 const vertices = new Float32Array([
@@ -184,7 +178,9 @@ const colorBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
 gl.bufferData(gl.ARRAY_BUFFER, edgeColors, gl.STATIC_DRAW);
 
-
+const edgeColorBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, edgeColorBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, blueEdgeColors, gl.STATIC_DRAW);
 
 const edgeIndexBuffer = gl.createBuffer();
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeIndexBuffer);
@@ -206,7 +202,7 @@ gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
 // gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
 gl.enableVertexAttribArray(aColor);
-gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+gl.bindBuffer(gl.ARRAY_BUFFER, edgeColorBuffer);
 gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
 
 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeIndexBuffer);
@@ -270,10 +266,10 @@ gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffer);
 gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
 
 // Enable vertex attribute for color
-// gl.enableVertexAttribArray(aColor);
-// gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-// gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
-gl.uniform1i(uUseFixedColor, true);
+gl.enableVertexAttribArray(aColor);
+gl.bindBuffer(gl.ARRAY_BUFFER, edgeColorBuffer);
+gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
+
 // Draw lines between each consecutive vertex pair
 
 // gl.drawArrays(gl.LINE_STRIP, 0,4); // n+1 vertices -> n edges

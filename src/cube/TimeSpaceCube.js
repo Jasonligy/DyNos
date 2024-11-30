@@ -77,7 +77,9 @@ export class TimeSpaceCube{
             const force=this.nodeAttributes['force'].get(node);
             // console.log(typeof force)
             pos.set(node,force.map((value,index)=>value+pos.get(node)[index]));
+            // console.log(pos.get(node))
         }
+
 
     }
     addMirrorLine(nodes){
@@ -121,10 +123,12 @@ export class TimeSpaceCube{
 
 
                 const startPos=intervals.valueAt(appearSlot.start);
+                // console.log('cyc;e')
                 // console.log(appearSlot.start)
                 // console.log(startPos)
+                // console.log(startPos.concat(appearSlot.start*this.tau))
                 line.addBend(startPos.concat(appearSlot.start*this.tau));
-
+                // console.log(line.coordinateList)
                 for(const interval of intervals.getAllIntervals(intervals.root)){
                     if(appearSlot.start<interval.end && appearSlot.end>interval.end){
                         const bendPos=interval.valueEnd;
@@ -155,6 +159,7 @@ export class TimeSpaceCube{
             let prev=null;
             // console.log(lines)
             for(const line of lines){
+                // console.log(line)
                 for(let coordinate of line.coordinateList){
                     let node=new Node();
                     this.nodes.add(node);
@@ -169,7 +174,9 @@ export class TimeSpaceCube{
                         line.segmentList.push(edge);
                         prev=node;
                     }
+                    // console.log(this.nodeAttributes['nodePosition'].get(node))
                 }
+                
          }
         }
     }
@@ -258,7 +265,7 @@ export class TimeSpaceCube{
         const mappedY = normalizedY * 2 -1;
         const mappedZ = normalizedZ * 3 -1;
     
-        return [mappedX, mappedY, mappedZ];
+        return [mappedX, mappedZ,mappedY ];
     }
     
 

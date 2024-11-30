@@ -34,7 +34,8 @@ export default function generateGraph(){
                 const target=graph.nodes.get(t);
                 const edge =new Edge(source,target);
                 graph.edges.add(edge);  // Add edge if not present
-                graph.edgeAttributes['appearance'].set(edge,[0,10])
+                graph.edgeAttributes['appearance'].set(edge,new IntervalTree(true))
+                graph.edgeAttributes['appearance'].get(edge).insert(new Interval(0,10))
                 i++;                    // Increment only when an edge is added
             }
         }
