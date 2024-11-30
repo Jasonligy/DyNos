@@ -1,4 +1,5 @@
 import{Node,Edge}from "../dygraph/Dygraph.js"
+import { avgVectors, distance2points } from "../utils/vectorOps.js";
 export class MirrorLine{
     constructor(dynode,appearInterval){
         this.dynode = dynode;
@@ -9,6 +10,7 @@ export class MirrorLine{
         this.coordinateList=[];
         this.mirrorNodeList=[];
         //all the node in that trajectory, need implement the correspond to coordinatelist
+        //nodeLIst correspond to the coordinateList, the 
         this.nodeList=[];
         this.segmentList=[];
     }
@@ -17,6 +19,32 @@ export class MirrorLine{
         
         
     }
+    contractBend(contractDistance){
+        if(this.coordinateList.length<3){
+            return
+        }
+        const newCoordinate=[];
+        for(let i=1;i<this.coordinateList.length-1;i++){
+
+        }
+    }
+    expandBend(expandDistance){
+        const newCoordinateList=[];
+        newCoordinateList.push(this.coordinateList[0]);
+        for(const i=0;i<this.nodeList.length-1;i++){
+            const firstCoord=this.coordinateList[i];
+            const secondCoord=this.coordinateList[i+1];    
+            const dist=distance2points(firstCoord,secondCoord);
+            if(dist>expandDistance&&Math.abs(firstCoord[2]-secondCoord[2])>expandDistance/2){
+                newCoordinateList.push(avgVectors(firstCoord,secondCoord));
+            }
+            newCoordinateList.push(secondCoord);
+        }
+
+    }
+    // updateCoordinate(){
+    //     for(const )
+    // }
 }
 //mirrorConnection only made a reference to the end points and its interval
 export class MirrorConnection{
@@ -180,6 +208,17 @@ export class TimeSpaceCube{
          }
         }
     }
+    updateCoordinateList(mirrorLine){
+        if(mirrorLine.nodeList.length!=mirrorLine.coordinateList.length){
+            throw new Error(" the node size of nodeList and coordinateList is not same")
+        }
+        const pos=this.nodeAttributes['nodePosition']
+        for(const i=0;i<mirrorLine.nodeList.length;i++){
+            const newCoordinate=pos.get(mirrorLine.nodeList[i]);
+            mirrorLine.coordinateList[i]=newCoordinate
+        }
+    }
+
     addMirrorConnection(edges){
         //here edges is a list
         // console.log(edges)

@@ -10,6 +10,17 @@ export function getUnitVector(vector) {
     // Divide each element by the magnitude
     return vector.map(val => val / magnitude);
 }
+export function distance2points(pointA,pointB){
+    if (pointA.length !== pointB.length) {
+        throw new Error("Points must have the same number of dimensions");
+      }
+    
+      const sumOfSquares = pointA.reduce((sum, coord, index) => {
+        return sum + Math.pow(coord - pointB[index], 2);
+      }, 0);
+    
+      return Math.sqrt(sumOfSquares);
+}
 export function avgVectors(vector1,vector2){
     if(vector1.length!=vector2.length){
         throw new Error("the two vector don't have same length");
