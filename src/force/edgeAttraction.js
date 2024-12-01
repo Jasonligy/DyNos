@@ -7,29 +7,34 @@ export class EdgeAttraction{
         this.finalExponent = 2;
         this.temperature=temperature;
     }
+    setTemperature(temperature){
+        this.temperature=temperature;
+    }
     computeShift(){
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
         for(const [edge,connection] of this.cube.edgeMirrorMap){
-            const dySourceNode=connection.source;
-            const dyTargetNode=connection.target;
-            const mirrorLineSource=this.cube.nodeMirrorMap.get(dySourceNode);
-            const mirrorLineTarget=this.cube.nodeMirrorMap.get(dyTargetNode);
-            computeForce(force,connection,mirrorLineSource,mirrorLineTarget);
+            const mirrorLineSource=connection.source;
+            const mirrorLineTarget=connection.target;
+            // const mirrorLineSource=this.cube.nodeMirrorMap.get(dySourceNode);
+            // const mirrorLineTarget=this.cube.nodeMirrorMap.get(dyTargetNode);
+            this.computeForce(force,connection,mirrorLineSource,mirrorLineTarget);
         }
 
         for(const [id,value] of overallForce.entries()){
             if(force.has(id)){
-                overallForce.set(id,overallForce.get(id)+force.get(id));
+                overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]));
             }
         }
 
     }
     computeForce(force,connection,source,target){
-        const connectionInterval=connection.interval;
+        const connectionInterval=[connection.interval.start,connection.interval.end];
+        // console.log(source)
         for(const a of source.segmentList){
-            console.log('has segment')
-            const aInterval=this.segmentInterval(a);      
+            // console.log('has segment')
+            const aInterval=this.segmentInterval(a);
+            // console.log(connectionInterval)      
             const aIntersection=getIntersection(aInterval,connectionInterval);
             if(aIntersection!=null){
                 for(const b of target.segmentList){
@@ -43,10 +48,10 @@ export class EdgeAttraction{
                             const allWidth=intersection[1]-bIntersection[0];
                             const aRatio = aWidth == 0 ? 1 : allWidth / aWidth;
                             const bRatio = bWidth == 0 ? 1 : allWidth / bWidth;
-                            const beginningVector = computeConnectingVector(a, b, intersection[0]);
-                            const endingVector = computeConnectingVector(a, b, intersection[1]);
-                            applyVector(force,beginningVector, intersection[0], a, b, aInterval, bInterval, aRatio, bRatio);
-                            applyVector(force,endingVector, intersection[1], a, b, aInterval, bInterval, aRatio, bRatio);
+                            const beginningVector = this.computeConnectingVector(a, b, intersection[0]);
+                            const endingVector = this.computeConnectingVector(a, b, intersection[1]);
+                            this.applyVector(force,beginningVector, intersection[0], a, b, aInterval, bInterval, aRatio, bRatio);
+                            this.applyVector(force,endingVector, intersection[1], a, b, aInterval, bInterval, aRatio, bRatio);
 
                         }
 
@@ -65,7 +70,7 @@ export class EdgeAttraction{
         const currentDistance=magnitude(vector);
         //need implement almost zero
         const unit=getUnitVector(vector);
-        const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,computeExponent()));
+        const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
         const aBalance=(zPos-aInt[0])/aWidth;
         const bBalance=(zPos-bInt[0])/bWidth;
         const aSourceForce=baseForce.map((value,index)=>value*aRatio*(1-aBalance));
@@ -97,8 +102,8 @@ export class EdgeAttraction{
     }
     //get the difference between line segment a and b at timestamp z
     computeConnectingVector(a,b,z){
-        const aPoint = valueAtZ(z, a);
-        const bPoint = valueAtZ(z, b);
+        const aPoint = this.valueAtZ(z, a);
+        const bPoint = this.valueAtZ(z, b);
         return bPoint.map((value,index)=>value-aPoint[index])
     }
     //get the position at time z of edge

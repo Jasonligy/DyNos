@@ -17,3 +17,14 @@ The possible way of improvement:
 
 questions:
 1. can first placement avoid the crossing
+
+
+
+
+
+the difference between the original implementation and js:
+1. the mirrorline of each dyNode in the original code is stored using interval tree but in js implementation using list.
+
+
+
+the constriant output maybe either single value or a map

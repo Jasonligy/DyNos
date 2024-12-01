@@ -4,6 +4,9 @@ export class TimeStraightning{
         this.cube=cube;
         this.desired=desired;
     }
+    setTemperature(temperature){
+        this.temperature=temperature;
+    }
     computeShift(){
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
@@ -21,7 +24,7 @@ export class TimeStraightning{
         }
         for(const[id,value] of overallForce.entries()){
             if(force.has(id)){
-                overallForce.set(id,overallForce.get(id)+force.get(id));
+                overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]))
             }
         }
 
@@ -37,15 +40,15 @@ export class TimeStraightning{
             }
             if (i == 0 || i == allBends.length - 1) {
                 const other = i != 0 ? allBends[i-1] : allBends[1];
-                console.log('other')
+                // console.log('other')
                 
                 const posOther = pos.get(other);
-                console.log(posOther)
+                // console.log(posOther)
                 desired=avgVectors(pos.get(node),posOther);
                 desired[2]=pos.get(node)[2];
                 desired=desired.map((value,index) => (value-pos.get(node)[index]));
-                console.log(desired)
-                console.log(pos.get(node))
+                // console.log(desired)
+                // console.log(pos.get(node))
             }
             else{
                 const posCurrent=pos.get(node);

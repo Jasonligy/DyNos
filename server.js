@@ -3,9 +3,11 @@ import path from 'path';
 import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
 import {IntervalTree,Interval} from './src/intervalTree/intervalTree.js';
 import generateCube from './src/generateCube.js';
+import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { DynosRunner } from './src/runDyNos.js';
+// import { draw } from './drawCube.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -21,6 +23,21 @@ app.get('/', (req, res) => {
   console.log('test')
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+app.get('/api/data', (req, res) => {
+  // const data = { name: 'Cube', color: 'blue', size: 3 };
+  // res.json(data);
+  let graph;
+  readFile()
+  .then((fileData) => {
+      graph=getDyGraph(fileData);
+    // const data=graph;
+    console.log(fileData)
+    const cubeBefore=new TimeSpaceCube(graph,-5);
+    // const [lines,mirrorIndex]=generateCube();
+    const [lines,mirrorIndex]=cubeBefore.outputMatrix();
+    const data={array:lines,index:mirrorIndex};
+    res.json(data)})
+});
 app.get('/tt', (req, res) => {
 
   let graph;
@@ -29,7 +46,27 @@ app.get('/tt', (req, res) => {
       graph=getDyGraph(fileData); // Pass the object to the new function
       // console.log(graph);
       const runner=new DynosRunner(graph,100,5);
-      runner.iterate();
+      const bcube=runner.cube;
+      for(const [id,lines] of bcube.nodeMirrorMap.entries()){
+        // console.log(line.nodeList)
+        for(const line of lines){
+          for(const node of line.nodeList){
+            // console.log(node)
+            console.log(bcube.nodeAttributes['nodePosition'].get(node))
+          }
+        }}
+      const cube=runner.iterate();
+      const nodeList=cube.nodes;
+      for(const [id,lines] of cube.nodeMirrorMap.entries()){
+        // console.log(line.nodeList)
+        for(const line of lines){
+          for(const node of line.nodeList){
+            // console.log(node)
+            // console.log(cube.nodeAttributes['nodePosition'].get(node))
+            }
+          }
+        }
+
   })
  
     // const data=readFile();  
@@ -64,7 +101,7 @@ app.get('/interval', (req, res) => {
   tree.insert(new Interval(2, 4, [100,100], [200,200]));
   // tree.insert(new Interval(6, 10, 25, 30)); // Interval [6, 10] with values 25 at the start and 30 at the end
   // tree.delete(firstInterval);
-  console.log(tree.getAllIntervals(tree.root))
+  // console.log(tree.getAllIntervals(tree.root))
   // Query for interpolated values
   const x = 3; // Query point
   const results = tree.query(tree.root, x);

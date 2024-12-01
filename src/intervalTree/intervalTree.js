@@ -159,7 +159,7 @@ export class Interval {
     }
     valueAt(x){
         const results=this.query(this.root,x);
-        console.log(results)
+        // console.log(results)
         if(results.length==0){
             return this.defaultValue;
         }
@@ -256,7 +256,7 @@ export class Interval {
   const x = 3; // Query point
   const results = tree.query(tree.root, x);
   
-  console.log(`Interpolated values at x = ${x}:`);
+//   console.log(`Interpolated values at x = ${x}:`);
   results.forEach(result => {
     const interpolatedValue = result.interpolatedValue;
     console.log(`Interval [${result.interval.start}, ${result.interval.end}] has value: ${interpolatedValue}`);
