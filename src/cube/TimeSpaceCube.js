@@ -23,10 +23,25 @@ export class MirrorLine{
         if(this.coordinateList.length<3){
             return
         }
-        const newCoordinate=[];
+        const newCoordinateList=[];
+        newCoordinateList.push(this.coordinateList[0]);
         for(let i=1;i<this.coordinateList.length-1;i++){
-
+            const first=this.coordinateList[newCoordinateList.length-1];
+            const second=this.coordinateList[i];
+            const third=this.coordinateList[i+1];
+            const distance12=distance2points(first,second);
+            const distance13=distance2points(first,third);
+            const distance23=distance2points(second,third);
+            if(distance13<contractDistance||distance23<contractDistance/5||distance12<contractDistance/5){
+                continue
+            }
+            else{
+                newCoordinateList.push(this.coordinateList[i])
+            }
         }
+        newCoordinateList.push(this.coordinateList[this.coordinateList.length-1])
+        
+
     }
     expandBend(expandDistance){
         const newCoordinateList=[];
