@@ -78,7 +78,9 @@ export class TimeSpaceCube{
     constructor(dyGraph,tau){
         this.nodes=new Set();
         this.edges=new Set();
+        this.edges2mirrorLine=new Map()
         this.nodeAttributes = new Object();
+        this.mirrorLine2DyNode=new Map();
         this.edgeAttributes = new Object();
         this.addDefaultNodeAttributes();
         this.addDefaultEdgeAttributes();
@@ -86,15 +88,16 @@ export class TimeSpaceCube{
         this.dyGraph=dyGraph;
         this.nodeMirrorMap=new Map();
         this.edgeMirrorMap=new Map();
-        const nodes=dyGraph.nodes;
-        const edges=dyGraph.edges;
+        
+        const DyNodes=dyGraph.nodes;
+        const DyEdges=dyGraph.edges;
         //create the mirrorline and update the coordinate list as the bend positions
-        this.addMirrorLine(nodes);
+        this.addMirrorLine(DyNodes);
         // for(const[id,node] of this.){
         //     console.log(dyGraph.nodeAttributes['nodePosition'].get(node))
         //     break
         // }
-        this.addMirrorConnection(edges);
+        this.addMirrorConnection(DyEdges);
         //create mirrornode inside mirrorline and update the node list from coordinate list
         this.getMirrorNode()
         // const edges=dyGraph.edges;
@@ -187,6 +190,7 @@ export class TimeSpaceCube{
                 else{
                     this.nodeMirrorMap.get(node).push(line);
                 }
+                this.mirrorLine2DyNode.set(line,node)
             }
 
         }
@@ -216,6 +220,7 @@ export class TimeSpaceCube{
                         this.edges.add(edge);
                         line.segmentList.push(edge);
                         prev=node;
+                        this.edges2mirrorLine.set(edge,line);
                     }
                     // console.log(this.nodeAttributes['nodePosition'].get(node))
                 }

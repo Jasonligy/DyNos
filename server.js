@@ -45,14 +45,14 @@ app.get('/tt', (req, res) => {
   .then((fileData) => {
       graph=getDyGraph(fileData); // Pass the object to the new function
       // console.log(graph);
-      const runner=new DynosRunner(graph,100,5);
+      const runner=new DynosRunner(graph,100,0.5);
       const bcube=runner.cube;
       for(const [id,lines] of bcube.nodeMirrorMap.entries()){
         // console.log(line.nodeList)
         for(const line of lines){
           for(const node of line.nodeList){
             // console.log(node)
-            console.log(bcube.nodeAttributes['nodePosition'].get(node))
+            // console.log(bcube.nodeAttributes['nodePosition'].get(node))
           }
         }}
       const cube=runner.iterate();

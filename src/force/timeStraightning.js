@@ -88,14 +88,18 @@ export class TimeStraightning{
                 const vector2D=[vector3D[0],vector3D[1],0];
 
                 //need implement the filter when the vector3D is almost zero
+
                 if(magnitude(vector2D)==0 || vector3D[2]==0){
                     continue
                 }
                 
-                const angle=Math.max(betweenAngle(vector2D,vector3D),0.01);
+                const angle=Math.max(betweenAngle(vector2D,vector3D).angleRadians,0.01);
+                
                 const shift=vector2D.map((value,index)=>value*(Math.PI/2-angle)/angle);
+                
                 force.set(source,force.get(source).map((value,index)=>value+shift[index]));
                 force.set(target,force.get(target).map((value,index)=>value-shift[index]));
+                // console.log(force.get(target))
             }
         }
     }

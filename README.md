@@ -17,7 +17,8 @@ The possible way of improvement:
 
 questions:
 1. can first placement avoid the crossing
-
+2. mirrorline为什么是interval data,
+3. How the locator using multilevel structure tracking lines that inside the desired distance.
 
 
 
@@ -28,3 +29,4 @@ the difference between the original implementation and js:
 
 
 the constriant output maybe either single value or a map
+need to do the constriant with temperature update

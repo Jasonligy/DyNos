@@ -12,13 +12,39 @@ export class EdgeRepulsion{
     }
     computeShift(){
         const force=new Map();
+        const pos=this.cube.nodeAttributes['nodePosition'];
         for(const node of this.cube.nodes){
             force.set(node,[0,0,0]);
 
         }
         let nodeDone=new Set();
-        for(const edge of this.cube.edges){
+        for(const node of this.cube.nodes){
+            const mirrorLineFirst=this.cube.node2mirrorLine.get(node)
+            const DyNodeFirst=this.cube.mirrorLine2DyNode(mirrorLineFirst);
+            for(const edge of this.cube.edges){
+                const mirrorLineSecond=this.cube.edges2mirrorLine.get(edge)
+                const DyNodeSecond=this.cube.mirrorLine2DyNode(mirrorLineSecond);
+                if(DyNodeFirst!=DyNodeSecond){
+                    //距离小于5
+                    const begin=edge.sourceNode;
+                    const end=edge.targetNode;
+                    const beginPos=pos.get(begin);
+                    const endPos=pos.get(end);
+                    const nodePos=pos.get(node);
+                    const distance=magnitude(nodePos,getclosestPoint(nodePos,beginPos,endPos));
+                    if(distance<5*this.desired){
+                        applyNodeEdgeRepulsion(force,node,nodePos,begin,beginPos,end,endPos)
+                    }
+                
+                    
+                }
+            }
 
+        }
+        for(const[id,value] of overallForce.entries()){
+            if(force.has(id)){
+                overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]))
+            }
         }
     }
     applyNodeEdgeRepulsion(force,a,aPos,c,cPos,d,dPos){

@@ -122,4 +122,63 @@ export function betweenAngle(vectorA, vectorB) {
     return { radians: angleRadians, degrees: angleDegrees };
 }
 
-// Example usage:
+function vectorSubtract(v1, v2) {
+    return [v1[0] - v2[0], v1[1] - v2[1], v1[2] - v2[2]];
+}
+
+function vectorDot(v1, v2) {
+    return v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
+}
+
+function vectorLength(v) {
+    return Math.sqrt(vectorDot(v, v));
+}
+
+function closestDistanceBetweenLineSegments(line1, line2) {
+    const P1=line1[0];
+    const Q1=line1[1];
+    const P2=line2[0];
+    const Q2=line2[1];
+    const d1 = vectorSubtract(Q1, P1); // Direction vector of segment 1
+    const d2 = vectorSubtract(Q2, P2); // Direction vector of segment 2
+    const r = vectorSubtract(P1, P2);
+
+    const a = vectorDot(d1, d1); // Squared length of segment 1
+    const e = vectorDot(d2, d2); // Squared length of segment 2
+    const f = vectorDot(d2, r);
+
+    let t = 0;
+    let u = 0;
+
+    const c = vectorDot(d1, r);
+    const b = vectorDot(d1, d2);
+
+    const denominator = a * e - b * b;
+
+    if (denominator !== 0) {
+        // Compute t and u (clamp them to [0, 1])
+        t = Math.max(0, Math.min(1, (b * f - c * e) / denominator));
+    }
+
+    u = Math.max(0, Math.min(1, (t * b + f) / e));
+
+    t = Math.max(0, Math.min(1, (b * u - c) / a));
+
+    // Compute the closest points
+    const closestPoint1 = [
+        P1[0] + t * d1[0],
+        P1[1] + t * d1[1],
+        P1[2] + t * d1[2],
+    ];
+
+    const closestPoint2 = [
+        P2[0] + u * d2[0],
+        P2[1] + u * d2[1],
+        P2[2] + u * d2[2],
+    ];
+
+    // Compute the distance
+    const diff = vectorSubtract(closestPoint1, closestPoint2);
+    return vectorLength(diff);
+}
+
