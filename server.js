@@ -52,7 +52,7 @@ app.get('/tt', (req, res) => {
         for(const line of lines){
           for(const node of line.nodeList){
             // console.log(node)
-            console.log(bcube.nodeAttributes['nodePosition'].get(node))
+            // console.log(bcube.nodeAttributes['nodePosition'].get(node))
           }
         }}
       const cube=runner.iterate();

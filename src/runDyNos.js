@@ -20,10 +20,11 @@ export class DynosRunner{
         const gravity=new Gravity(this.cube);
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
-        this.forceList=[gravity,timeStraightning,edgeAttraction];
+        // this.forceList=[gravity,timeStraightning,edgeAttraction];
+        this.forceList=[edgeAttraction];
     }
     iterate(){
-        for(let i=0;i<this.iteration;i++){
+        for(let i=0;i<1;i++){
             // console.log(i)
             this.cube.updateForce();
             this.forceList.forEach((force)=>force.computeShift());

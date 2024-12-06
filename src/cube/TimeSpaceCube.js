@@ -126,11 +126,12 @@ export class TimeSpaceCube{
 
     }
     addMirrorLine(nodes){
+        // console.log('begin count');
         for(const [id,node] of nodes.entries()){
             // appears is a list, ststing the appeared slots for the node
             const appears=this.dyGraph.nodeAttributes['appearance'].get(node)
             const intervals=this.dyGraph.nodeAttributes['nodePosition'].get(node);
-            // console.log(node)
+            // console.log(appears.getAllIntervals(appears.root))
             for(const appearSlot of appears.getAllIntervals(appears.root)){
                 let line=new MirrorLine(node,appearSlot);
                 //biuld trajectory using mirrorLine, creating bends in the mirrorlines
@@ -190,6 +191,7 @@ export class TimeSpaceCube{
             }
 
         }
+        console.log('finish count');
 
     }
     updateForce(){
@@ -237,13 +239,17 @@ export class TimeSpaceCube{
     addMirrorConnection(edges){
         //here edges is a list
         // console.log(edges)
-        
+        let countConnection=0;
         for(const edge of edges){
             // appears is a list, ststing the appeared slots for the node
             const appears=this.dyGraph.edgeAttributes['appearance'].get(edge)
             // console.log(appears)
+            countConnection+= appears.getAllIntervalsWithoutValue(appears.root).length
+            // console.log(appears.getAllIntervals(appears.root))
+            // console.log(appears.getAllIntervalsWithoutValue(appears.root))
+            // console.log('check')
             // const intervals=this.dyGraph.nodeAttributea['nodePosition'].get(node);
-            for(const appearSlot of appears.getAllIntervals(appears.root)){
+            for(const appearSlot of appears.getAllIntervalsWithoutValue(appears.root)){
                 const connection = new MirrorConnection(edge,appearSlot);
                 //need cautious and update later, now it is pasuodocode
                 const source=edge.sourceNode;
@@ -277,6 +283,8 @@ export class TimeSpaceCube{
             }
 
         }
+        console.log('countconnection');
+        console.log(countConnection)
         
     }
     outputMatrix(){
