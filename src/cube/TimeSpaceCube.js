@@ -1,5 +1,5 @@
 import{Node,Edge}from "../dygraph/Dygraph.js"
-import { avgVectors, distance2points } from "../utils/vectorOps.js";
+import { avgVectors, distance2points, magnitude } from "../utils/vectorOps.js";
 export class MirrorLine{
     constructor(dynode,appearInterval){
         this.dynode = dynode;
@@ -108,6 +108,7 @@ export class TimeSpaceCube{
         this.nodeAttributes['color']=new Map();
         this.nodeAttributes['force']=new Map();
         this.nodeAttributes['movement']=new Map();
+        this.nodeAttributes['constiant']=new Map();
     }
     addDefaultEdgeAttributes(){
         this.edgeAttributes['appearance']=new Map();
@@ -118,7 +119,18 @@ export class TimeSpaceCube{
     updateCube(){
         const pos=this.nodeAttributes['nodePosition'];
         for(const node of this.nodes){
-            const move=this.nodeAttributes['movement'].get(node);
+            const force=this.nodeAttributes['force'].get(node);
+            const nodeMovement=this.nodeAttributes['movement'].get(node);
+            const constriant=this.nodeAttributes['constriant'].get(node)*this.safetyMovementFactor;
+            const mag=magnitude(force);
+            if(!mag<0.001&&!constriant<0.001){
+                const movement=[...force];
+                if(mag>constriant){
+                    movement=movement.map((value,index)=>value*constriant/mag);
+
+                }
+                nodeMovement.set(node,movement);
+            }
             // console.log(typeof force)
             pos.set(node,move.map((value,index)=>value+pos.get(node)[index]));
             // console.log(pos.get(node))
@@ -195,13 +207,13 @@ export class TimeSpaceCube{
         console.log('finish count');
 
     }
-    updateForce(){
+    updateForceMovement(){
         for(const node of this.nodes){
             this.nodeAttributes['force'].set(node,[0,0,0]);
-        }
-        for(const node of this.nodes){
             this.nodeAttributes['movement'].set(node,[0,0,0]);
+            this.nodeAttributes['constriant'].set(node,Infinity);
         }
+ 
     }
     getMirrorNode(){
         for(const [id,lines] of this.nodeMirrorMap.entries()){
