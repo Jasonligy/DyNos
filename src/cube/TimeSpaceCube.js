@@ -107,6 +107,7 @@ export class TimeSpaceCube{
         this.nodeAttributes['nodePosition']=new Map();
         this.nodeAttributes['color']=new Map();
         this.nodeAttributes['force']=new Map();
+        this.nodeAttributes['movement']=new Map();
     }
     addDefaultEdgeAttributes(){
         this.edgeAttributes['appearance']=new Map();
@@ -117,9 +118,9 @@ export class TimeSpaceCube{
     updateCube(){
         const pos=this.nodeAttributes['nodePosition'];
         for(const node of this.nodes){
-            const force=this.nodeAttributes['force'].get(node);
+            const move=this.nodeAttributes['movement'].get(node);
             // console.log(typeof force)
-            pos.set(node,force.map((value,index)=>value+pos.get(node)[index]));
+            pos.set(node,move.map((value,index)=>value+pos.get(node)[index]));
             // console.log(pos.get(node))
         }
 
@@ -197,6 +198,9 @@ export class TimeSpaceCube{
     updateForce(){
         for(const node of this.nodes){
             this.nodeAttributes['force'].set(node,[0,0,0]);
+        }
+        for(const node of this.nodes){
+            this.nodeAttributes['movement'].set(node,[0,0,0]);
         }
     }
     getMirrorNode(){
@@ -287,6 +291,19 @@ export class TimeSpaceCube{
         console.log(countConnection)
         
     }
+    postProcessing(){
+        for(const trajectory of this.nodeMirrorMap.entries()){
+            //if(temperature() > shutDownTemperature)
+            //if (refreshCounter % refreshInterval == 0 ) 
+            trajectory.expandBend(this.expandDistance);
+        }
+        for(const trajectory of this.nodeMirrorMap.entries()){
+            //if(temperature() > shutDownTemperature)
+            //if (refreshCounter % refreshInterval == 0 ) 
+            trajectory.contractBend(this.contractDistance);
+        }         
+    }
+
     outputMatrix(){
         let lines=[];
         let mirrorIndex=[];
