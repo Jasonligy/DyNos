@@ -46,15 +46,25 @@ export class MirrorLine{
     expandBend(expandDistance){
         const newCoordinateList=[];
         newCoordinateList.push(this.coordinateList[0]);
-        for(const i=0;i<this.nodeList.length-1;i++){
+        // console.log('l');
+        // console.log(this.coordinateList.length);
+        // console.log(this.nodeList.length);
+        for(let i=0;i<this.coordinateList.length-1;i++){
             const firstCoord=this.coordinateList[i];
-            const secondCoord=this.coordinateList[i+1];    
+            const secondCoord=this.coordinateList[i+1];  
+            // console.log(i)  ;
+            // console.log()
+            // console.log(secondCoord)
             const dist=distance2points(firstCoord,secondCoord);
+            // expandDistance=0.1
             if(dist>expandDistance&&Math.abs(firstCoord[2]-secondCoord[2])>expandDistance/2){
+
+                // console.log('expand')
                 newCoordinateList.push(avgVectors(firstCoord,secondCoord));
             }
             newCoordinateList.push(secondCoord);
         }
+        this.coordinateList=newCoordinateList
 
     }
     // updateCoordinate(){
@@ -76,6 +86,7 @@ export class MirrorConnection{
 }
 export class TimeSpaceCube{
     constructor(dyGraph,tau){
+        this.delta=5;
         this.nodes=new Set();
         this.edges=new Set();
         this.nodeAttributes = new Object();
@@ -97,6 +108,8 @@ export class TimeSpaceCube{
         this.addMirrorConnection(edges);
         //create mirrornode inside mirrorline and update the node list from coordinate list
         this.getMirrorNode()
+        this.expandDistance=2.0*this.delta;
+        this.contractDistance=1.5*this.delta;
         // const edges=dyGraph.edges;
 
 
@@ -108,7 +121,7 @@ export class TimeSpaceCube{
         this.nodeAttributes['color']=new Map();
         this.nodeAttributes['force']=new Map();
         this.nodeAttributes['movement']=new Map();
-        this.nodeAttributes['constiant']=new Map();
+        this.nodeAttributes['constriant']=new Map();
     }
     addDefaultEdgeAttributes(){
         this.edgeAttributes['appearance']=new Map();
@@ -116,7 +129,7 @@ export class TimeSpaceCube{
         this.edgeAttributes['strength']=new Map();
         
     }
-    updateCube(){
+    computeMovement(){
         const pos=this.nodeAttributes['nodePosition'];
         for(const node of this.nodes){
             const force=this.nodeAttributes['force'].get(node);
@@ -132,8 +145,20 @@ export class TimeSpaceCube{
                 nodeMovement.set(node,movement);
             }
             // console.log(typeof force)
-            pos.set(node,move.map((value,index)=>value+pos.get(node)[index]));
+            // pos.set(node,move.map((value,index)=>value+pos.get(node)[index]));
             // console.log(pos.get(node))
+        }
+
+
+    }
+    updateCube(){
+        const pos=this.nodeAttributes['nodePosition'];
+        const move=this.nodeAttributes['movement'];
+        for(const node of this.nodes){
+            
+            
+            pos.set(node,move.get(node).map((value,index)=>value+pos.get(node)[index]));
+          
         }
 
 
@@ -208,6 +233,9 @@ export class TimeSpaceCube{
 
     }
     updateForceMovement(){
+        this.nodeAttributes['force'].clear();
+        this.nodeAttributes['movement'].clear();
+        this.nodeAttributes['constriant'].clear();
         for(const node of this.nodes){
             this.nodeAttributes['force'].set(node,[0,0,0]);
             this.nodeAttributes['movement'].set(node,[0,0,0]);
@@ -216,10 +244,16 @@ export class TimeSpaceCube{
  
     }
     getMirrorNode(){
+        this.nodes.clear();
+        this.edges.clear();
+        this.nodeAttributes['nodePosition'].clear();
         for(const [id,lines] of this.nodeMirrorMap.entries()){
             let prev=null;
             // console.log(lines)
+
             for(const line of lines){
+                line.nodeList=[];
+                line.segmentList=[]
                 // console.log(line)
                 for(let coordinate of line.coordinateList){
                     let node=new Node();
@@ -304,15 +338,19 @@ export class TimeSpaceCube{
         
     }
     postProcessing(){
-        for(const trajectory of this.nodeMirrorMap.entries()){
+        for(const [id,trajectories] of this.nodeMirrorMap.entries()){
             //if(temperature() > shutDownTemperature)
             //if (refreshCounter % refreshInterval == 0 ) 
-            trajectory.expandBend(this.expandDistance);
+            for(const trajectory of trajectories){
+                trajectory.expandBend(this.expandDistance);
+            }
         }
-        for(const trajectory of this.nodeMirrorMap.entries()){
+        for(const [id,trajectories] of this.nodeMirrorMap.entries()){
             //if(temperature() > shutDownTemperature)
             //if (refreshCounter % refreshInterval == 0 ) 
-            trajectory.contractBend(this.contractDistance);
+            for(const trajectory of trajectories){
+                trajectory.contractBend(this.contractDistance);
+            }
         }         
     }
 

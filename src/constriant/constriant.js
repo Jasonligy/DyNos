@@ -8,13 +8,13 @@ export class DecreasingMaxMovement{
         this.temperature=temperature;
        
     }
-    computeConstraint(){
+    computeConstriant(){
        return {defaultValue:this.temperature*this.initialMaxMovement,nodeConstriant:new Map()}
     }
    
 }
 
-export class DecreasingMaxMovement{
+export class MovementAcceleration{
     constructor(cube,maxMovement){
         this.cube=cube;
         this.maxMovement=maxMovement;
@@ -24,7 +24,7 @@ export class DecreasingMaxMovement{
     setTemperature(temperature){
         this.temperature=temperature;
     }
-    computeConstraint(){
+    computeConstriant(){
         const force=this.cube.nodeAttributes['force'];
         for(const node of this.cube.nodes){
             const currentForce=force.get(node);

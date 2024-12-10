@@ -140,7 +140,7 @@ export function getDyGraph(fileData){
         dyGraph.nodeAttributes['nodePosition'].set(node,new IntervalTree([0,0]));
         dyGraph.nodeAttributes['appearance'].set(node,new IntervalTree(true))
         //the interval from origin code 
-        dyGraph.nodeAttributes['appearance'].get(node).insert(new Interval(-1,7))
+        dyGraph.nodeAttributes['appearance'].get(node).insert(new Interval(-1,6.5))
         // console.log(dyGraph.nodeAttributes['appearance'].get(node))
         // console.log(new Interval(-1,7))
 
@@ -179,7 +179,7 @@ export function getDyGraph(fileData){
     }
     console.log('count');
     console.log(count)
-    scatterNode(dyGraph,5);
+    scatterNode(dyGraph,40);
     // for(const[id,node] of dyGraph.nodes){
     //     console.log(dyGraph.nodeAttributes['nodePosition'].get(node))
     //     break
