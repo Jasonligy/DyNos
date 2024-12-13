@@ -3,6 +3,7 @@ export class DecreasingMaxMovement{
     constructor(cube,initialMaxMovement){
         this.cube=cube;
         this.initialMaxMovement=initialMaxMovement;
+        this.temperature=1;
     }
     setTemperature(temperature){
         this.temperature=temperature;
@@ -33,7 +34,7 @@ export class MovementAcceleration{
             const currentForce=force.get(node);
             const z=currentForce[2];
             currentForce[2]=0;
-            if(magnitude(currentForce)<0.01){
+            if(magnitude(currentForce)<0.0001){
                 this.previousMovements.delete(node)
             }
             currentForce[2]=z;
@@ -43,18 +44,28 @@ export class MovementAcceleration{
 
             }
             else{
+                // console.log('try')
                 const previousMovement=this.previousMovements.get(node);
+                
+                
+                
                 const angleDiff=betweenAngle(currentForce,previousMovement);
                 const previousMagnitude=magnitude(previousMovement);
-                if(angleDiff<Math.PI/3){
-                    currentLimit=Math.min(previousMagnitude * (1 + 2 * (1 - angleDiff / (Math.PI / 3))));
-
+                if(angleDiff.radians<Math.PI/3){
+                    // console.log('pi3')
+                    currentLimit=Math.min(previousMagnitude * (1 + 2 * (1 - angleDiff.radians / (Math.PI / 3))),this.maxMovement);
+                    // console.log(currentLimit)
                 }
-                else if(angleDiff<Math.PI/2){
+                else if(angleDiff.radians<Math.PI/2){
+                    // console.log('pi2')
                     currentLimit=previousMagnitude;
+                    // console.log(currentLimit)
                 }
                 else{
-                    currentLimit=previousMagnitude / (1 + 4 * (angleDiff / (Math.PI / 2) - 1));
+                    // console.log('pio');
+                    currentLimit=previousMagnitude / (1 + 4 * (angleDiff.radians / (Math.PI / 2) - 1));
+                    
+                    // console.log(currentLimit);
                 }
 
             }

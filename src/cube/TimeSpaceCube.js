@@ -13,6 +13,7 @@ export class MirrorLine{
         //nodeLIst correspond to the coordinateList, the 
         this.nodeList=[];
         this.segmentList=[];
+        this.current2Prev=new Map();
         
     }
     addBend(coordinat){
@@ -34,6 +35,11 @@ export class MirrorLine{
             const distance13=distance2points(first,third);
             const distance23=distance2points(second,third);
             if(distance13<contractDistance||distance23<contractDistance/5||distance12<contractDistance/5){
+                // this.nodeList.slice(i,1);
+                const firstSegment=this.segmentList[i-1];
+                firstSegment.target=this.nodeList[i+1];
+                this.segmentList.splice(i,1);
+                this.nodeList.slice(i,1);
                 continue
             }
             else{
@@ -41,7 +47,13 @@ export class MirrorLine{
             }
         }
         newCoordinateList.push(this.coordinateList[this.coordinateList.length-1])
-        
+        this.coordinateList=newCoordinateList;
+        if(this.segmentList.length!=this.nodeList.length-1){
+            throw new Error('segment length is not equal to node list minus 1');
+        }
+        if(this.coordinateList.length!=this.nodeList.length){
+            throw new Error('coordinate list length is not equal to node list ');
+        }
 
     }
     expandBend(expandDistance){
@@ -61,12 +73,25 @@ export class MirrorLine{
             if(dist>expandDistance&&Math.abs(firstCoord[2]-secondCoord[2])>expandDistance/2){
 
                 // console.log('expand')
+                let node=new Node();
+                this.nodeList.splice(i+1,0,node) ;
+
+                const edge0=this.segmentList[i];
+                const targetNode=edge0.target;
+                edge0.target=node;   
+                const edge1=new Edge(node,targetNode);
+                this.segmentList.splice(i+1,0,edge1) ;
                 newCoordinateList.push(avgVectors(firstCoord,secondCoord));
             }
             newCoordinateList.push(secondCoord);
         }
         this.coordinateList=newCoordinateList
-
+        if(this.segmentList.length!=this.nodeList.length-1){
+            throw new Error('segment length is not equal to node list minus 1');
+        }
+        if(this.coordinateList.length!=this.nodeList.length){
+            throw new Error('coordinate list length is not equal to node list ');
+        }
     }
     // updateCoordinate(){
     //     for(const )
@@ -140,7 +165,7 @@ export class TimeSpaceCube{
             const mag=magnitude(force);
           
             if(!mag<0.001&&!constriant<0.001){
-                const movement=[...force];
+                let movement=[...force];
                 if(mag>constriant){
                     movement=movement.map((value,index)=>value*constriant/mag);
 
@@ -162,9 +187,22 @@ export class TimeSpaceCube{
             
             
             pos.set(node,move.get(node).map((value,index)=>value+pos.get(node)[index]));
-          
+            
         }
+        for(const [id,lines] of this.nodeMirrorMap.entries()){
+            let prev=null;
+            // console.log(lines)
 
+            for(const line of lines){
+                for(let i=0;i<line.coordinateList.length;i++){
+                    const node=line.nodeList[i];
+
+                   const nodePos=pos.get(node);
+                   line.coordinateList[i]=nodePos;
+                }
+                
+         }
+        }
 
     }
     addMirrorLine(nodes){
@@ -279,6 +317,30 @@ export class TimeSpaceCube{
          }
         }
     }
+    getMirrorNode2(){
+        this.nodes.clear();
+        this.edges.clear();
+        this.nodeAttributes['nodePosition'].clear();
+        for(const [id,lines] of this.nodeMirrorMap.entries()){
+            let prev=null;
+            // console.log(lines)
+
+            for(const line of lines){
+                for(let i=0;i<line.coordinateList.length;i++){
+                    const node=line.nodeList[i];
+
+                    this.nodes.add(node);
+                    this.nodeAttributes['nodePosition'].set(node,line.coordinateList[i]);
+                    if(i!=line.coordinateList.length-1){
+                        const edge=line.segmentList[i];
+                        this.edges.add(edge);
+                    }
+                }
+                
+         }
+        }
+    }
+    
     updateCoordinateList(mirrorLine){
         if(mirrorLine.nodeList.length!=mirrorLine.coordinateList.length){
             throw new Error(" the node size of nodeList and coordinateList is not same")

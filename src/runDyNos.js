@@ -30,8 +30,8 @@ export class DynosRunner{
     getConstriantList(){
         const decreasingMaxMovement=new DecreasingMaxMovement(this.cube,this.initialMaxMovement);
         const movementAcceleration=new MovementAcceleration(this.cube,this.maxMovement);
-        this.constraintList=[movementAcceleration];
-        // this.constraintList=[decreasingMaxMovement,movementAcceleration];
+        // this.constraintList=[decreasingMaxMovement];
+        this.constraintList=[decreasingMaxMovement,movementAcceleration];
     }
     getForceList(){
         const gravity=new Gravity(this.cube);
@@ -41,8 +41,12 @@ export class DynosRunner{
         this.forceList=[gravity];
     }
     iterate(){
-        for(let i=0;i<2;i++){
+        for(let i=0;i<100;i++){
             console.log(i)
+            this.temperature=(this.iteration-i)/this.iteration;
+            this.forceList.forEach((force)=>force.setTemperature(this.temperature));
+            this.constraintList.forEach((constraint)=>constraint.setTemperature(this.temperature));
+        
             this.cube.updateForceMovement();
             this.forceList.forEach((force)=>force.computeShift());
             // this.constraintList.forEach((constraint)=>constraint.computeConstraint());//need change
@@ -51,16 +55,18 @@ export class DynosRunner{
             this.preMovementList.forEach((preMove)=>preMove.execute());
             this.cube.updateCube();
             this.cube.postProcessing();
-            this.cube.getMirrorNode();
-            this.temperature=(this.iteration-i)/this.iteration;
-            this.forceList.forEach((force)=>force.setTemperature(this.temperature));
-            if(i==1){
+            this.cube.getMirrorNode2();
+               let c=0;
+            if(i==99){
                 console.log('movestart');
-                for(const[id,value]of this.cube.nodeAttributes['movement'].entries()){
-                // for(const[id,value]of this.cube.nodeAttributes['constriant'].entries()){
+                // for(const[id,value]of this.cube.nodeAttributes['movement'].entries()){
+                for(const[id,value]of this.cube.nodeAttributes['constriant'].entries()){
                     console.log(value)
+                    
                 }
                 console.log('moveend');
+                // console.log(c);
+                
             }
 
         }
@@ -74,7 +80,9 @@ export class DynosRunner{
             limit=Math.min(limit,valueObj.defaultValue);
             for(const node of this.cube.nodes){
                 let nodeMovement=Math.min(mirrorConstriant.get(node),limit);
-                nodeMovement=Math.min(nodeMovement,valueObj.nodeConstriant.get(node));
+                if(valueObj.nodeConstriant.has(node)){
+                    nodeMovement=Math.min(nodeMovement,valueObj.nodeConstriant.get(node));
+                }
                 mirrorConstriant.set(node,nodeMovement);
             }
         }
