@@ -69,7 +69,7 @@ app.get('/tt', (req, res) => {
 
           for(const node of line.nodeList){
             // console.log(node)
-            console.log(cube.nodeAttributes['nodePosition'].get(node))
+            // console.log(cube.nodeAttributes['nodePosition'].get(node))
             }
           }
         }

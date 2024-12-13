@@ -16,6 +16,7 @@ export class DecreasingMaxMovement{
 
 export class MovementAcceleration{
     constructor(cube,maxMovement){
+
         this.cube=cube;
         this.maxMovement=maxMovement;
         this.previousMovements=new Map();
@@ -25,7 +26,9 @@ export class MovementAcceleration{
         this.temperature=temperature;
     }
     computeConstriant(){
+        this.constriant.clear();
         const force=this.cube.nodeAttributes['force'];
+      
         for(const node of this.cube.nodes){
             const currentForce=force.get(node);
             const z=currentForce[2];
@@ -58,6 +61,7 @@ export class MovementAcceleration{
             this.constriant.set(node,currentLimit);
             this.previousMovements.set(node,getUnitVector(currentForce).map((value,index)=>currentLimit*value))
         }
+        // console.log(this.constriant);
         return{defaultValue:Infinity,nodeConstriant:this.constriant};
     }
    

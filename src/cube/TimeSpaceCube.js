@@ -13,6 +13,7 @@ export class MirrorLine{
         //nodeLIst correspond to the coordinateList, the 
         this.nodeList=[];
         this.segmentList=[];
+        
     }
     addBend(coordinat){
         this.coordinateList.push(coordinat);
@@ -110,6 +111,7 @@ export class TimeSpaceCube{
         this.getMirrorNode()
         this.expandDistance=2.0*this.delta;
         this.contractDistance=1.5*this.delta;
+        this.safetyMovementFactor=0.9
         // const edges=dyGraph.edges;
 
 
@@ -136,13 +138,15 @@ export class TimeSpaceCube{
             const nodeMovement=this.nodeAttributes['movement'].get(node);
             const constriant=this.nodeAttributes['constriant'].get(node)*this.safetyMovementFactor;
             const mag=magnitude(force);
+          
             if(!mag<0.001&&!constriant<0.001){
                 const movement=[...force];
                 if(mag>constriant){
                     movement=movement.map((value,index)=>value*constriant/mag);
 
                 }
-                nodeMovement.set(node,movement);
+                
+                this.nodeAttributes['movement'].set(node,movement);
             }
             // console.log(typeof force)
             // pos.set(node,move.map((value,index)=>value+pos.get(node)[index]));

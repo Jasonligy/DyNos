@@ -15,10 +15,11 @@ export class DynosRunner{
         this.iteration=number;
         this.forceList=[];
         this.getForceList();
-        this.getConstriantList();
+        
         this.temperature=1;
-        this.initialMaxMovement;
-        this.maxMovement;
+        this.initialMaxMovement=10;
+        this.maxMovement=2*this.delta;
+        this.getConstriantList();
         //desired distance
         this.desired=this.delta;
         this.expandDistance=2*this.delta;
@@ -29,7 +30,7 @@ export class DynosRunner{
     getConstriantList(){
         const decreasingMaxMovement=new DecreasingMaxMovement(this.cube,this.initialMaxMovement);
         const movementAcceleration=new MovementAcceleration(this.cube,this.maxMovement);
-        this.constraintList=[decreasingMaxMovement];
+        this.constraintList=[movementAcceleration];
         // this.constraintList=[decreasingMaxMovement,movementAcceleration];
     }
     getForceList(){
@@ -40,7 +41,7 @@ export class DynosRunner{
         this.forceList=[gravity];
     }
     iterate(){
-        for(let i=0;i<100;i++){
+        for(let i=0;i<2;i++){
             console.log(i)
             this.cube.updateForceMovement();
             this.forceList.forEach((force)=>force.computeShift());
@@ -56,9 +57,10 @@ export class DynosRunner{
             if(i==1){
                 console.log('movestart');
                 for(const[id,value]of this.cube.nodeAttributes['movement'].entries()){
+                // for(const[id,value]of this.cube.nodeAttributes['constriant'].entries()){
                     console.log(value)
                 }
-                console.log('movestart');
+                console.log('moveend');
             }
 
         }
