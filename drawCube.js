@@ -303,7 +303,7 @@ function draw(edge,indexs){
         // }
 
         console.log(indexs[i])
-        gl.drawArrays(gl.LINE_STRIP, index, 2); // n+1 vertices -> n edges
+        gl.drawArrays(gl.LINE_STRIP, index, indexs[i]); // n+1 vertices -> n edges
         index+=indexs[i];
     }}
     // fetch('/api/data')

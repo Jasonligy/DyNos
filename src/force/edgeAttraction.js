@@ -99,8 +99,8 @@ export class EdgeAttraction{
         this.computeExponent()
         // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
         const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));
-        console.log(this.desired);
-        console.log('base');
+        // console.log(this.desired);
+        // console.log('base');
         
         
         const aBalance=(zPos-aInt[0])/aWidth;

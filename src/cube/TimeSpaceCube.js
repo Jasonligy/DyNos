@@ -423,6 +423,17 @@ export class TimeSpaceCube{
     outputMatrix(){
         let lines=[];
         let mirrorIndex=[];
+        let getH=[]
+        // for(const [id,nodeLines] of this.nodeMirrorMap.entries()){
+        //     for(const nodeline of nodeLines){
+        //         let coordinateList=nodeline.coordinateList;
+        //         const index=coordinateList.length;
+        //         mirrorIndex.push(index);
+        //         // console.log('co')
+        //         // console.log(coordinateList)
+        //         lines.push(...coordinateList)
+        //     }
+        // }
         for(const [id,nodeLines] of this.nodeMirrorMap.entries()){
             for(const nodeline of nodeLines){
                 let coordinateList=nodeline.coordinateList;
@@ -433,6 +444,11 @@ export class TimeSpaceCube{
                 lines.push(...this.convertCoordinate(coordinateList))
             }
         }
+        console.log('lines');
+        console.log(lines.length);
+        
+        console.log(lines);
+        
         return [lines,mirrorIndex];
     }
     //coordinates is a 2D array from the mirror, store the 3D coordinates of each node
@@ -440,7 +456,7 @@ export class TimeSpaceCube{
     convertCoordinate(coordinates){
         let convertedCoordinates=[]
         for(let coordinate of coordinates){
-            const convertedCoordinate=this.fmap3DCoordinates(coordinate,[-1,-1,0],[1,1,10]);
+            const convertedCoordinate=this.fmap3DCoordinates(coordinate,[0,0,-2.122449],[40,40,13.8]);
             
             convertedCoordinates.push(...convertedCoordinate);
         }

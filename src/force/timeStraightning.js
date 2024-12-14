@@ -63,9 +63,9 @@ export class TimeStraightning{
                 
             }
             const vectorMag=magnitude(desired);
-            console.log('desired');
+            // console.log('desired');
             
-            console.log(desired);
+            // console.log(desired);
             
             //when vectormag equals to 0, means the trajectory is perpendicular with time
             if(vectorMag>0){
