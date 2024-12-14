@@ -32,7 +32,7 @@ app.get('/api/data', (req, res) => {
       graph=getDyGraph(fileData);
     // const data=graph;
     console.log(fileData)
-    const cubeBefore=new TimeSpaceCube(graph,-5);
+    const cubeBefore=new TimeSpaceCube(graph,2.122449);
     // const [lines,mirrorIndex]=generateCube();
     const [lines,mirrorIndex]=cubeBefore.outputMatrix();
     const data={array:lines,index:mirrorIndex};
@@ -49,23 +49,31 @@ app.get('/tt', (req, res) => {
       const bcube=runner.cube;
       for(const [id,lines] of bcube.nodeMirrorMap.entries()){
         // console.log(line.nodeList)
+
         for(const line of lines){
+          // console.log(line.coordinateList.length);
+          // console.log(line.nodeList.length);
           for(const node of line.nodeList){
             // console.log(node)
-            console.log(bcube.nodeAttributes['nodePosition'].get(node))
+            
+            // console.log(bcube.nodeAttributes['nodePosition'].get(node))
           }
         }}
+      console.log('bcube');
+      console.log(bcube.nodes.size)
       const cube=runner.iterate();
       const nodeList=cube.nodes;
       for(const [id,lines] of cube.nodeMirrorMap.entries()){
         // console.log(line.nodeList)
         for(const line of lines){
+
           for(const node of line.nodeList){
             // console.log(node)
             // console.log(cube.nodeAttributes['nodePosition'].get(node))
             }
           }
         }
+      console.log(nodeList.size)
 
   })
  

@@ -28,3 +28,12 @@ the difference between the original implementation and js:
 
 
 the constriant output maybe either single value or a map
+
+
+
+cautious to the vandebunt implementation at java code!!!! the corrected value in vandebunt seems to be wrong
+
+safetyMovementFactor
+temperature
+
+tau 2.122448979591837

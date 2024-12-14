@@ -6,13 +6,19 @@ export class EdgeAttraction{
         this.initialExponent = 4;
         this.finalExponent = 2;
         this.temperature=temperature;
+        this.count=0;
+        console.log(this.desired)
     }
     setTemperature(temperature){
+        // console.log(temperature)
         this.temperature=temperature;
     }
     computeShift(){
+        // console.log('begin')
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
+        console.log('size')
+        console.log(this.cube.edgeMirrorMap.size)
         for(const [edge,connection] of this.cube.edgeMirrorMap){
             const mirrorLineSource=connection.source;
             const mirrorLineTarget=connection.target;
@@ -20,17 +26,28 @@ export class EdgeAttraction{
             // const mirrorLineTarget=this.cube.nodeMirrorMap.get(dyTargetNode);
             this.computeForce(force,connection,mirrorLineSource,mirrorLineTarget);
         }
+        for(const [id,value] of force.entries()){
+            // console.log(value)
+        }
 
         for(const [id,value] of overallForce.entries()){
             if(force.has(id)){
+                // console.log(force.get(id));
+                
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]));
             }
         }
+        // console.log(this.temperature)
+        console.log(this.count)
+        console.log('finish')
+        
 
     }
     computeForce(force,connection,source,target){
         const connectionInterval=[connection.interval.start,connection.interval.end];
         // console.log(source)
+        // console.log('length')
+        // console.log(target.segmentList.length)
         for(const a of source.segmentList){
             // console.log('has segment')
             const aInterval=this.segmentInterval(a);
@@ -38,11 +55,13 @@ export class EdgeAttraction{
             const aIntersection=getIntersection(aInterval,connectionInterval);
             if(aIntersection!=null){
                 for(const b of target.segmentList){
+                   
                     const bInterval=this.segmentInterval(b);         
                     const bIntersection=getIntersection(bInterval,connectionInterval);
                     if(bIntersection!=null){
                         const intersection=getIntersection(aIntersection,bIntersection);
                         if(intersection!=null){
+                            // console.log(intersection)
                             const aWidth=aInterval[1]-aInterval[0];
                             const bWidth=bInterval[1]-bInterval[0];
                             const allWidth=intersection[1]-bIntersection[0];
@@ -62,21 +81,37 @@ export class EdgeAttraction{
         }
     }
     computeExponent(){
+        // console.log('exponent '+this.temperature )
+        this.count+=1;
         return this.finalExponent + (this.initialExponent - this.finalExponent) * this.temperature;
     }
     applyVector(force,vector,zPos,a,b,aInt,bInt,aRatio,bRatio){
         const aWidth=aInt[1]-aInt[0];
         const bWidth=bInt[1]-bInt[0];
         const currentDistance=magnitude(vector);
+        if(currentDistance<0.001){
+            return
+        }
         //need implement almost zero
         const unit=getUnitVector(vector);
-        const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
+        // console.log(this.computeExponent())
+        // console.log('test')
+        this.computeExponent()
+        // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
+        const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));
+        console.log(this.desired);
+        console.log('base');
+        
+        
         const aBalance=(zPos-aInt[0])/aWidth;
         const bBalance=(zPos-bInt[0])/bWidth;
+        // console.log(this.desired)
+        // console.log(Math.pow(currentDistance / this.desired,this.computeExponent()))
         const aSourceForce=baseForce.map((value,index)=>value*aRatio*(1-aBalance));
         const aTargetForce=baseForce.map((value,index)=>value*aRatio*(aBalance));
         const bSourceForce=baseForce.map((value,index)=>value*(-bRatio*(1-bBalance)));
         const bTargetForce=baseForce.map((value,index)=>value*(-bRatio*(bBalance)));
+        // console.log(aSourceForce)
         if(!force.has(a.sourceNode)){
             force.set(a.sourceNode,aSourceForce);
         }else{
@@ -120,6 +155,8 @@ export class EdgeAttraction{
         const sourcePos=pos.get(edge.sourceNode);
         const targetPos=pos.get(edge.targetNode);
         //get z coordinate of the source node and target node
+        // console.log(edge.targetNode);
+        
         return [sourcePos[2],targetPos[2]];
     }
     

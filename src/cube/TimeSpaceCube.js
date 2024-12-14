@@ -1,5 +1,5 @@
 import{Node,Edge}from "../dygraph/Dygraph.js"
-import { avgVectors, distance2points } from "../utils/vectorOps.js";
+import { avgVectors, distance2points, magnitude } from "../utils/vectorOps.js";
 export class MirrorLine{
     constructor(dynode,appearInterval){
         this.dynode = dynode;
@@ -13,6 +13,8 @@ export class MirrorLine{
         //nodeLIst correspond to the coordinateList, the 
         this.nodeList=[];
         this.segmentList=[];
+        this.current2Prev=new Map();
+        
     }
     addBend(coordinat){
         this.coordinateList.push(coordinat);
@@ -33,6 +35,11 @@ export class MirrorLine{
             const distance13=distance2points(first,third);
             const distance23=distance2points(second,third);
             if(distance13<contractDistance||distance23<contractDistance/5||distance12<contractDistance/5){
+                // this.nodeList.slice(i,1);
+                const firstSegment=this.segmentList[i-1];
+                firstSegment.target=this.nodeList[i+1];
+                this.segmentList.splice(i,1);
+                this.nodeList.slice(i,1);
                 continue
             }
             else{
@@ -40,22 +47,51 @@ export class MirrorLine{
             }
         }
         newCoordinateList.push(this.coordinateList[this.coordinateList.length-1])
-        
+        this.coordinateList=newCoordinateList;
+        if(this.segmentList.length!=this.nodeList.length-1){
+            throw new Error('segment length is not equal to node list minus 1');
+        }
+        if(this.coordinateList.length!=this.nodeList.length){
+            throw new Error('coordinate list length is not equal to node list ');
+        }
 
     }
     expandBend(expandDistance){
         const newCoordinateList=[];
         newCoordinateList.push(this.coordinateList[0]);
-        for(const i=0;i<this.nodeList.length-1;i++){
+        // console.log('l');
+        // console.log(this.coordinateList.length);
+        // console.log(this.nodeList.length);
+        for(let i=0;i<this.coordinateList.length-1;i++){
             const firstCoord=this.coordinateList[i];
-            const secondCoord=this.coordinateList[i+1];    
+            const secondCoord=this.coordinateList[i+1];  
+            // console.log(i)  ;
+            // console.log()
+            // console.log(secondCoord)
             const dist=distance2points(firstCoord,secondCoord);
+            // expandDistance=0.1
             if(dist>expandDistance&&Math.abs(firstCoord[2]-secondCoord[2])>expandDistance/2){
+
+                // console.log('expand')
+                let node=new Node();
+                this.nodeList.splice(i+1,0,node) ;
+
+                const edge0=this.segmentList[i];
+                const targetNode=edge0.targetNode;
+                edge0.targetNode=node;   
+                const edge1=new Edge(node,targetNode);
+                this.segmentList.splice(i+1,0,edge1) ;
                 newCoordinateList.push(avgVectors(firstCoord,secondCoord));
             }
             newCoordinateList.push(secondCoord);
         }
-
+        this.coordinateList=newCoordinateList
+        if(this.segmentList.length!=this.nodeList.length-1){
+            throw new Error('segment length is not equal to node list minus 1');
+        }
+        if(this.coordinateList.length!=this.nodeList.length){
+            throw new Error('coordinate list length is not equal to node list ');
+        }
     }
     // updateCoordinate(){
     //     for(const )
@@ -76,6 +112,7 @@ export class MirrorConnection{
 }
 export class TimeSpaceCube{
     constructor(dyGraph,tau){
+        this.delta=5;
         this.nodes=new Set();
         this.edges=new Set();
         this.nodeAttributes = new Object();
@@ -97,6 +134,9 @@ export class TimeSpaceCube{
         this.addMirrorConnection(edges);
         //create mirrornode inside mirrorline and update the node list from coordinate list
         this.getMirrorNode()
+        this.expandDistance=2.0*this.delta;
+        this.contractDistance=1.5*this.delta;
+        this.safetyMovementFactor=0.9
         // const edges=dyGraph.edges;
 
 
@@ -107,6 +147,8 @@ export class TimeSpaceCube{
         this.nodeAttributes['nodePosition']=new Map();
         this.nodeAttributes['color']=new Map();
         this.nodeAttributes['force']=new Map();
+        this.nodeAttributes['movement']=new Map();
+        this.nodeAttributes['constriant']=new Map();
     }
     addDefaultEdgeAttributes(){
         this.edgeAttributes['appearance']=new Map();
@@ -114,23 +156,62 @@ export class TimeSpaceCube{
         this.edgeAttributes['strength']=new Map();
         
     }
-    updateCube(){
+    computeMovement(){
         const pos=this.nodeAttributes['nodePosition'];
         for(const node of this.nodes){
             const force=this.nodeAttributes['force'].get(node);
+            const nodeMovement=this.nodeAttributes['movement'].get(node);
+            const constriant=this.nodeAttributes['constriant'].get(node)*this.safetyMovementFactor;
+            const mag=magnitude(force);
+          
+            if(!mag<0.001&&!constriant<0.001){
+                let movement=[...force];
+                if(mag>constriant){
+                    movement=movement.map((value,index)=>value*constriant/mag);
+
+                }
+                
+                this.nodeAttributes['movement'].set(node,movement);
+            }
             // console.log(typeof force)
-            pos.set(node,force.map((value,index)=>value+pos.get(node)[index]));
+            // pos.set(node,move.map((value,index)=>value+pos.get(node)[index]));
             // console.log(pos.get(node))
         }
 
 
     }
+    updateCube(){
+        const pos=this.nodeAttributes['nodePosition'];
+        const move=this.nodeAttributes['movement'];
+        for(const node of this.nodes){
+            
+            
+            pos.set(node,move.get(node).map((value,index)=>value+pos.get(node)[index]));
+            
+        }
+        for(const [id,lines] of this.nodeMirrorMap.entries()){
+            let prev=null;
+            // console.log(lines)
+
+            for(const line of lines){
+                for(let i=0;i<line.coordinateList.length;i++){
+                    const node=line.nodeList[i];
+
+                   const nodePos=pos.get(node);
+                   line.coordinateList[i]=nodePos;
+                }
+                
+         }
+        }
+
+    }
     addMirrorLine(nodes){
+        // console.log('begin count');
         for(const [id,node] of nodes.entries()){
             // appears is a list, ststing the appeared slots for the node
             const appears=this.dyGraph.nodeAttributes['appearance'].get(node)
             const intervals=this.dyGraph.nodeAttributes['nodePosition'].get(node);
-            // console.log(node)
+            // console.log(appears.getAllIntervals(appears.root))
             for(const appearSlot of appears.getAllIntervals(appears.root)){
                 let line=new MirrorLine(node,appearSlot);
                 //biuld trajectory using mirrorLine, creating bends in the mirrorlines
@@ -190,18 +271,31 @@ export class TimeSpaceCube{
             }
 
         }
+        console.log('finish count');
 
     }
-    updateForce(){
+    updateForceMovement(){
+        this.nodeAttributes['force'].clear();
+        this.nodeAttributes['movement'].clear();
+        this.nodeAttributes['constriant'].clear();
         for(const node of this.nodes){
             this.nodeAttributes['force'].set(node,[0,0,0]);
+            this.nodeAttributes['movement'].set(node,[0,0,0]);
+            this.nodeAttributes['constriant'].set(node,Infinity);
         }
+ 
     }
     getMirrorNode(){
+        this.nodes.clear();
+        this.edges.clear();
+        this.nodeAttributes['nodePosition'].clear();
         for(const [id,lines] of this.nodeMirrorMap.entries()){
             let prev=null;
             // console.log(lines)
+
             for(const line of lines){
+                line.nodeList=[];
+                line.segmentList=[]
                 // console.log(line)
                 for(let coordinate of line.coordinateList){
                     let node=new Node();
@@ -223,6 +317,30 @@ export class TimeSpaceCube{
          }
         }
     }
+    getMirrorNode2(){
+        this.nodes.clear();
+        this.edges.clear();
+        this.nodeAttributes['nodePosition'].clear();
+        for(const [id,lines] of this.nodeMirrorMap.entries()){
+            let prev=null;
+            // console.log(lines)
+
+            for(const line of lines){
+                for(let i=0;i<line.coordinateList.length;i++){
+                    const node=line.nodeList[i];
+
+                    this.nodes.add(node);
+                    this.nodeAttributes['nodePosition'].set(node,line.coordinateList[i]);
+                    if(i!=line.coordinateList.length-1){
+                        const edge=line.segmentList[i];
+                        this.edges.add(edge);
+                    }
+                }
+                
+         }
+        }
+    }
+    
     updateCoordinateList(mirrorLine){
         if(mirrorLine.nodeList.length!=mirrorLine.coordinateList.length){
             throw new Error(" the node size of nodeList and coordinateList is not same")
@@ -237,13 +355,17 @@ export class TimeSpaceCube{
     addMirrorConnection(edges){
         //here edges is a list
         // console.log(edges)
-        
+        let countConnection=0;
         for(const edge of edges){
             // appears is a list, ststing the appeared slots for the node
             const appears=this.dyGraph.edgeAttributes['appearance'].get(edge)
             // console.log(appears)
+            countConnection+= appears.getAllIntervalsWithoutValue(appears.root).length
+            // console.log(appears.getAllIntervals(appears.root))
+            // console.log(appears.getAllIntervalsWithoutValue(appears.root))
+            // console.log('check')
             // const intervals=this.dyGraph.nodeAttributea['nodePosition'].get(node);
-            for(const appearSlot of appears.getAllIntervals(appears.root)){
+            for(const appearSlot of appears.getAllIntervalsWithoutValue(appears.root)){
                 const connection = new MirrorConnection(edge,appearSlot);
                 //need cautious and update later, now it is pasuodocode
                 const source=edge.sourceNode;
@@ -277,8 +399,27 @@ export class TimeSpaceCube{
             }
 
         }
+        console.log('countconnection');
+        console.log(countConnection)
         
     }
+    postProcessing(){
+        for(const [id,trajectories] of this.nodeMirrorMap.entries()){
+            //if(temperature() > shutDownTemperature)
+            //if (refreshCounter % refreshInterval == 0 ) 
+            for(const trajectory of trajectories){
+                trajectory.expandBend(this.expandDistance);
+            }
+        }
+        for(const [id,trajectories] of this.nodeMirrorMap.entries()){
+            //if(temperature() > shutDownTemperature)
+            //if (refreshCounter % refreshInterval == 0 ) 
+            for(const trajectory of trajectories){
+                trajectory.contractBend(this.contractDistance);
+            }
+        }         
+    }
+
     outputMatrix(){
         let lines=[];
         let mirrorIndex=[];

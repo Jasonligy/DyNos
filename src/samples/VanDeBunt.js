@@ -140,23 +140,33 @@ export function getDyGraph(fileData){
         dyGraph.nodeAttributes['nodePosition'].set(node,new IntervalTree([0,0]));
         dyGraph.nodeAttributes['appearance'].set(node,new IntervalTree(true))
         //the interval from origin code 
-        dyGraph.nodeAttributes['appearance'].get(node).insert(new Interval(-1,7))
+        dyGraph.nodeAttributes['appearance'].get(node).insert(new Interval(-1,6.5))
         // console.log(dyGraph.nodeAttributes['appearance'].get(node))
         // console.log(new Interval(-1,7))
 
     }
-    for(let [id,value] of fileData.relations.entries()){
-        for(let i=0;i<7;i++){
+    console.log('count');
+    let count=0;
+    // for(let [id,value] of fileData.relations.entries()){
+    for(let id=1;id<7;id++){
+        // if(id==0){
+        //     console.log(value)
+        // }
+        // console.log(value)
+        const value= fileData.relations.get(id)
+        for(let i=0;i<32;i++){
             for(let j=i+1;j<value[i].length;j++){
                 // node strength is not applicable
                 // const strength
-                if((value[i][j]=='3'||value[i][j]=='4')&&(value[j][i]=='3'||value[j][i]=='4')){
+                if((value[i][j]=='2'||value[i][j]=='1')&&(value[j][i]=='2'||value[j][i]=='1')){
                     const node1=dyGraph.nodes.get(i);
                     const node2=dyGraph.nodes.get(j);
+                    
+                 
                     if(!dyGraph.queryEdge(node1,node2)){
                         const edge=dyGraph.addEdge(node1,node2);
                         dyGraph.edgeAttributes['appearance'].set(edge,new IntervalTree(true))
-                        
+                        count+=1;
                     }
                     const edge=dyGraph.queryEdge(node1,node2);
                     // console.log(new Interval(id-0.5.id+0.5))
@@ -165,8 +175,11 @@ export function getDyGraph(fileData){
                 }
             }
         }
+        // break;
     }
-    scatterNode(dyGraph,5);
+    console.log('count');
+    console.log(count)
+    scatterNode(dyGraph,40);
     // for(const[id,node] of dyGraph.nodes){
     //     console.log(dyGraph.nodeAttributes['nodePosition'].get(node))
     //     break

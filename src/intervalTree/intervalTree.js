@@ -224,7 +224,35 @@ export class Interval {
         this._inOrderTraversal(root, intervals);
         return intervals;
     }
-    
+    getAllIntervalsWithoutValue(root) {
+      let intervals = [];
+      this._inOrderTraversal(root, intervals);
+     
+      if (intervals.length === 0) return intervals;
+
+      let mergedIntervals = [];
+      let currentInterval = intervals[0];
+  
+      for (let i = 1; i < intervals.length; i++) {
+          let nextInterval = intervals[i];
+  
+          // Check if the intervals overlap or are adjacent
+          if (currentInterval.end >= nextInterval.start ) {
+              // Merge the intervals
+              currentInterval.end = Math.max(currentInterval.end, nextInterval.end);
+          } else {
+              // Push the current interval and move to the next
+              mergedIntervals.push(currentInterval);
+              currentInterval = nextInterval;
+          }
+      }
+  
+      // Add the last interval
+      mergedIntervals.push(currentInterval);
+  
+      return mergedIntervals;
+      // return intervals;
+  }
     // Helper function for in-order traversal
     _inOrderTraversal(node, intervals) {
         if (!node) return;

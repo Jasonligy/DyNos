@@ -24,6 +24,8 @@ export class TimeStraightning{
         }
         for(const[id,value] of overallForce.entries()){
             if(force.has(id)){
+                // console.log(force.get(id));
+                
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]))
             }
         }
@@ -61,6 +63,10 @@ export class TimeStraightning{
                 
             }
             const vectorMag=magnitude(desired);
+            console.log('desired');
+            
+            console.log(desired);
+            
             //when vectormag equals to 0, means the trajectory is perpendicular with time
             if(vectorMag>0){
                 const unit=getUnitVector(desired);
@@ -92,7 +98,7 @@ export class TimeStraightning{
                     continue
                 }
                 
-                const angle=Math.max(betweenAngle(vector2D,vector3D),0.01);
+                const angle=Math.max(betweenAngle(vector2D,vector3D).radians,0.01);
                 const shift=vector2D.map((value,index)=>value*(Math.PI/2-angle)/angle);
                 force.set(source,force.get(source).map((value,index)=>value+shift[index]));
                 force.set(target,force.get(target).map((value,index)=>value-shift[index]));

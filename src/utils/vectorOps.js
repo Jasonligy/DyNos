@@ -102,7 +102,7 @@ export function betweenAngle(vectorA, vectorB) {
     }
 
     // Dot product of vectorA and vectorB
-    const dotProduct = vectorA[0] * vectorB[0] + vectorA[1] * vectorB[1] + vectorA[2] * vectorB[2];
+    let dotProduct = vectorA[0] * vectorB[0] + vectorA[1] * vectorB[1] + vectorA[2] * vectorB[2];
 
     // Magnitudes of vectorA and vectorB
     const magnitudeA = Math.sqrt(vectorA[0] ** 2 + vectorA[1] ** 2 + vectorA[2] ** 2);
@@ -112,12 +112,23 @@ export function betweenAngle(vectorA, vectorB) {
     if (magnitudeA === 0 || magnitudeB === 0) {
         throw new Error("Magnitude of one of the vectors is zero. Cannot calculate angle.");
     }
-
+    if(magnitudeA * magnitudeB<dotProduct ){
+        dotProduct=magnitudeA * magnitudeB
+    }
     // Calculate the angle in radians
     const angleRadians = Math.acos(dotProduct / (magnitudeA * magnitudeB));
 
     // Convert to degrees if needed
     const angleDegrees = (angleRadians * 180) / Math.PI;
+    // console.log('radian');
+    // console.log(vectorA);
+    // console.log(vectorB);
+    // console.log(magnitudeA * magnitudeB);
+    // console.log(dotProduct);
+    
+    
+    // console.log(angleRadians);
+    
 
     return { radians: angleRadians, degrees: angleDegrees };
 }
