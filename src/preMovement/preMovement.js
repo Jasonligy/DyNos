@@ -42,7 +42,7 @@ export class EnsureTimeCorrectness{
         const b=nodeList[i+1];
         const aPos=pos.get(a);
         const bPos=pos.get(b);
-        const halfInitDist=(bPos[2]-aPos[2])*this.safeMovementFactor;
+        const halfInitDist=(bPos[2]-aPos[2])*this.safeMovementFactor/2;
         const aMovZ=finals[i][2]-aPos[2];
         const bMovZ=bPos[2]-finals[i+1][2];
         if(aMovZ>halfInitDist){

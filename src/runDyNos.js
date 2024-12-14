@@ -14,6 +14,7 @@ export class DynosRunner{
         this.cube=new TimeSpaceCube(dyGraph,2.122449);
         this.iteration=number;
         this.forceList=[];
+        this.desired=this.delta;
         this.getForceList();
         
         this.temperature=1;
@@ -21,7 +22,7 @@ export class DynosRunner{
         this.maxMovement=2*this.delta;
         this.getConstriantList();
         //desired distance
-        this.desired=this.delta;
+        
         this.expandDistance=2*this.delta;
         this.contractDistance=1.5*this.delta;
         this.safeMovementFactor=0.9;
@@ -38,7 +39,7 @@ export class DynosRunner{
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
         // this.forceList=[gravity,timeStraightning,edgeAttraction];
-        this.forceList=[gravity];
+        this.forceList=[edgeAttraction];
     }
     iterate(){
         for(let i=0;i<100;i++){
@@ -50,6 +51,18 @@ export class DynosRunner{
             this.cube.updateForceMovement();
             this.forceList.forEach((force)=>force.computeShift());
             // this.constraintList.forEach((constraint)=>constraint.computeConstraint());//need change
+            // if(i==0){
+            //     console.log('movestart');
+            //     // for(const[id,value]of this.cube.nodeAttributes['movement'].entries()){
+            //     for(const[id,value]of this.cube.nodeAttributes['force'].entries()){
+            //         console.log(value)
+                    
+            //     }
+            //     console.log('moveend');
+            //     // console.log(c);
+                
+            // }
+
             this.computeConstriant();
             this.cube.computeMovement();
             this.preMovementList.forEach((preMove)=>preMove.execute());
@@ -60,7 +73,9 @@ export class DynosRunner{
             if(i==99){
                 console.log('movestart');
                 // for(const[id,value]of this.cube.nodeAttributes['movement'].entries()){
-                for(const[id,value]of this.cube.nodeAttributes['constriant'].entries()){
+                // for(const[id,value]of this.cube.nodeAttributes['constriant'].entries()){
+                // for(const[id,value]of this.cube.nodeAttributes['force'].entries()){
+                for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
                     console.log(value)
                     
                 }

@@ -77,8 +77,8 @@ export class MirrorLine{
                 this.nodeList.splice(i+1,0,node) ;
 
                 const edge0=this.segmentList[i];
-                const targetNode=edge0.target;
-                edge0.target=node;   
+                const targetNode=edge0.targetNode;
+                edge0.targetNode=node;   
                 const edge1=new Edge(node,targetNode);
                 this.segmentList.splice(i+1,0,edge1) ;
                 newCoordinateList.push(avgVectors(firstCoord,secondCoord));

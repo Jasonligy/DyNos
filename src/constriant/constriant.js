@@ -33,6 +33,8 @@ export class MovementAcceleration{
         for(const node of this.cube.nodes){
             const currentForce=force.get(node);
             const z=currentForce[2];
+            // console.log(currentForce);
+            
             currentForce[2]=0;
             if(magnitude(currentForce)<0.0001){
                 this.previousMovements.delete(node)
@@ -69,8 +71,12 @@ export class MovementAcceleration{
                 }
 
             }
+            // console.log();
+            
             this.constriant.set(node,currentLimit);
-            this.previousMovements.set(node,getUnitVector(currentForce).map((value,index)=>currentLimit*value))
+            if(magnitude(currentForce)>0){
+                this.previousMovements.set(node,getUnitVector(currentForce).map((value,index)=>currentLimit*value))
+            }
         }
         // console.log(this.constriant);
         return{defaultValue:Infinity,nodeConstriant:this.constriant};

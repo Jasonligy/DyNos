@@ -32,6 +32,8 @@ export class EdgeAttraction{
 
         for(const [id,value] of overallForce.entries()){
             if(force.has(id)){
+                // console.log(force.get(id));
+                
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]));
             }
         }
@@ -87,7 +89,9 @@ export class EdgeAttraction{
         const aWidth=aInt[1]-aInt[0];
         const bWidth=bInt[1]-bInt[0];
         const currentDistance=magnitude(vector);
-       
+        if(currentDistance<0.001){
+            return
+        }
         //need implement almost zero
         const unit=getUnitVector(vector);
         // console.log(this.computeExponent())
@@ -95,7 +99,10 @@ export class EdgeAttraction{
         this.computeExponent()
         // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
         const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));
-
+        console.log(this.desired);
+        console.log('base');
+        
+        
         const aBalance=(zPos-aInt[0])/aWidth;
         const bBalance=(zPos-bInt[0])/bWidth;
         // console.log(this.desired)
@@ -148,6 +155,8 @@ export class EdgeAttraction{
         const sourcePos=pos.get(edge.sourceNode);
         const targetPos=pos.get(edge.targetNode);
         //get z coordinate of the source node and target node
+        // console.log(edge.targetNode);
+        
         return [sourcePos[2],targetPos[2]];
     }
     
