@@ -121,6 +121,9 @@ export class TimeSpaceCube{
         this.addDefaultEdgeAttributes();
         this.tau=tau
         this.dyGraph=dyGraph;
+        this.node2mirrorLine=new Map();
+        this.edges2mirrorLine=new Map();
+        this.mirrorLine2DyNode=new Map();
         this.nodeMirrorMap=new Map();
         this.edgeMirrorMap=new Map();
         const nodes=dyGraph.nodes;
@@ -262,6 +265,7 @@ export class TimeSpaceCube{
 
                 const endPos=intervals.valueAt(appearSlot.end);
                 line.addBend(endPos.concat(appearSlot.end*this.tau));
+                this.mirrorLine2DyNode.set(line,node);
                 // console.log('check add node')
                 if(!this.nodeMirrorMap.has(node)){
                     this.nodeMirrorMap.set(node, [line]);}
@@ -300,6 +304,7 @@ export class TimeSpaceCube{
                 for(let coordinate of line.coordinateList){
                     let node=new Node();
                     this.nodes.add(node);
+                    this.node2mirrorLine.set(node,line);
                     this.nodeAttributes['nodePosition'].set(node,coordinate);
                     line.nodeList.push(node);
                     if(prev==null){
@@ -307,6 +312,7 @@ export class TimeSpaceCube{
                     }
                     else{
                         const edge=new Edge(prev,node);
+                        this.edges2mirrorLine.set(edge,line);
                         this.edges.add(edge);
                         line.segmentList.push(edge);
                         prev=node;
@@ -321,6 +327,8 @@ export class TimeSpaceCube{
         this.nodes.clear();
         this.edges.clear();
         this.nodeAttributes['nodePosition'].clear();
+        this.node2mirrorLine.clear();
+        this.edges2mirrorLine.clear();
         for(const [id,lines] of this.nodeMirrorMap.entries()){
             let prev=null;
             // console.log(lines)
@@ -330,10 +338,12 @@ export class TimeSpaceCube{
                     const node=line.nodeList[i];
 
                     this.nodes.add(node);
+                    this.node2mirrorLine.set(node,line);
                     this.nodeAttributes['nodePosition'].set(node,line.coordinateList[i]);
                     if(i!=line.coordinateList.length-1){
                         const edge=line.segmentList[i];
                         this.edges.add(edge);
+                        this.edges2mirrorLine.set(edge,line);
                     }
                 }
                 
@@ -393,8 +403,12 @@ export class TimeSpaceCube{
                     }
                 }
                 
-               
-                this.edgeMirrorMap.set(edge,connection);
+               if(!this.edgeMirrorMap.has(edge)){
+                    this.edgeMirrorMap.set(edge,[connection]);
+               }
+               else{
+                    this.edgeMirrorMap.get(edge).push(connection)
+               }
 
             }
 
@@ -444,10 +458,10 @@ export class TimeSpaceCube{
                 lines.push(...this.convertCoordinate(coordinateList))
             }
         }
-        console.log('lines');
-        console.log(lines.length);
+        // console.log('lines');
+        // console.log(lines.length);
         
-        console.log(lines);
+        // console.log(lines);
         
         return [lines,mirrorIndex];
     }

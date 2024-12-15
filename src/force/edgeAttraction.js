@@ -18,14 +18,20 @@ export class EdgeAttraction{
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
         console.log('size')
-        console.log(this.cube.edgeMirrorMap.size)
-        for(const [edge,connection] of this.cube.edgeMirrorMap){
-            const mirrorLineSource=connection.source;
-            const mirrorLineTarget=connection.target;
-            // const mirrorLineSource=this.cube.nodeMirrorMap.get(dySourceNode);
-            // const mirrorLineTarget=this.cube.nodeMirrorMap.get(dyTargetNode);
-            this.computeForce(force,connection,mirrorLineSource,mirrorLineTarget);
+        // console.log(this.cube.edgeMirrorMap.size)
+        let c=0;
+        for(const [edge,connections] of this.cube.edgeMirrorMap){
+            for(const connection of connections){
+                c++;
+                const mirrorLineSource=connection.source;
+                const mirrorLineTarget=connection.target;
+                // const mirrorLineSource=this.cube.nodeMirrorMap.get(dySourceNode);
+                // const mirrorLineTarget=this.cube.nodeMirrorMap.get(dyTargetNode);
+                this.computeForce(force,connection,mirrorLineSource,mirrorLineTarget);
+            }
         }
+        console.log(c);
+        
         for(const [id,value] of force.entries()){
             // console.log(value)
         }
@@ -38,7 +44,7 @@ export class EdgeAttraction{
             }
         }
         // console.log(this.temperature)
-        console.log(this.count)
+        // console.log(this.count)
         console.log('finish')
         
 
@@ -97,8 +103,8 @@ export class EdgeAttraction{
         // console.log(this.computeExponent())
         // console.log('test')
         this.computeExponent()
-        // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
-        const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));
+        const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
+        // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));
         // console.log(this.desired);
         // console.log('base');
         

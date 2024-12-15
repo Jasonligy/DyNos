@@ -7,10 +7,6 @@ export class EdgeRepulsion{
         this.finalExponent = 2;
         this.temperature=temperature;
     }
-    setTemperature(temperature){
-        // console.log(temperature)
-        this.temperature=temperature;
-    }
     computeExponent(){
         return this.finalExponent + (this.initialExponent - this.finalExponent) * this.temperature;
     }
@@ -25,10 +21,10 @@ export class EdgeRepulsion{
         let nodeDone=new Set();
         for(const node of this.cube.nodes){
             const mirrorLineFirst=this.cube.node2mirrorLine.get(node)
-            const DyNodeFirst=this.cube.mirrorLine2DyNode.get(mirrorLineFirst);
+            const DyNodeFirst=this.cube.mirrorLine2DyNode(mirrorLineFirst);
             for(const edge of this.cube.edges){
                 const mirrorLineSecond=this.cube.edges2mirrorLine.get(edge)
-                const DyNodeSecond=this.cube.mirrorLine2DyNode.get(mirrorLineSecond);
+                const DyNodeSecond=this.cube.mirrorLine2DyNode(mirrorLineSecond);
                 if(DyNodeFirst!=DyNodeSecond){
                     //距离小于5
                     const begin=edge.sourceNode;
@@ -38,7 +34,7 @@ export class EdgeRepulsion{
                     const nodePos=pos.get(node);
                     const distance=magnitude(nodePos,getclosestPoint(nodePos,beginPos,endPos));
                     if(distance<5*this.desired){
-                        this.applyNodeEdgeRepulsion(force,node,nodePos,begin,beginPos,end,endPos)
+                        applyNodeEdgeRepulsion(force,node,nodePos,begin,beginPos,end,endPos)
                     }
                 
                     
@@ -52,11 +48,6 @@ export class EdgeRepulsion{
             }
         }
     }
-    computeExponent(){
-        // console.log('exponent '+this.temperature )
-        this.count+=1;
-        return this.finalExponent + (this.initialExponent - this.finalExponent) * this.temperature;
-    }
     applyNodeEdgeRepulsion(force,a,aPos,c,cPos,d,dPos){
         //need implement almost zero for node (a and c) and (a and d);
 
@@ -64,17 +55,11 @@ export class EdgeRepulsion{
         const closest=relation.closestPoint;
         const nodeEdgeVector=closest.map((value,index)=>value-aPos[index]);
         const unit=getUnitVector(nodeEdgeVector);
-        const baseForce=unit.map((value,index)=>value*Math.pow(this.desired/magnitude(nodeEdgeVector),this.computeExponent()));
+        const baseForce=unit.map((value,index)=>value*Math.pow(this.desired/magnitude(nodeEdgeVector),computeExponent()));
         //cautious with original one 
-        
-        
-        
         if(relation.isIncluded){
             const balance=magnitude(closest.map((value,index)=>value-cPos))/
                 magnitude(dPos.map((value,index)=>value-cPos));
-            
-            // console.log('baseforce');
-            // console.log(balance);
             force.set(a,force.get(a).map((value,id)=>value-baseForce[id]));
             force.set(c,force.get(c).map((value,id)=>value+baseForce[id]*(1-balance)));
             force.set(d,force.get(d).map((value,id)=>value+baseForce[id]*(balance)));
@@ -82,8 +67,6 @@ export class EdgeRepulsion{
                 
         }
         else{
-            // console.log('notinclude');
-            
             force.set(a,force.get(a).map((value,id)=>value-baseForce[id]));
             force.set(c,force.get(c).map((value,id)=>value+baseForce[id]));
             force.set(d,force.get(d).map((value,id)=>value+baseForce[id]));

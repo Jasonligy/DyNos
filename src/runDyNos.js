@@ -1,6 +1,7 @@
 import {TimeSpaceCube} from "./cube/TimeSpaceCube.js";
 import {Gravity} from "./force/gravity.js";
 import {EdgeAttraction} from "./force/edgeAttraction.js";
+import { EdgeRepulsion } from "./force/edgeRepulsion.js";
 import {TimeStraightning} from "./force/timeStraightning.js";
 import{DecreasingMaxMovement,MovementAcceleration} from "./constriant/constriant.js"
 import { EnsureTimeCorrectness } from "./preMovement/preMovement.js";
@@ -38,11 +39,12 @@ export class DynosRunner{
         const gravity=new Gravity(this.cube);
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
+        const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
         // this.forceList=[gravity,timeStraightning,edgeAttraction];
-        this.forceList=[edgeAttraction,timeStraightning];
+        this.forceList=[edgeRepulsion];
     }
     iterate(){
-        for(let i=0;i<100;i++){
+        for(let i=0;i<2;i++){
             console.log(i)
             this.temperature=(this.iteration-i)/this.iteration;
             this.forceList.forEach((force)=>force.setTemperature(this.temperature));
@@ -70,12 +72,12 @@ export class DynosRunner{
             this.cube.postProcessing();
             this.cube.getMirrorNode2();
                let c=0;
-            if(i==99){
+            if(i==1){
                 console.log('movestart');
                 // for(const[id,value]of this.cube.nodeAttributes['movement'].entries()){
                 // for(const[id,value]of this.cube.nodeAttributes['constriant'].entries()){
-                // for(const[id,value]of this.cube.nodeAttributes['force'].entries()){
-                for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
+                for(const[id,value]of this.cube.nodeAttributes['force'].entries()){
+                // for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
                     console.log(value)
                     
                 }
