@@ -66,12 +66,19 @@ export class EdgeRepulsion{
         const unit=getUnitVector(nodeEdgeVector);
         const baseForce=unit.map((value,index)=>value*Math.pow(this.desired/magnitude(nodeEdgeVector),this.computeExponent()));
         //cautious with original one 
+        // console.log('pp');
+        // console.log(aPos);
+        // console.log(dPos);
+        // console.log(dPos.map((value,index)=>value-cPos));
+        
+        
+        
         
         
         
         if(relation.isIncluded){
-            const balance=magnitude(closest.map((value,index)=>value-cPos))/
-                magnitude(dPos.map((value,index)=>value-cPos));
+            const balance=magnitude(closest.map((value,id)=>value-cPos[id]))/
+                magnitude(dPos.map((value,id)=>value-cPos[id]));
             
             // console.log('baseforce');
             // console.log(balance);

@@ -52,6 +52,8 @@ export function getIntersection(vector1,vector2){
 }
 export function getclosestPoint(point, lineStart, lineEnd) {
     // Decompose the inputs
+    // console.log(lineEnd);
+    
     const [px, py, pz] = point;
     const [x1, y1, z1] = lineStart;
     const [x2, y2, z2] = lineEnd;

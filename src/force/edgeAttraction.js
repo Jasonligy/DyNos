@@ -17,7 +17,7 @@ export class EdgeAttraction{
         // console.log('begin')
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
-        console.log('size')
+        // console.log('size')
         // console.log(this.cube.edgeMirrorMap.size)
         let c=0;
         for(const [edge,connections] of this.cube.edgeMirrorMap){
@@ -30,7 +30,7 @@ export class EdgeAttraction{
                 this.computeForce(force,connection,mirrorLineSource,mirrorLineTarget);
             }
         }
-        console.log(c);
+        // console.log(c);
         
         for(const [id,value] of force.entries()){
             // console.log(value)
@@ -45,7 +45,7 @@ export class EdgeAttraction{
         }
         // console.log(this.temperature)
         // console.log(this.count)
-        console.log('finish')
+        // console.log('finish')
         
 
     }

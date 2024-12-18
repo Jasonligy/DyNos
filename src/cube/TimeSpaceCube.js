@@ -27,6 +27,9 @@ export class MirrorLine{
         }
         const newCoordinateList=[];
         newCoordinateList.push(this.coordinateList[0]);
+        // console.log(this.segmentList.length);
+        // console.log(this.nodeList.length);
+        let contractCount=0;
         for(let i=1;i<this.coordinateList.length-1;i++){
             const first=this.coordinateList[newCoordinateList.length-1];
             const second=this.coordinateList[i];
@@ -36,10 +39,11 @@ export class MirrorLine{
             const distance23=distance2points(second,third);
             if(distance13<contractDistance||distance23<contractDistance/5||distance12<contractDistance/5){
                 // this.nodeList.slice(i,1);
-                const firstSegment=this.segmentList[i-1];
-                firstSegment.target=this.nodeList[i+1];
-                this.segmentList.splice(i,1);
-                this.nodeList.slice(i,1);
+                const firstSegment=this.segmentList[i-contractCount-1];
+                firstSegment.targetNode=this.nodeList[i-contractCount+1];
+                this.segmentList.splice(i-contractCount,1);
+                this.nodeList.splice(i-contractCount,1);
+                contractCount++;
                 continue
             }
             else{
@@ -48,7 +52,12 @@ export class MirrorLine{
         }
         newCoordinateList.push(this.coordinateList[this.coordinateList.length-1])
         this.coordinateList=newCoordinateList;
+        
+        
+        
         if(this.segmentList.length!=this.nodeList.length-1){
+            console.log(this.segmentList.length);
+        console.log(this.nodeList.length);
             throw new Error('segment length is not equal to node list minus 1');
         }
         if(this.coordinateList.length!=this.nodeList.length){
@@ -62,6 +71,7 @@ export class MirrorLine{
         // console.log('l');
         // console.log(this.coordinateList.length);
         // console.log(this.nodeList.length);
+        let expandCount=0;
         for(let i=0;i<this.coordinateList.length-1;i++){
             const firstCoord=this.coordinateList[i];
             const secondCoord=this.coordinateList[i+1];  
@@ -74,14 +84,15 @@ export class MirrorLine{
 
                 // console.log('expand')
                 let node=new Node();
-                this.nodeList.splice(i+1,0,node) ;
+                this.nodeList.splice(i+expandCount+1,0,node) ;
 
-                const edge0=this.segmentList[i];
+                const edge0=this.segmentList[i+expandCount];
                 const targetNode=edge0.targetNode;
                 edge0.targetNode=node;   
                 const edge1=new Edge(node,targetNode);
-                this.segmentList.splice(i+1,0,edge1) ;
+                this.segmentList.splice(i+expandCount+1,0,edge1) ;
                 newCoordinateList.push(avgVectors(firstCoord,secondCoord));
+                expandCount++;
             }
             newCoordinateList.push(secondCoord);
         }
@@ -275,7 +286,7 @@ export class TimeSpaceCube{
             }
 
         }
-        console.log('finish count');
+        // console.log('finish count');
 
     }
     updateForceMovement(){
@@ -413,8 +424,8 @@ export class TimeSpaceCube{
             }
 
         }
-        console.log('countconnection');
-        console.log(countConnection)
+        // console.log('countconnection');
+        // console.log(countConnection)
         
     }
     postProcessing(){
@@ -448,6 +459,34 @@ export class TimeSpaceCube{
         //         lines.push(...coordinateList)
         //     }
         // }
+        let minC=[10000,10000,10000];
+        let maxC=[-10000,-10000,-10000];
+        for(const [id,pos] of this.nodeAttributes['nodePosition'].entries()){
+           if(pos[0]<minC[0]){
+            minC[0]=pos[0];
+           }
+           if(pos[1]<minC[1]){
+            minC[1]=pos[1];
+           }
+           if(pos[2]<minC[2]){
+            minC[2]=pos[2];
+           }
+           if(pos[0]>maxC[0]){
+            maxC[0]=pos[0];
+           }
+           if(pos[1]>maxC[1]){
+            maxC[1]=pos[1];
+           }
+           if(pos[2]>maxC[2]){
+            maxC[2]=pos[2];
+           }
+        }
+        console.log('extrme');
+        
+        console.log(minC);
+        console.log(maxC);
+        
+        
         for(const [id,nodeLines] of this.nodeMirrorMap.entries()){
             for(const nodeline of nodeLines){
                 let coordinateList=nodeline.coordinateList;
@@ -455,7 +494,7 @@ export class TimeSpaceCube{
                 mirrorIndex.push(index);
                 // console.log('co')
                 // console.log(coordinateList)
-                lines.push(...this.convertCoordinate(coordinateList))
+                lines.push(...this.convertCoordinate(coordinateList,minC,maxC))
             }
         }
         // console.log('lines');
@@ -467,10 +506,10 @@ export class TimeSpaceCube{
     }
     //coordinates is a 2D array from the mirror, store the 3D coordinates of each node
     //may adjust the coordinate in the future
-    convertCoordinate(coordinates){
+    convertCoordinate(coordinates,minC,maxC){
         let convertedCoordinates=[]
         for(let coordinate of coordinates){
-            const convertedCoordinate=this.fmap3DCoordinates(coordinate,[0,0,-2.122449],[40,40,13.8]);
+            const convertedCoordinate=this.fmap3DCoordinates(coordinate,minC,maxC);
             
             convertedCoordinates.push(...convertedCoordinate);
         }

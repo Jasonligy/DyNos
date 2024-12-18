@@ -23,15 +23,10 @@ function draw(edge,indexs){
         attribute vec4 aColor;
         varying vec4 vColor;
         uniform mat4 uModelViewMatrix;
-         uniform bool uUseFixedColor;
         uniform mat4 uProjectionMatrix;
         void main() {
             gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
-            //vColor = aColor; // Pass the color to the fragment shader
-            // vColor = uUseFixedColor ? vec4(0.0, 0.0, 0.0, 0.0) : aColor;
-        //     if (!uUseFixedColor) {
-        //     vColor = aColor;
-        // }
+            vColor = aColor; // Pass the color to the fragment shader
         }
     `;
 
@@ -40,13 +35,12 @@ function draw(edge,indexs){
         precision mediump float;
         varying vec4 vColor;
         uniform bool uUseFixedColor;
-        uniform vec4 uFixedColor;
         void main() {
             
             if (uUseFixedColor) {
-            gl_FragColor = uFixedColor; // Black color
+            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); // Black color
         } else {
-            gl_FragColor = vec4(0.0, 0.0, 1.0, 0.5); // Use the vertex color
+            gl_FragColor = vColor; // Use the vertex color
         }
         }
     `;
@@ -165,11 +159,6 @@ function draw(edge,indexs){
     ]);
 
 
-    // Get the location of the fixed color uniform
-    const uFixedColor = gl.getUniformLocation(program, 'uFixedColor');
-
-    // Set the color you want (e.g., red)
-    gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 1.0); // Red color (R, G, B, A)
 
     // Get attribute and uniform locations
     const aPosition = gl.getAttribLocation(program, 'aPosition');
@@ -228,7 +217,7 @@ function draw(edge,indexs){
     gl.enableVertexAttribArray(aColor);
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
-    gl.uniform1i(uUseFixedColor, false);
+
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeIndexBuffer);
     gl.drawElements(gl.LINES, edgeIndices.length, gl.UNSIGNED_SHORT, 0);
 
@@ -284,12 +273,11 @@ function draw(edge,indexs){
     ]);
 
     // Create and bind the color buffer
-    // const edgecolorBuffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, edgecolorBuffer);
-    // gl.bufferData(gl.ARRAY_BUFFER, lineColors, gl.STATIC_DRAW);
+    const edgecolorBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, edgecolorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, lineColors, gl.STATIC_DRAW);
 
     // Enable vertex attribute for position
-    gl.uniform1i(uUseFixedColor, true);
     gl.enableVertexAttribArray(aPosition);
     gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffer);
     gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
@@ -298,9 +286,7 @@ function draw(edge,indexs){
     // gl.enableVertexAttribArray(aColor);
     // gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     // gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
-
-
-
+    gl.uniform1i(uUseFixedColor, true);
     // Draw lines between each consecutive vertex pair
 
     // gl.drawArrays(gl.LINE_STRIP, 0,4); // n+1 vertices -> n edges
@@ -322,9 +308,7 @@ function draw(edge,indexs){
         console.log('index');
         
         console.log(indexs[i])
-        gl.uniform1i(uUseFixedColor, true);
-        gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 1.0); // Red color (R, G, B, A)
-        gl.drawArrays(gl.LINE_STRIP, index, indexs[i]); // n+1 vertices -> n edges
+        gl.drawArrays(gl.LINE, index, indexs[i]); // n+1 vertices -> n edges
         index+=indexs[i];
     }
     console.log(index);

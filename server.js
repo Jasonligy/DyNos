@@ -33,7 +33,7 @@ app.get('/api/data', (req, res) => {
       const runner=new DynosRunner(graph,100,5);
       const cube=runner.iterate();
     // const data=graph;
-    console.log(fileData)
+    // console.log(fileData)
     const cubeBefore=new TimeSpaceCube(graph,2.122449);
     // const [lines,mirrorIndex]=generateCube();
     // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
