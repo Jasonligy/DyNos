@@ -17,6 +17,8 @@
     <script  src="drawCube.js"></script>
     <script>
         // Fetch data from the server
+        console.log('cubebegin');
+        
         fetch('/api/data')
             .then(response => response.json())
             .then(data => {

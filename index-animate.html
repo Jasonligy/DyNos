@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGL Project</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <canvas id="glCanvas" width="800" height="2500"></canvas>
+    <!-- <script src="src/circle.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js"></script>
+
+    <!-- <script type="module" src="src/run.js"></script> -->
+    <script  src="src/run_copy.js">
+        //  requestAnimationFrame(animate);
+    </script> 
+    <!-- <script  src="src/samples/VanDeBunt.js"></script> -->
+    <!-- <script  src="drawCube.js"></script> -->
+    <script>
+        // Fetch data from the server
+        fetch('/api/graph')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched data:', data);
+                animate(data)
+                // Use the data for rendering or logic
+            })
+            .catch(error => console.error('Error fetching data:', error));
+
+       
+    </script>
+
+    <!-- <script type="module" src="src/cube.js"></script> -->
+
+
+
+

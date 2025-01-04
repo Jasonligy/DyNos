@@ -19,9 +19,14 @@ app.use(express.static(path.join(__dirname)));  // This serves all files in the 
 
 // Serve the index.html file
 app.get('/', (req, res) => {
-  read();  
+  // read();  
   console.log('test')
   res.sendFile(path.join(__dirname, 'index.html'));
+});
+app.get('/animate', (req, res) => {
+  // read();  
+  console.log('test')
+  res.sendFile(path.join(__dirname, 'index-animate.html'));
 });
 app.get('/api/data', (req, res) => {
   // const data = { name: 'Cube', color: 'blue', size: 3 };
@@ -40,6 +45,24 @@ app.get('/api/data', (req, res) => {
     const [lines,mirrorIndex]=cube.outputMatrix();
     const data={array:lines,index:mirrorIndex};
     res.json(data)})
+});
+app.get('/api/graph', (req, res) => {
+  // const data = { name: 'Cube', color: 'blue', size: 3 };
+  // res.json(data);
+  let graph;
+  readFile()
+  .then((fileData) => {
+      graph=getDyGraph(fileData);
+      const runner=new DynosRunner(graph,100,5);
+      const cube=runner.iterate();
+    // const data=graph;
+    // console.log(fileData)
+    const cubeBefore=new TimeSpaceCube(graph,2.122449);
+    // const [lines,mirrorIndex]=generateCube();
+    // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
+    const afterGraph=cube.cube2DyGraph();
+    // const data={array:lines,index:mirrorIndex};
+    res.json(afterGraph)})
 });
 app.get('/tt', (req, res) => {
 

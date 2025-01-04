@@ -1,5 +1,6 @@
 import{Node,Edge}from "../dygraph/Dygraph.js"
 import { avgVectors, distance2points, magnitude } from "../utils/vectorOps.js";
+import {Interval,IntervalTree}from "../intervalTree/intervalTree.js"
 export class MirrorLine{
     constructor(dynode,appearInterval){
         this.dynode = dynode;
@@ -444,21 +445,7 @@ export class TimeSpaceCube{
             }
         }         
     }
-
-    outputMatrix(){
-        let lines=[];
-        let mirrorIndex=[];
-        let getH=[]
-        // for(const [id,nodeLines] of this.nodeMirrorMap.entries()){
-        //     for(const nodeline of nodeLines){
-        //         let coordinateList=nodeline.coordinateList;
-        //         const index=coordinateList.length;
-        //         mirrorIndex.push(index);
-        //         // console.log('co')
-        //         // console.log(coordinateList)
-        //         lines.push(...coordinateList)
-        //     }
-        // }
+    getMinMax(){
         let minC=[10000,10000,10000];
         let maxC=[-10000,-10000,-10000];
         for(const [id,pos] of this.nodeAttributes['nodePosition'].entries()){
@@ -481,8 +468,25 @@ export class TimeSpaceCube{
             maxC[2]=pos[2];
            }
         }
-        console.log('extrme');
+        return [minC,maxC]
+    }
+    outputMatrix(){
+        let lines=[];
+        let mirrorIndex=[];
+        let getH=[]
+        // for(const [id,nodeLines] of this.nodeMirrorMap.entries()){
+        //     for(const nodeline of nodeLines){
+        //         let coordinateList=nodeline.coordinateList;
+        //         const index=coordinateList.length;
+        //         mirrorIndex.push(index);
+        //         // console.log('co')
+        //         // console.log(coordinateList)
+        //         lines.push(...coordinateList)
+        //     }
+        // }
         
+        console.log('extrme');
+        const [minC,maxC]=this.getMinMax();
         console.log(minC);
         console.log(maxC);
         
@@ -531,6 +535,29 @@ export class TimeSpaceCube{
     
         return [mappedX, mappedZ,mappedY ];
     }
-    
+    cube2DyGraph(){
+        const [minC,maxC]=this.getMinMax();
+        for(const [id,nodeLines] of this.nodeMirrorMap.entries()){
+            this.dyGraph.nodeAttributes['nodePosition'].set(id,new IntervalTree(true))
+            const tree=this.dyGraph.nodeAttributes['nodePosition'].get(id)
+            for(const nodeline of nodeLines){
+                let coordinateList=nodeline.coordinateList;
+               
+                // console.log('co')
+                // console.log(coordinateList)
+                // lines.push(...this.convertCoordinate(coordinateList,minC,maxC))
+                // const after=this.convertCoordinate(coordinateList,minC,maxC)
+                for(let i=0;i<coordinateList.length-1;i++){
+                    console.log(coordinateList[i]);
+                    
+                    const coor1=this.fmap3DCoordinates(coordinateList[i],minC,maxC)
+                    const coor2=this.fmap3DCoordinates(coordinateList[i+1],minC,maxC)
+                    const interval=this.dyGraph.createIntervalBlock(coor1[1],coor2[1],[coor1[0],coor1[2]],[coor2[0],coor2[2]])
+                    tree.insert(interval)
+                }
+            }
+        }
+        return this.dyGraph
+    }
 
 }
