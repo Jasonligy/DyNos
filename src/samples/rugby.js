@@ -71,3 +71,54 @@ export async function readFile() {
 
     return fileData;
 }
+export function getDyGraph(fileData){
+    const daySeconds=24*60*60;
+    const dyGraph=new DyGraph();
+    const nodeMap=new Map();
+    for(let i=0;i<fileData.teams.length;i++){
+        const node=dyGraph.addNode(i);
+        dyGraph.nodeAttributes['nodePosition'].set(node,new IntervalTree([0,0]));
+        dyGraph.nodeAttributes['appearance'].set(node,new IntervalTree(false))
+        //the interval from origin code 
+        // dyGraph.nodeAttributes['appearance'].get(node).insert(new Interval(-1,6.5))
+        // console.log(dyGraph.nodeAttributes['appearance'].get(node))
+        // console.log(new Interval(-1,7))
+        nodeMap.set(fileData.teams[i].team,node);
+    }
+    console.log('count');
+    let count=0;
+    // for(let [id,value] of fileData.relations.entries()){
+
+    for(let i=0;i<fileData.tweets.length;i++){
+
+        const node1=nodeMap.get(fileData.tweets[i].from);
+        const node2=nodeMap.get(fileData.tweets[i].to);
+        if(!dyGraph.queryEdge(node1,node2)){
+            const edge=dyGraph.addEdge(node1,node2);
+            dyGraph.edgeAttributes['appearance'].set(edge,new IntervalTree(true))
+            count+=1;
+        }
+        const edge=dyGraph.queryEdge(node1,node2);
+        // console.log(new Interval(id-0.5.id+0.5))
+                // console.log(dyGraph.edgeAttributes['appearance'].get(edge))
+        const tweetTIme=Math.floor(fileData.tweets[i].time.getTime()/1000);
+        dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds))
+        dyGraph.nodeAttributes['appearance'].get(node1).insert(new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds))
+        dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds))
+
+
+    }
+        // break;
+    
+    console.log('count');
+    console.log(count)
+    scatterNode(dyGraph,100);
+    // for(const[id,node] of dyGraph.nodes){
+    //     console.log(dyGraph.nodeAttributes['nodePosition'].get(node))
+    //     break
+    // }
+    
+    return dyGraph
+    // console.log(fileData.students)
+
+}
