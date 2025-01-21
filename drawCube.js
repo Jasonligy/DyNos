@@ -9,7 +9,7 @@ function draw(edge,indexs){
     //     }
     // }
     edge=new Float32Array(edge)
-    console.log(edge)
+    // console.log(edge)
     const canvas = document.getElementById('glCanvas');
     const gl = canvas.getContext('webgl');
 
@@ -314,14 +314,14 @@ function draw(edge,indexs){
         
         console.log(indexs.length)
     // for(let i=0;i<indexs.length;i++){
-    for(let i=0;i<32;i++){
+    for(let i=0;i<indexs.length;i++){
         // if(i<6){
         //     index+=indexs[i];
         //     continue
         // }
-        console.log('index');
+        // console.log('index');
         
-        console.log(indexs[i])
+        // console.log(indexs.length)
         gl.uniform1i(uUseFixedColor, true);
         gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 1.0); // Red color (R, G, B, A)
         gl.drawArrays(gl.LINE_STRIP, index, indexs[i]); // n+1 vertices -> n edges

@@ -1,6 +1,9 @@
 import express from 'express';
 import path from 'path';
-import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
+// import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
+// import {readFile,getDyGraph} from './src/samples/newcomb.js';
+// import {readFile,getDyGraph} from './src/samples/dialog.js';
+import {readFile,getDyGraph} from './src/samples/rugby.js';
 import {IntervalTree,Interval} from './src/intervalTree/intervalTree.js';
 import generateCube from './src/generateCube.js';
 import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";

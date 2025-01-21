@@ -43,7 +43,7 @@ async function readFileLineByLine(filePath) {
 
 export async function readFile() {
     console.log('first');
-    const filePath = '"data/Rugby_tweets/pro12_mentions.csv"';
+    const filePath = 'data/Rugby_tweets/pro12_mentions.csv';
     const fileData = {
         tweets: [],
         teams: new Set(),
@@ -75,7 +75,8 @@ export function getDyGraph(fileData){
     const daySeconds=24*60*60;
     const dyGraph=new DyGraph();
     const nodeMap=new Map();
-    for(let i=0;i<fileData.teams.length;i++){
+    const teams=Array.from(fileData.teams)
+    for(let i=0;i<teams.length;i++){
         const node=dyGraph.addNode(i);
         dyGraph.nodeAttributes['nodePosition'].set(node,new IntervalTree([0,0]));
         dyGraph.nodeAttributes['appearance'].set(node,new IntervalTree(false))
@@ -83,13 +84,13 @@ export function getDyGraph(fileData){
         // dyGraph.nodeAttributes['appearance'].get(node).insert(new Interval(-1,6.5))
         // console.log(dyGraph.nodeAttributes['appearance'].get(node))
         // console.log(new Interval(-1,7))
-        nodeMap.set(fileData.teams[i].team,node);
+        nodeMap.set(teams[i],node);
     }
     console.log('count');
     let count=0;
     // for(let [id,value] of fileData.relations.entries()){
 
-    for(let i=0;i<fileData.tweets.length;i++){
+    for(let i=1;i<fileData.tweets.length;i++){
 
         const node1=nodeMap.get(fileData.tweets[i].from);
         const node2=nodeMap.get(fileData.tweets[i].to);
@@ -102,7 +103,16 @@ export function getDyGraph(fileData){
         // console.log(new Interval(id-0.5.id+0.5))
                 // console.log(dyGraph.edgeAttributes['appearance'].get(edge))
         const tweetTIme=Math.floor(fileData.tweets[i].time.getTime()/1000);
-        dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds))
+        const t=new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds)
+        dyGraph.edgeAttributes['appearance'].get(edge).insert(t)
+        if(isNaN(t.start)){
+            // console.log(count);
+            console.log(fileData.tweets[i].time);
+            console.log(tweetTIme+0.5*daySeconds);
+            
+            
+            throw new Error('appearslot is nan')
+        }
         dyGraph.nodeAttributes['appearance'].get(node1).insert(new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds))
         dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds))
 
@@ -111,7 +121,7 @@ export function getDyGraph(fileData){
         // break;
     
     console.log('count');
-    console.log(count)
+    console.log(fileData.tweets.length)
     scatterNode(dyGraph,100);
     // for(const[id,node] of dyGraph.nodes){
     //     console.log(dyGraph.nodeAttributes['nodePosition'].get(node))
@@ -121,4 +131,10 @@ export function getDyGraph(fileData){
     return dyGraph
     // console.log(fileData.students)
 
+}
+function scatterNode(graph,desired){
+    const pos=graph.nodeAttributes['nodePosition'];
+    for(const[id,node] of graph.nodes.entries()){
+        pos.set(node,new IntervalTree([Math.random()*desired,Math.random()*desired]));
+    }
 }

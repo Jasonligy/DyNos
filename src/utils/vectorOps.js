@@ -28,6 +28,19 @@ export function avgVectors(vector1,vector2){
     // let newvector=[];
     return vector1.map((value, index) => (value + vector2[index]) / 2);
 }
+export function checkTriVectors(vector1,vector2,vector3){
+    for(let i=0;i<2;i++){
+        if(vector1[i]!=vector2[i]&&vector1[i]!=vector3[i]){
+            // console.log(vector1[i]);
+            // console.log(vector2[i]);
+            // console.log(vector3[i]);
+            // console.log('not same');
+            return true
+            
+        }
+    }
+    return false
+}
 export function magnitude(vector){
     return Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
 }

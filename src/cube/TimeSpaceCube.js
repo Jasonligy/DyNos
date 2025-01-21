@@ -1,5 +1,5 @@
 import{Node,Edge}from "../dygraph/Dygraph.js"
-import { avgVectors, distance2points, magnitude } from "../utils/vectorOps.js";
+import { avgVectors, distance2points, magnitude,checkTriVectors } from "../utils/vectorOps.js";
 import {Interval,IntervalTree}from "../intervalTree/intervalTree.js"
 export class MirrorLine{
     constructor(dynode,appearInterval){
@@ -69,6 +69,8 @@ export class MirrorLine{
     expandBend(expandDistance){
         const newCoordinateList=[];
         newCoordinateList.push(this.coordinateList[0]);
+        // console.log(this.segmentList.length);
+        // console.log(this.nodeList.length);
         // console.log('l');
         // console.log(this.coordinateList.length);
         // console.log(this.nodeList.length);
@@ -92,12 +94,17 @@ export class MirrorLine{
                 edge0.targetNode=node;   
                 const edge1=new Edge(node,targetNode);
                 this.segmentList.splice(i+expandCount+1,0,edge1) ;
+                const mid=avgVectors(firstCoord,secondCoord);
                 newCoordinateList.push(avgVectors(firstCoord,secondCoord));
+                checkTriVectors(mid,firstCoord,secondCoord)
                 expandCount++;
             }
             newCoordinateList.push(secondCoord);
         }
         this.coordinateList=newCoordinateList
+       
+        
+        
         if(this.segmentList.length!=this.nodeList.length-1){
             throw new Error('segment length is not equal to node list minus 1');
         }
@@ -198,6 +205,7 @@ export class TimeSpaceCube{
     updateCube(){
         const pos=this.nodeAttributes['nodePosition'];
         const move=this.nodeAttributes['movement'];
+        // const move=this.nodeAttributes['force'];
         for(const node of this.nodes){
             
             
@@ -209,12 +217,23 @@ export class TimeSpaceCube{
             // console.log(lines)
 
             for(const line of lines){
+               
                 for(let i=0;i<line.coordinateList.length;i++){
                     const node=line.nodeList[i];
 
                    const nodePos=pos.get(node);
                    line.coordinateList[i]=nodePos;
+
                 }
+                if(line.coordinateList.length==3){
+                    // if(checkTriVectors(line.coordinateList[0],line.coordinateList[1],line.coordinateList[2])){
+                    //     console.log('firstnotsame');
+                        
+                    // }
+                    // console.log(checkTriVectors(line.coordinateList[1],line.coordinateList[0],line.coordinateList[2]));
+                    //  checkTriVectors(line.coordinateList[0],line.coordinateList[1],line.coordinateList[2])
+                }
+
                 
          }
         }
@@ -306,10 +325,11 @@ export class TimeSpaceCube{
         this.edges.clear();
         this.nodeAttributes['nodePosition'].clear();
         for(const [id,lines] of this.nodeMirrorMap.entries()){
-            let prev=null;
+            
             // console.log(lines)
 
             for(const line of lines){
+                let prev=null;
                 line.nodeList=[];
                 line.segmentList=[]
                 // console.log(line)
@@ -331,6 +351,13 @@ export class TimeSpaceCube{
                     }
                     // console.log(this.nodeAttributes['nodePosition'].get(node))
                 }
+                if(line.segmentList.length!=line.nodeList.length-1){
+                    throw new Error('segment length is not equal to node list minus 1');
+                }
+                // else{
+                //     console.log('pass');
+                    
+                // }
                 
          }
         }
@@ -351,6 +378,7 @@ export class TimeSpaceCube{
 
                     this.nodes.add(node);
                     this.node2mirrorLine.set(node,line);
+                    // checkTriVectors(line.coordinateList[1],line.coordinateList[0],line.coordinateList[2])
                     this.nodeAttributes['nodePosition'].set(node,line.coordinateList[i]);
                     if(i!=line.coordinateList.length-1){
                         const edge=line.segmentList[i];
@@ -358,6 +386,7 @@ export class TimeSpaceCube{
                         this.edges2mirrorLine.set(edge,line);
                     }
                 }
+                checkTriVectors(line.coordinateList[1],line.coordinateList[0],line.coordinateList[2])
                 
          }
         }
@@ -387,7 +416,14 @@ export class TimeSpaceCube{
             // console.log(appears.getAllIntervalsWithoutValue(appears.root))
             // console.log('check')
             // const intervals=this.dyGraph.nodeAttributea['nodePosition'].get(node);
+            let count=0;
             for(const appearSlot of appears.getAllIntervalsWithoutValue(appears.root)){
+                if(isNaN(appearSlot.start)){
+                    console.log(count);
+                    
+                    throw new Error('appearslot is null')
+                }
+                count++;
                 const connection = new MirrorConnection(edge,appearSlot);
                 //need cautious and update later, now it is pasuodocode
                 const source=edge.sourceNode;
@@ -395,10 +431,19 @@ export class TimeSpaceCube{
                 const middlePoint=(appearSlot.start+appearSlot.end)/2;
 
                 const sourceLines=this.nodeMirrorMap.get(source);
+                // console.log('checksourceline');
+                // console.log(sourceLines);
+                
                 // console.log(sourceLines.length)
                 // console.log(appearSlot)
                 for(const sourceLine of sourceLines){
                     // console.log('checks')
+                    // console.log(sourceLine.interval.start);
+                    // console.log(middlePoint);
+                    // console.log(sourceLine.interval.end);
+                    
+                    
+                    
                     if(sourceLine.interval.start<=middlePoint&&sourceLine.interval.end>=middlePoint){
                         
                         connection.addSource(sourceLine);
@@ -433,6 +478,8 @@ export class TimeSpaceCube{
         for(const [id,trajectories] of this.nodeMirrorMap.entries()){
             //if(temperature() > shutDownTemperature)
             //if (refreshCounter % refreshInterval == 0 ) 
+            // console.log('id'+ id);
+            
             for(const trajectory of trajectories){
                 trajectory.expandBend(this.expandDistance);
             }
@@ -448,7 +495,11 @@ export class TimeSpaceCube{
     getMinMax(){
         let minC=[10000,10000,10000];
         let maxC=[-10000,-10000,-10000];
+        // console.log(this.nodeAttributes['nodePosition'].entries());
+        
         for(const [id,pos] of this.nodeAttributes['nodePosition'].entries()){
+            // console.log(pos[0]);
+            
            if(pos[0]<minC[0]){
             minC[0]=pos[0];
            }
@@ -548,7 +599,7 @@ export class TimeSpaceCube{
                 // lines.push(...this.convertCoordinate(coordinateList,minC,maxC))
                 // const after=this.convertCoordinate(coordinateList,minC,maxC)
                 for(let i=0;i<coordinateList.length-1;i++){
-                    console.log(coordinateList[i]);
+                    // console.log(coordinateList[i]);
                     
                     const coor1=this.fmap3DCoordinates(coordinateList[i],minC,maxC)
                     const coor2=this.fmap3DCoordinates(coordinateList[i+1],minC,maxC)

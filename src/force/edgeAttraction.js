@@ -23,6 +23,8 @@ export class EdgeAttraction{
         for(const [edge,connections] of this.cube.edgeMirrorMap){
             for(const connection of connections){
                 c++;
+                // console.log(connection);
+                
                 const mirrorLineSource=connection.source;
                 const mirrorLineTarget=connection.target;
                 // const mirrorLineSource=this.cube.nodeMirrorMap.get(dySourceNode);
@@ -54,6 +56,7 @@ export class EdgeAttraction{
         // console.log(source)
         // console.log('length')
         // console.log(target.segmentList.length)
+
         for(const a of source.segmentList){
             // console.log('has segment')
             const aInterval=this.segmentInterval(a);

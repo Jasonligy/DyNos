@@ -39,8 +39,11 @@ export async function readFile() {
     // Process all files with Promises
     await Promise.all(
         files.map((file) => {
+
             const filePath = path.join(folderPath, file);
             const chapter=parseInt(file.replace(/\D/g, ''));
+            // console.log(chapter);
+            
             fileData.startTime=Math.min(fileData.startTime,chapter);
             fileData.endTime=Math.max(fileData.endTime,chapter+1);
             return new Promise((resolve, reject) => {
@@ -53,6 +56,8 @@ export async function readFile() {
                 rl.on('line', (line) => {
                     if(line.includes("\t")){
                         const tokens = line.split("\t");
+                        console.log(tokens);
+                        
                         if(tokens.length!=2){
                             throw new Error("dialog person not 2")
                         }
@@ -68,6 +73,8 @@ export async function readFile() {
                 });
 
                 rl.on('close', ()=>{
+                    // console.log('close');
+                    
                     let order=0;
                     for(const dialog of fileDialog){
                         dialog.duration=1/fileDialog.length;
@@ -75,13 +82,16 @@ export async function readFile() {
                         fileData.dialogs.push(dialog);
                         order++;
                     }
+                    // console.log('precomp');
+                    resolve();
                 });
                 rl.on('error', reject);
                 
             });
         })
     );
-
+    console.log('complete');
+    
     return fileData;
 }
 
@@ -90,6 +100,8 @@ export function getDyGraph(fileData){
     const dyGraph=new DyGraph();
     const nodeMap=new Map();
     let index=0;
+    console.log(fileData.characters.size);
+    
     for(const ch of fileData.characters){
         const node=dyGraph.addNode(index);
         dyGraph.nodeAttributes['nodePosition'].set(node,new IntervalTree([0,0]));
@@ -125,6 +137,7 @@ export function getDyGraph(fileData){
     }
     // console.log(fileData.students)
     scatterNode(dyGraph,200);
+    return dyGraph
 
 }
 function scatterNode(graph,desired){

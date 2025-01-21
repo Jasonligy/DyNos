@@ -40,12 +40,13 @@ export class DynosRunner{
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
         const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
+        this.forceList=[gravity,timeStraightning,edgeAttraction,];
         // this.forceList=[gravity,timeStraightning,edgeAttraction,edgeRepulsion];
-        this.forceList=[gravity];
+        // this.forceList=[gravity];
     }
     iterate(){
-        for(let i=0;i<100;i++){
-            // console.log(i)
+        for(let i=0;i<8;i++){
+            console.log('epoch'+i)
             this.temperature=(this.iteration-i)/this.iteration;
             this.forceList.forEach((force)=>force.setTemperature(this.temperature));
             this.constraintList.forEach((constraint)=>constraint.setTemperature(this.temperature));
@@ -68,6 +69,7 @@ export class DynosRunner{
             this.computeConstriant();
             this.cube.computeMovement();
             this.preMovementList.forEach((preMove)=>preMove.execute());
+
             this.cube.updateCube();
             this.cube.postProcessing();
             this.cube.getMirrorNode2();

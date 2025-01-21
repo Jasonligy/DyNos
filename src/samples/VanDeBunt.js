@@ -3,6 +3,7 @@ import fs from 'fs';
 import readline from 'readline';
 import path from 'path';
 import { DyGraph,Node,Edge } from '../dygraph/Dygraph.js';
+import { DiscretisationData } from '../dygraph/DiscretisationData.js';
 import { IntervalTree,Interval } from '../intervalTree/intervalTree.js';
 // const fs = require('fs');
 // const readline = require('readline');
@@ -194,6 +195,39 @@ function scatterNode(graph,desired){
     for(const[id,node] of graph.nodes.entries()){
         pos.set(node,new IntervalTree([Math.random()*desired,Math.random()*desired]));
     }
+}
+function discretise(origin){
+    const snapshotTime=[];
+    for(let i=0;i<=6;i++){
+        snapshotTime.push(i);
+
+    }
+    const radius=0.49;
+    const intervals=[];
+    for(const center of snapshotTime){
+        const leftBound=center-radius;
+        const rightBound=center+radius;
+        intervals.add(new Interval(leftBound,rightBound));
+    }
+    const graph=discretiseWithIntervals(origin, intervals);
+    return graph
+
+}
+function discretiseWithIntervals(origin, intervals){
+    const data=new DiscretisationData(origin);
+    for (let i = 0; i < intervals.length; i++) {
+        let leftBound = i > 0
+            ? (intervals[i - 1].end + intervals[i].start) / 2.0
+            : intervals[i].start - (intervals[i].end - intervals[i].start) * 0.2;
+    
+        let rightBound = i < intervals.length - 1
+            ? (intervals[i].end + intervals[i + 1].start) / 2.0
+            : intervals[i].end + (intervals[i].end - intervals[i].start) * 0.2;
+        const outputInterval=new Interval(leftBound,rightBound);
+        applyBlockAttributes(data, intervals.get(i), outputInterval);
+        // Use leftBound and rightBound as needed
+    }
+    return data.discrete;
 }
 // // Create a readable stream from the file
 // const fileStream = fs.createReadStream(filePath);
