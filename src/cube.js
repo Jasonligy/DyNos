@@ -236,7 +236,7 @@ gl.drawElements(gl.LINES, edgeIndices.length, gl.UNSIGNED_SHORT, 0);
 // console.log(edge)
 let [edge,indexs]=generateCube()
 edge=new Float32Array(edge)
-console.log(edge.length)
+// console.log(edge.length)
 
 
 

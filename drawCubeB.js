@@ -308,7 +308,7 @@ function draw(edge,indexs){
         console.log('index');
         
         console.log(indexs[i])
-        gl.drawArrays(gl.LINE, index, indexs[i]); // n+1 vertices -> n edges
+        gl.drawArrays(gl.LINE_STRIPS, index, indexs[i]); // n+1 vertices -> n edges
         index+=indexs[i];
     }
     console.log(index);

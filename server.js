@@ -1,15 +1,16 @@
 import express from 'express';
 import path from 'path';
-// import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
+import {readFile,getDyGraph,discretise} from './src/samples/VanDeBunt.js';
 // import {readFile,getDyGraph} from './src/samples/newcomb.js';
 // import {readFile,getDyGraph} from './src/samples/dialog.js';
-import {readFile,getDyGraph} from './src/samples/rugby.js';
+// import {readFile,getDyGraph} from './src/samples/rugby.js';
 import {IntervalTree,Interval} from './src/intervalTree/intervalTree.js';
 import generateCube from './src/generateCube.js';
 import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { DynosRunner } from './src/runDyNos.js';
+import { DynosRunnerM } from './src/runDyNosMetrics.js';
 // import { draw } from './drawCube.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -35,10 +36,32 @@ app.get('/api/data', (req, res) => {
   // const data = { name: 'Cube', color: 'blue', size: 3 };
   // res.json(data);
   let graph;
+  let discreteGraph;
   readFile()
   .then((fileData) => {
       graph=getDyGraph(fileData);
+     
       const runner=new DynosRunner(graph,100,5);
+      const cube=runner.iterate();
+    // const data=graph;
+    // console.log(fileData)
+    const cubeBefore=new TimeSpaceCube(graph,2.122449);
+    // const [lines,mirrorIndex]=generateCube();
+    // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
+    const [lines,mirrorIndex]=cube.outputMatrix();
+    const data={array:lines,index:mirrorIndex};
+    res.json(data)})
+});
+app.get('/api/datametrics', (req, res) => {
+  // const data = { name: 'Cube', color: 'blue', size: 3 };
+  // res.json(data);
+  let graph;
+  readFile()
+  .then((fileData) => {
+      graph=getDyGraph(fileData);
+      const discreteGraph=discretise(graph);
+      // const runner=new DynosRunner(discreteGraph,100,5);
+      const runner=new DynosRunnerM(discreteGraph,100,5);
       const cube=runner.iterate();
     // const data=graph;
     // console.log(fileData)

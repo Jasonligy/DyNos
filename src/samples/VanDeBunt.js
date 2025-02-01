@@ -196,7 +196,7 @@ function scatterNode(graph,desired){
         pos.set(node,new IntervalTree([Math.random()*desired,Math.random()*desired]));
     }
 }
-function discretise(origin){
+export function discretise(origin){
     const snapshotTime=[];
     for(let i=0;i<=6;i++){
         snapshotTime.push(i);
@@ -207,7 +207,7 @@ function discretise(origin){
     for(const center of snapshotTime){
         const leftBound=center-radius;
         const rightBound=center+radius;
-        intervals.add(new Interval(leftBound,rightBound));
+        intervals.push(new Interval(leftBound,rightBound));
     }
     const graph=discretiseWithIntervals(origin, intervals);
     return graph
@@ -215,6 +215,13 @@ function discretise(origin){
 }
 function discretiseWithIntervals(origin, intervals){
     const data=new DiscretisationData(origin);
+    for(const [id,node] of data.original.nodes){
+        // if(data.isPresentInIntervalNode(node,data.originalEdgePresence.get(node))){
+        //     data.discreteNodePresence.get(node).insert(outputInterval)
+        // }
+        data.discreteNodePresence.set(node,data.originalEdgePresence.get(node))
+       
+    }
     for (let i = 0; i < intervals.length; i++) {
         let leftBound = i > 0
             ? (intervals[i - 1].end + intervals[i].start) / 2.0
@@ -224,10 +231,26 @@ function discretiseWithIntervals(origin, intervals){
             ? (intervals[i].end + intervals[i + 1].start) / 2.0
             : intervals[i].end + (intervals[i].end - intervals[i].start) * 0.2;
         const outputInterval=new Interval(leftBound,rightBound);
-        applyBlockAttributes(data, intervals.get(i), outputInterval);
+        applyBlockAttributes(data, intervals[i], outputInterval);
         // Use leftBound and rightBound as needed
     }
     return data.discrete;
+}
+function applyBlockAttributes(data,interval,outputInterval){
+    for(const [id,node] of data.original.nodes){
+        // if(data.isPresentInIntervalNode(node,interval)){
+        //     data.discreteNodePresence.get(node).insert(outputInterval)
+        // }
+        const valueLeft=data.originalNodePosition.get(node).valueAt(outputInterval.start);
+        const valueRight=data.originalNodePosition.get(node).valueAt(outputInterval.end);
+        data.discreteNodePosition.get(node).insert(new Interval(outputInterval.start,outputInterval.end,valueLeft,valueRight))
+
+    }
+    for(const edge of data.original.edges){
+        if(data.isPresentInIntervalEdge(edge,interval)){
+            data.discreteEdgePresence.get(edge).insert(outputInterval)
+        }
+    }
 }
 // // Create a readable stream from the file
 // const fileStream = fs.createReadStream(filePath);

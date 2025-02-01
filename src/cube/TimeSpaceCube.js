@@ -58,7 +58,7 @@ export class MirrorLine{
         
         if(this.segmentList.length!=this.nodeList.length-1){
             console.log(this.segmentList.length);
-        console.log(this.nodeList.length);
+        // console.log(this.nodeList.length);
             throw new Error('segment length is not equal to node list minus 1');
         }
         if(this.coordinateList.length!=this.nodeList.length){
@@ -246,6 +246,8 @@ export class TimeSpaceCube{
             const appears=this.dyGraph.nodeAttributes['appearance'].get(node)
             const intervals=this.dyGraph.nodeAttributes['nodePosition'].get(node);
             // console.log(appears.getAllIntervals(appears.root))
+            console.log(appears);
+            
             for(const appearSlot of appears.getAllIntervals(appears.root)){
                 let line=new MirrorLine(node,appearSlot);
                 //biuld trajectory using mirrorLine, creating bends in the mirrorlines
@@ -386,7 +388,9 @@ export class TimeSpaceCube{
                         this.edges2mirrorLine.set(edge,line);
                     }
                 }
-                checkTriVectors(line.coordinateList[1],line.coordinateList[0],line.coordinateList[2])
+                // console.log(line.coordinateList.length);
+                
+                // checkTriVectors(line.coordinateList[1],line.coordinateList[0],line.coordinateList[2])
                 
          }
         }
