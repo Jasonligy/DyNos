@@ -7,12 +7,12 @@ import{DecreasingMaxMovement,MovementAcceleration} from "./constriant/constriant
 import { EnsureTimeCorrectness } from "./preMovement/preMovement.js";
 
 export class DynosRunner{
-    constructor(dyGraph,number,delta=5){
+    constructor(dyGraph,number,delta=1){
 
         this.dygraph=dyGraph
         this.delta=delta
         // console.log(dyGraph)
-        this.cube=new TimeSpaceCube(dyGraph,2.122449);
+        this.cube=new TimeSpaceCube(dyGraph,0.875);
         this.iteration=number;
         this.forceList=[];
         this.desired=this.delta;
@@ -40,14 +40,26 @@ export class DynosRunner{
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
         const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
-        this.forceList=[gravity,timeStraightning,edgeAttraction,];
+        this.forceList=[edgeAttraction,];
         // this.forceList=[gravity,timeStraightning,edgeAttraction,edgeRepulsion];
         // this.forceList=[gravity];
     }
     iterate(){
-        for(let i=0;i<8;i++){
-            console.log('epoch'+i)
-            this.temperature=(this.iteration-i)/this.iteration;
+        console.log('begin');
+        for(const [id,value]of this.dygraph.nodes){
+            console.log(this.dygraph.nodeAttributes['nodePosition'].get(value));
+        }
+        for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
+            console.log(value)
+            
+        }
+        const numberofiteration=3
+        for(let i=0;i<numberofiteration;i++){
+            console.log(i);
+            
+            
+            // console.log('epoch'+i)
+            // this.temperature=(this.iteration-i)/this.iteration;
             this.forceList.forEach((force)=>force.setTemperature(this.temperature));
             this.constraintList.forEach((constraint)=>constraint.setTemperature(this.temperature));
         
@@ -71,7 +83,7 @@ export class DynosRunner{
             this.preMovementList.forEach((preMove)=>preMove.execute());
 
             this.cube.updateCube();
-            this.cube.postProcessing();
+            // this.cube.postProcessing();
             this.cube.getMirrorNode2();
                let c=0;
             if(i==99){
@@ -79,15 +91,23 @@ export class DynosRunner{
                 // for(const[id,value]of this.cube.nodeAttributes['movement'].entries()){
                 // for(const[id,value]of this.cube.nodeAttributes['constriant'].entries()){
                 // for(const[id,value]of this.cube.nodeAttributes['force'].entries()){
-                for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
-                    // console.log(value)
-                    
-                }
+                
                 // console.log('moveend');
                 // console.log(c);
                 
             }
-
+            this.temperature=(numberofiteration-i-1)/numberofiteration;
+            console.log('after');
+            
+            for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
+                console.log(value)
+                
+            }
+        }
+        console.log('end');
+        for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
+            console.log(value)
+            
         }
         return this.cube
     }

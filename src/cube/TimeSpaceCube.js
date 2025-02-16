@@ -156,8 +156,8 @@ export class TimeSpaceCube{
         this.addMirrorConnection(edges);
         //create mirrornode inside mirrorline and update the node list from coordinate list
         this.getMirrorNode()
-        this.expandDistance=2.0*this.delta;
-        this.contractDistance=1.5*this.delta;
+        this.expandDistance=0.5*this.delta;
+        this.contractDistance=19*this.delta;
         this.safetyMovementFactor=0.9
         // const edges=dyGraph.edges;
 
@@ -246,9 +246,9 @@ export class TimeSpaceCube{
             const appears=this.dyGraph.nodeAttributes['appearance'].get(node)
             const intervals=this.dyGraph.nodeAttributes['nodePosition'].get(node);
             // console.log(appears.getAllIntervals(appears.root))
-            console.log(appears);
+            // console.log(appears);
             
-            for(const appearSlot of appears.getAllIntervals(appears.root)){
+            for(const appearSlot of appears.getAllIntervalsWithoutValue(appears.root)){
                 let line=new MirrorLine(node,appearSlot);
                 //biuld trajectory using mirrorLine, creating bends in the mirrorlines
                 // for(const interval of intervals.getAllIntervals(intervals.root)){
@@ -488,6 +488,8 @@ export class TimeSpaceCube{
                 trajectory.expandBend(this.expandDistance);
             }
         }
+
+
         for(const [id,trajectories] of this.nodeMirrorMap.entries()){
             //if(temperature() > shutDownTemperature)
             //if (refreshCounter % refreshInterval == 0 ) 

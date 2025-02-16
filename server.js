@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import {readFile,getDyGraph,discretise} from './src/samples/VanDeBunt.js';
+import {getOneNodeGraph} from './src/test/oneegde.js';
 // import {readFile,getDyGraph} from './src/samples/newcomb.js';
 // import {readFile,getDyGraph} from './src/samples/dialog.js';
 // import {readFile,getDyGraph} from './src/samples/rugby.js';
@@ -37,15 +38,19 @@ app.get('/api/data', (req, res) => {
   // res.json(data);
   let graph;
   let discreteGraph;
+  console.log('begin');
   readFile()
   .then((fileData) => {
-      graph=getDyGraph(fileData);
+      graph=getOneNodeGraph();
+     console.log(graph.nodes);
      
-      const runner=new DynosRunner(graph,100,5);
+      const runner=new DynosRunner(graph,100,0.5);
+      console.log('begin');
+      
       const cube=runner.iterate();
     // const data=graph;
     // console.log(fileData)
-    const cubeBefore=new TimeSpaceCube(graph,2.122449);
+    const cubeBefore=new TimeSpaceCube(graph,0.1);
     // const [lines,mirrorIndex]=generateCube();
     // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
     const [lines,mirrorIndex]=cube.outputMatrix();
