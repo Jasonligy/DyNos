@@ -63,14 +63,14 @@ export class EdgeAttraction{
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]));
             }
         }
-        for(const [id,value] of overallForce.entries()){
-            if(force.has(id)){
+        for(const [id,value] of force.entries()){
+        
                 // console.log(force.get(id));
                 // console.log(force.get(id)[index]);
                 
-                console.log(overallForce.get(id));
-                 ;
-            }
+                console.log(force.get(id));
+                 
+       
         }
         // console.log(this.temperature)
         // console.log(this.count)
@@ -99,7 +99,7 @@ export class EdgeAttraction{
 
                     if(bIntersection!=null){
                         const intersection=getIntersection(aIntersection,bIntersection);
-                        console.log('inter');
+                        // console.log('inter');
                         
                         // console.log(intersection);
                         // console.log(aIntersection);
@@ -113,7 +113,7 @@ export class EdgeAttraction{
                             const allWidth=intersection[1]-bIntersection[0];
                             const aRatio = aWidth == 0 ? 1 : allWidth / aWidth;
                             const bRatio = bWidth == 0 ? 1 : allWidth / bWidth;
-                            console.log('aratio');
+                            // console.log('aratio');
                           
                             
                             const beginningVector = this.computeConnectingVector(a, b, intersection[0]);
@@ -150,9 +150,9 @@ export class EdgeAttraction{
         // console.log(this.computeExponent())
         // console.log('test')
         this.computeExponent()
-        console.log('exponent');
+        // console.log('exponent');
         
-        console.log(this.computeExponent());
+        // console.log(this.computeExponent());
         
         const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
         // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));

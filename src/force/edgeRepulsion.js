@@ -46,8 +46,9 @@ export class EdgeRepulsion{
                     const endPos=pos.get(end);
                     const nodePos=pos.get(node);
                     const distance=magnitude(nodePos,getclosestPoint(nodePos,beginPos,endPos));
-                    if(distance<5*this.desired){
+                    if(distance<9*this.desired){
                         this.applyNodeEdgeRepulsion(force,node,nodePos,begin,beginPos,end,endPos)
+                        continue;
                     }
                     this.count++;
                     // console.log(this.count);
@@ -56,7 +57,7 @@ export class EdgeRepulsion{
                     
                 }
                 else{
-                    console.log('not equal');
+                    // console.log('not equal');
                     
                 }
             }
@@ -69,8 +70,19 @@ export class EdgeRepulsion{
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]))
             }
         }
+        console.log('repulsion');
+        
+        for(const [id,value] of overallForce.entries()){
+            if(force.has(id)){
+                // console.log(force.get(id));
+                // console.log(force.get(id)[index]);
+                
+                console.log(force.get(id));
+                 ;
+            }
+        }
 
-        console.log(this.count);
+        // console.log(this.count);
         
     }
     computeExponent(){
@@ -87,12 +99,12 @@ export class EdgeRepulsion{
         const unit=getUnitVector(nodeEdgeVector);
         const baseForce=unit.map((value,index)=>value*Math.pow(this.desired/magnitude(nodeEdgeVector),this.computeExponent()));
         console.log('baseforce');
-        console.log(this.desired);
-        console.log(this.computeExponent());
+        // console.log(this.desired);
+        // console.log(this.computeExponent());
         
         
-        console.log(unit);
-        console.log(magnitude(nodeEdgeVector));
+        // console.log(unit);
+        // console.log(magnitude(nodeEdgeVector));
         
         
         console.log(baseForce);
@@ -110,6 +122,8 @@ export class EdgeRepulsion{
         
         
         if(relation.isIncluded){
+            console.log('include');
+            
             const balance=magnitude(closest.map((value,id)=>value-cPos[id]))/
                 magnitude(dPos.map((value,id)=>value-cPos[id]));
             

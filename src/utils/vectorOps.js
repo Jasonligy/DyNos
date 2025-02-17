@@ -91,7 +91,7 @@ export function getclosestPoint(point, lineStart, lineEnd) {
     // Normalized position along the line
     let t = dotProduct / lineLengthSquared;
     let isProjectedInclude=false;
-    if(t>=0 ||t<=1){
+    if(t>=0 &&t<=1){
         isProjectedInclude=true;
     }
 

@@ -40,7 +40,7 @@ export class DynosRunner{
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
         const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
-        this.forceList=[edgeRepulsion];
+        this.forceList=[edgeRepulsion,edgeAttraction];
         // this.forceList=[gravity,timeStraightning,edgeAttraction,edgeRepulsion];
         // this.forceList=[gravity];
     }
@@ -122,7 +122,8 @@ export class DynosRunner{
                 if(valueObj.nodeConstriant.has(node)){
                     nodeMovement=Math.min(nodeMovement,valueObj.nodeConstriant.get(node));
                 }
-                mirrorConstriant.set(node,nodeMovement);
+                // mirrorConstriant.set(node,nodeMovement);
+                mirrorConstriant.set(node,Infinity);
             }
         }
     }
