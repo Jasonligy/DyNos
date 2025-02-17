@@ -40,7 +40,7 @@ export class DynosRunner{
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
         const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
-        this.forceList=[edgeAttraction,];
+        this.forceList=[edgeRepulsion];
         // this.forceList=[gravity,timeStraightning,edgeAttraction,edgeRepulsion];
         // this.forceList=[gravity];
     }

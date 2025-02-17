@@ -44,7 +44,7 @@ app.get('/api/data', (req, res) => {
       graph=getOneNodeGraph();
      console.log(graph.nodes);
      
-      const runner=new DynosRunner(graph,100,0.5);
+      const runner=new DynosRunner(graph,100,5);
       console.log('begin');
       
       const cube=runner.iterate();

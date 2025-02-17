@@ -4,7 +4,7 @@ import { loadavg } from "os";
 export class EdgeAttraction{
     constructor(cube,desired,temperature){
         this.cube=cube;
-        this.desired=5;
+        this.desired=desired;
         this.initialExponent = 4;
         this.finalExponent = 2;
         this.temperature=temperature;

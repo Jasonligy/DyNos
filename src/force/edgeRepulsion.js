@@ -3,18 +3,19 @@ export class EdgeRepulsion{
     constructor(cube,desired,temperature){
         this.cube=cube;
         this.desired=desired;
-        this.initialExponent = 4;
-        this.finalExponent = 2;
+        this.initialExponent = 1;
+        this.finalExponent = 3;
         this.temperature=temperature;
+        this.count=0;
     }
     setTemperature(temperature){
         // console.log(temperature)
         this.temperature=temperature;
     }
     computeExponent(){
-        return this.finalExponent + (this.initialExponent - this.finalExponent) * this.temperature;
-    }
+        return this.finalExponent + (this.initialExponent - this.finalExponent) * this.temperature;}
     computeShift(){
+        const checkedNode= new Set();
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
         const pos=this.cube.nodeAttributes['nodePosition'];
@@ -23,7 +24,15 @@ export class EdgeRepulsion{
 
         }
         let nodeDone=new Set();
+        // console.log('leng');
+        // console.log(this.cube.nodes);
+        
+        
         for(const node of this.cube.nodes){
+            // console.log('node');
+            
+            // console.log(node);
+            
             const mirrorLineFirst=this.cube.node2mirrorLine.get(node)
             const DyNodeFirst=this.cube.mirrorLine2DyNode.get(mirrorLineFirst);
             for(const edge of this.cube.edges){
@@ -40,21 +49,33 @@ export class EdgeRepulsion{
                     if(distance<5*this.desired){
                         this.applyNodeEdgeRepulsion(force,node,nodePos,begin,beginPos,end,endPos)
                     }
-                
+                    this.count++;
+                    // console.log(this.count);
+                    
+                    break;
+                    
+                }
+                else{
+                    console.log('not equal');
                     
                 }
             }
 
         }
+        // console.log('pause');
+        
         for(const[id,value] of overallForce.entries()){
             if(force.has(id)){
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]))
             }
         }
+
+        console.log(this.count);
+        
     }
     computeExponent(){
         // console.log('exponent '+this.temperature )
-        this.count+=1;
+        // this.count+=1;
         return this.finalExponent + (this.initialExponent - this.finalExponent) * this.temperature;
     }
     applyNodeEdgeRepulsion(force,a,aPos,c,cPos,d,dPos){
@@ -65,6 +86,18 @@ export class EdgeRepulsion{
         const nodeEdgeVector=closest.map((value,index)=>value-aPos[index]);
         const unit=getUnitVector(nodeEdgeVector);
         const baseForce=unit.map((value,index)=>value*Math.pow(this.desired/magnitude(nodeEdgeVector),this.computeExponent()));
+        console.log('baseforce');
+        console.log(this.desired);
+        console.log(this.computeExponent());
+        
+        
+        console.log(unit);
+        console.log(magnitude(nodeEdgeVector));
+        
+        
+        console.log(baseForce);
+        
+        
         //cautious with original one 
         // console.log('pp');
         // console.log(aPos);
