@@ -28,19 +28,20 @@ export class DynosRunner{
         this.contractDistance=1.5*this.delta;
         this.safeMovementFactor=0.9;
         this.preMovementList=[new EnsureTimeCorrectness(this.cube,this.safeMovementFactor)];
+        this.preMovementList=[];
     }
     getConstriantList(){
-        const decreasingMaxMovement=new DecreasingMaxMovement(this.cube,this.initialMaxMovement);
+        const decreasingMaxMovement=new DecreasingMaxMovement(this.cube,this.maxMovement);
         const movementAcceleration=new MovementAcceleration(this.cube,this.maxMovement);
-        // this.constraintList=[decreasingMaxMovement];
         this.constraintList=[decreasingMaxMovement,movementAcceleration];
+        // this.constraintList=[decreasingMaxMovement,movementAcceleration];
     }
     getForceList(){
         const gravity=new Gravity(this.cube);
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
         const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
-        this.forceList=[edgeRepulsion,edgeAttraction];
+        this.forceList=[edgeAttraction,edgeRepulsion,gravity];
         // this.forceList=[gravity,timeStraightning,edgeAttraction,edgeRepulsion];
         // this.forceList=[gravity];
     }
@@ -53,7 +54,7 @@ export class DynosRunner{
             console.log(value)
             
         }
-        const numberofiteration=3
+        const numberofiteration=2
         for(let i=0;i<numberofiteration;i++){
             console.log(i);
             
@@ -65,6 +66,12 @@ export class DynosRunner{
         
             this.cube.updateForceMovement();
             this.forceList.forEach((force)=>force.computeShift());
+            console.log('force!');
+            
+            for(const[id,value]of this.cube.nodeAttributes['force'].entries()){
+                console.log(value)
+                
+            }
             // this.constraintList.forEach((constraint)=>constraint.computeConstraint());//need change
             // if(i==0){
             //     console.log('movestart');
@@ -83,7 +90,7 @@ export class DynosRunner{
             this.preMovementList.forEach((preMove)=>preMove.execute());
 
             this.cube.updateCube();
-            // this.cube.postProcessing();
+            this.cube.postProcessing();
             this.cube.getMirrorNode2();
                let c=0;
             if(i==99){
@@ -122,8 +129,8 @@ export class DynosRunner{
                 if(valueObj.nodeConstriant.has(node)){
                     nodeMovement=Math.min(nodeMovement,valueObj.nodeConstriant.get(node));
                 }
-                // mirrorConstriant.set(node,nodeMovement);
-                mirrorConstriant.set(node,Infinity);
+                mirrorConstriant.set(node,nodeMovement);
+                // mirrorConstriant.set(node,Infinity);
             }
         }
     }

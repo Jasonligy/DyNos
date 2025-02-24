@@ -48,12 +48,12 @@ export class EdgeRepulsion{
                     const distance=magnitude(nodePos,getclosestPoint(nodePos,beginPos,endPos));
                     if(distance<9*this.desired){
                         this.applyNodeEdgeRepulsion(force,node,nodePos,begin,beginPos,end,endPos)
-                        continue;
+                        // continue;
                     }
                     this.count++;
                     // console.log(this.count);
                     
-                    break;
+                    // break;
                     
                 }
                 else{
@@ -61,8 +61,12 @@ export class EdgeRepulsion{
                     
                 }
             }
+            
 
         }
+        console.log('cc');
+            
+            console.log(this.count);
         // console.log('pause');
         
         for(const[id,value] of overallForce.entries()){
@@ -98,7 +102,7 @@ export class EdgeRepulsion{
         const nodeEdgeVector=closest.map((value,index)=>value-aPos[index]);
         const unit=getUnitVector(nodeEdgeVector);
         const baseForce=unit.map((value,index)=>value*Math.pow(this.desired/magnitude(nodeEdgeVector),this.computeExponent()));
-        console.log('baseforce');
+        // console.log('baseforce');
         // console.log(this.desired);
         // console.log(this.computeExponent());
         
@@ -107,7 +111,7 @@ export class EdgeRepulsion{
         // console.log(magnitude(nodeEdgeVector));
         
         
-        console.log(baseForce);
+        // console.log(baseForce);
         
         
         //cautious with original one 
@@ -120,15 +124,24 @@ export class EdgeRepulsion{
         
         
         
-        
+        console.log(relation.closestPoint);
+        console.log(relation.t);
         if(relation.isIncluded){
+        // if(true){
+            let balance=0;
             console.log('include');
+            console.log(relation.projection);
             
-            const balance=magnitude(closest.map((value,id)=>value-cPos[id]))/
-                magnitude(dPos.map((value,id)=>value-cPos[id]));
-            
+            if(relation.projection || true){
+                // if(relation.projection){
+                 balance=magnitude(closest.map((value,id)=>value-cPos[id]))/
+                    magnitude(dPos.map((value,id)=>value-cPos[id]));}
+            else{
+                balance=magnitude(aPos.map((value,id)=>value-cPos[id]))/
+                    magnitude(dPos.map((value,id)=>value-cPos[id]));
+            }
             // console.log('baseforce');
-            // console.log(balance);
+            console.log(balance);
             force.set(a,force.get(a).map((value,id)=>value-baseForce[id]));
             force.set(c,force.get(c).map((value,id)=>value+baseForce[id]*(1-balance)));
             force.set(d,force.get(d).map((value,id)=>value+baseForce[id]*(balance)));

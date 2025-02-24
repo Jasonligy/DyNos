@@ -56,6 +56,7 @@ export class MirrorLine{
         
         
         
+        
         if(this.segmentList.length!=this.nodeList.length-1){
             console.log(this.segmentList.length);
         // console.log(this.nodeList.length);
@@ -85,7 +86,7 @@ export class MirrorLine{
             // expandDistance=0.1
             if(dist>expandDistance&&Math.abs(firstCoord[2]-secondCoord[2])>expandDistance/2){
 
-                // console.log('expand')
+                console.log('expand')
                 let node=new Node();
                 this.nodeList.splice(i+expandCount+1,0,node) ;
 
@@ -101,8 +102,10 @@ export class MirrorLine{
             }
             newCoordinateList.push(secondCoord);
         }
+
         this.coordinateList=newCoordinateList
-       
+       console.log('coordinate list len');
+        console.log(this.coordinateList.length);
         
         
         if(this.segmentList.length!=this.nodeList.length-1){
@@ -156,8 +159,8 @@ export class TimeSpaceCube{
         this.addMirrorConnection(edges);
         //create mirrornode inside mirrorline and update the node list from coordinate list
         this.getMirrorNode()
-        this.expandDistance=0.5*this.delta;
-        this.contractDistance=19*this.delta;
+        this.expandDistance=2*this.delta;
+        this.contractDistance=1.5*this.delta;
         this.safetyMovementFactor=0.9
         // const edges=dyGraph.edges;
 
@@ -375,6 +378,9 @@ export class TimeSpaceCube{
             // console.log(lines)
 
             for(const line of lines){
+                console.log('update node');
+                console.log(line.coordinateList.length);
+                
                 for(let i=0;i<line.coordinateList.length;i++){
                     const node=line.nodeList[i];
 
@@ -485,7 +491,12 @@ export class TimeSpaceCube{
             // console.log('id'+ id);
             
             for(const trajectory of trajectories){
+                
                 trajectory.expandBend(this.expandDistance);
+                console.log('tra');
+                
+                console.log(trajectory.coordinateList.length);
+                
             }
         }
 

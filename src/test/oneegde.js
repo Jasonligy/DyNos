@@ -13,16 +13,16 @@ export function getOneNodeGraph(){
     //the interval from origin code 
     // dyGraph.nodeAttributes['appearance'].get(node1).insert(new Interval(0,5));
     // dyGraph.nodeAttributes['appearance'].get(node1).insert(new Interval(5,10));
-    dyGraph.nodeAttributes['appearance'].get(node1).insert(new Interval(0,1));
+    dyGraph.nodeAttributes['appearance'].get(node1).insert(new Interval(0,100));
     let node2=dyGraph.addNode(1);
-    dyGraph.nodeAttributes['nodePosition'].set(node2,new IntervalTree([1,1]));
+    dyGraph.nodeAttributes['nodePosition'].set(node2,new IntervalTree([10,10]));
     dyGraph.nodeAttributes['appearance'].set(node2,new IntervalTree(true))
     //the interval from origin code 
     // dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(0,5))
     // dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(5,10));
-    dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(0,1));
+    dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(0,100));
     const edge=dyGraph.addEdge(node1,node2);
     dyGraph.edgeAttributes['appearance'].set(edge,new IntervalTree(true))
-    dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(0.1,0.8))
+    dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(10,80))
     return dyGraph
 }
