@@ -1,4 +1,4 @@
-import {getUnitVector,getclosestPoint, magnitude} from "../utils/vectorOps.js"
+import {getUnitVector,getclosestPoint, getNearestPoint,magnitude,distance2points} from "../utils/vectorOps.js"
 export class EdgeRepulsion{
     constructor(cube,desired,temperature){
         this.cube=cube;
@@ -15,6 +15,7 @@ export class EdgeRepulsion{
     computeExponent(){
         return this.finalExponent + (this.initialExponent - this.finalExponent) * this.temperature;}
     computeShift(){
+        this.count=0;
         const checkedNode= new Set();
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
@@ -45,21 +46,34 @@ export class EdgeRepulsion{
                     const beginPos=pos.get(begin);
                     const endPos=pos.get(end);
                     const nodePos=pos.get(node);
-                    const distance=magnitude(nodePos,getclosestPoint(nodePos,beginPos,endPos));
-                    if(distance<9*this.desired){
+                    const distance=distance2points(nodePos,getNearestPoint(nodePos,beginPos,endPos));
+
+                    if(distance<15*this.desired){
+                       
+                        
+                        
+                                                
+                        this.count++;
                         this.applyNodeEdgeRepulsion(force,node,nodePos,begin,beginPos,end,endPos)
                         // continue;
                     }
-                    this.count++;
+                    else{
+                        console.log('compare');
+                        console.log(beginPos);
+                        console.log(endPos);
+                        console.log(node);
+                        
+                        console.log(distance);
+                        console.log('not equal');
+                        
+                    }
+                    // this.count++;
                     // console.log(this.count);
                     
                     // break;
                     
                 }
-                else{
-                    // console.log('not equal');
-                    
-                }
+                
             }
             
 
@@ -124,13 +138,13 @@ export class EdgeRepulsion{
         
         
         
-        console.log(relation.closestPoint);
-        console.log(relation.t);
+        // console.log(relation.closestPoint);
+        // console.log(relation.t);
         if(relation.isIncluded){
         // if(true){
             let balance=0;
-            console.log('include');
-            console.log(relation.projection);
+            // console.log('include');
+            // console.log(relation.projection);
             
             if(relation.projection || true){
                 // if(relation.projection){
@@ -141,7 +155,7 @@ export class EdgeRepulsion{
                     magnitude(dPos.map((value,id)=>value-cPos[id]));
             }
             // console.log('baseforce');
-            console.log(balance);
+            // console.log(balance);
             force.set(a,force.get(a).map((value,id)=>value-baseForce[id]));
             force.set(c,force.get(c).map((value,id)=>value+baseForce[id]*(1-balance)));
             force.set(d,force.get(d).map((value,id)=>value+baseForce[id]*(balance)));

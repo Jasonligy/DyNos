@@ -111,6 +111,14 @@ export function getIntersection(vector1,vector2){
 //             isIncluded:isProjectedInclude,
 //     };
 // }
+export function getNearestPoint(nodePos,beginPos,endPos){
+    if(distance2points(nodePos,beginPos)<distance2points(nodePos,endPos)){
+        return beginPos;
+    }
+    else{
+        return endPos;
+    }
+}
 export function getclosestPoint(point, lineStart, lineEnd) {
     let isProjectedInclude = false;
     const [px, py, pz] = point;
@@ -133,8 +141,8 @@ export function getclosestPoint(point, lineStart, lineEnd) {
     const dotProduct = pointVector[0] * lineVector[0] +
                        pointVector[1] * lineVector[1] +
                        pointVector[2] * lineVector[2];
-    console.log('dot');
-    console.log(dotProduct);
+    // console.log('dot');
+    // console.log(dotProduct);
     
     
 
@@ -148,9 +156,9 @@ export function getclosestPoint(point, lineStart, lineEnd) {
     const epsilon = 0.00001;
     let projection=true;
     isProjectedInclude = (t >= 0-epsilon && t <= 1 +epsilon);
-    console.log('t');
+    // console.log('t');
     
-    console.log(t);
+    // console.log(t);
     
     projection = !((t >= -epsilon && t <= epsilon) ||(t >=1-epsilon && t <= 1+epsilon));
     // Calculate the closest point on the line segment

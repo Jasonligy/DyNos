@@ -86,7 +86,7 @@ export class MirrorLine{
             // expandDistance=0.1
             if(dist>expandDistance&&Math.abs(firstCoord[2]-secondCoord[2])>expandDistance/2){
 
-                console.log('expand')
+                // console.log('expand')
                 let node=new Node();
                 this.nodeList.splice(i+expandCount+1,0,node) ;
 
@@ -104,8 +104,8 @@ export class MirrorLine{
         }
 
         this.coordinateList=newCoordinateList
-       console.log('coordinate list len');
-        console.log(this.coordinateList.length);
+    //    console.log('coordinate list len');
+    //     console.log(this.coordinateList.length);
         
         
         if(this.segmentList.length!=this.nodeList.length-1){
@@ -348,6 +348,7 @@ export class TimeSpaceCube{
                         prev=node;
                     }
                     else{
+                    
                         const edge=new Edge(prev,node);
                         this.edges2mirrorLine.set(edge,line);
                         this.edges.add(edge);
@@ -378,8 +379,8 @@ export class TimeSpaceCube{
             // console.log(lines)
 
             for(const line of lines){
-                console.log('update node');
-                console.log(line.coordinateList.length);
+                // console.log('update node');
+                // console.log(line.coordinateList.length);
                 
                 for(let i=0;i<line.coordinateList.length;i++){
                     const node=line.nodeList[i];
@@ -493,9 +494,9 @@ export class TimeSpaceCube{
             for(const trajectory of trajectories){
                 
                 trajectory.expandBend(this.expandDistance);
-                console.log('tra');
+                // console.log('tra');
                 
-                console.log(trajectory.coordinateList.length);
+                // console.log(trajectory.coordinateList.length);
                 
             }
         }

@@ -57,7 +57,7 @@ export class EdgeAttraction{
         
         for(const [id,value] of overallForce.entries()){
             if(force.has(id)){
-                console.log(force.get(id));
+                // console.log(force.get(id));
                 // console.log(force.get(id)[index]);
                 
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]));

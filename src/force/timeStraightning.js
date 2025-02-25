@@ -2,7 +2,7 @@ import {avgVectors,getUnitVector,magnitude,betweenAngle} from "../utils/vectorOp
 export class TimeStraightning{
     constructor(cube,desired){
         this.cube=cube;
-        this.desired=desired;
+        this.desired=desired/5;
     }
     setTemperature(temperature){
         this.temperature=temperature;
@@ -13,18 +13,22 @@ export class TimeStraightning{
         let sumPosition=[0,0];
         for(const [dyNode,mirrors] of this.cube.nodeMirrorMap ){
             //the implement is different from java
+            let allBends=[];
             for(const mirrorLine of mirrors){
-                let allBends=[];
+                
                 allBends.push(...mirrorLine.nodeList);
-                this.computeSmoothingComponent(force,allBends);
-                this.computeStraightningComponent(force, allBends);
+               
                 
             }
+            this.computeSmoothingComponent(force,allBends);
+            this.computeStraightningComponent(force, allBends);
            
         }
+        console.log('timestr');
+        
         for(const[id,value] of overallForce.entries()){
             if(force.has(id)){
-                // console.log(force.get(id));
+                console.log(force.get(id));
                 
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]))
             }
@@ -63,22 +67,24 @@ export class TimeStraightning{
                 
             }
             const vectorMag=magnitude(desired);
-            // console.log('desired');
             
-            // console.log(desired);
             
             //when vectormag equals to 0, means the trajectory is perpendicular with time
-            if(vectorMag>0){
+            if(vectorMag>0.00001){
                 const unit=getUnitVector(desired);
                 const shift=unit.map((value,index) => Math.pow(vectorMag/this.desired,2)*value);
                 force.set(node,shift);
+                // console.log('checksame');
+                // console.log(shift);
+                
+                
             }
         }
     }
     computeStraightningComponent(force, allBends){
         const pos=this.cube.nodeAttributes['nodePosition'];
-        for(let i=0;i<allBends.length;i++ ){
-            for(let j=i+1;i<allBends.length;i++ ){
+        for(let i=0;i<allBends.length-1;i++ ){
+            for(let j=i+1;j<allBends.length;j++ ){
                 
                 const source=allBends[i];
                 const target=allBends[j];

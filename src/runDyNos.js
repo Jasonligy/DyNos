@@ -41,7 +41,7 @@ export class DynosRunner{
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
         const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
-        this.forceList=[edgeAttraction,edgeRepulsion,gravity];
+        this.forceList=[edgeAttraction,edgeRepulsion,gravity,timeStraightning];
         // this.forceList=[gravity,timeStraightning,edgeAttraction,edgeRepulsion];
         // this.forceList=[gravity];
     }
@@ -54,7 +54,7 @@ export class DynosRunner{
             console.log(value)
             
         }
-        const numberofiteration=2
+        const numberofiteration=3;
         for(let i=0;i<numberofiteration;i++){
             console.log(i);
             
@@ -66,12 +66,12 @@ export class DynosRunner{
         
             this.cube.updateForceMovement();
             this.forceList.forEach((force)=>force.computeShift());
-            console.log('force!');
+            // console.log('force!');
             
-            for(const[id,value]of this.cube.nodeAttributes['force'].entries()){
-                console.log(value)
+            // for(const[id,value]of this.cube.nodeAttributes['force'].entries()){
+            //     console.log(value)
                 
-            }
+            // }
             // this.constraintList.forEach((constraint)=>constraint.computeConstraint());//need change
             // if(i==0){
             //     console.log('movestart');
@@ -111,11 +111,11 @@ export class DynosRunner{
                 
             }
         }
-        console.log('end');
-        for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
-            console.log(value)
+        // console.log('end');
+        // for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
+        //     console.log(value)
             
-        }
+        // }
         return this.cube
     }
     computeConstriant(){

@@ -52,9 +52,9 @@ export class MovementAcceleration{
                 
                 
                 const angleDiff=betweenAngle(currentForce,previousMovement);
-                console.log('between');
-                console.log(currentForce);
-                console.log(previousMovement);
+                // console.log('between');
+                // console.log(currentForce);
+                // console.log(previousMovement);
                 
                 
                 
@@ -90,9 +90,9 @@ export class MovementAcceleration{
             
             this.previousMovements.set(node,getUnitVector(currentForce).map((value,index)=>currentLimit*value))
         }
-        console.log('constriant');
+        // console.log('constriant');
         
-        console.log(this.constriant);
+        // console.log(this.constriant);
         return{defaultValue:Infinity,nodeConstriant:this.constriant};
     }
    
