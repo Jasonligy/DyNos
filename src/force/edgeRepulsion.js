@@ -58,13 +58,13 @@ export class EdgeRepulsion{
                         // continue;
                     }
                     else{
-                        console.log('compare');
-                        console.log(beginPos);
-                        console.log(endPos);
-                        console.log(node);
+                        // console.log('compare');
+                        // console.log(beginPos);
+                        // console.log(endPos);
+                        // console.log(node);
                         
-                        console.log(distance);
-                        console.log('not equal');
+                        // console.log(distance);
+                        // console.log('not equal');
                         
                     }
                     // this.count++;
@@ -78,9 +78,9 @@ export class EdgeRepulsion{
             
 
         }
-        console.log('cc');
+        // console.log('cc');
             
-            console.log(this.count);
+        //     console.log(this.count);
         // console.log('pause');
         
         for(const[id,value] of overallForce.entries()){
@@ -88,14 +88,14 @@ export class EdgeRepulsion{
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]))
             }
         }
-        console.log('repulsion');
+        // console.log('repulsion');
         
         for(const [id,value] of overallForce.entries()){
             if(force.has(id)){
                 // console.log(force.get(id));
                 // console.log(force.get(id)[index]);
                 
-                console.log(force.get(id));
+                // console.log(force.get(id));
                  ;
             }
         }

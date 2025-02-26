@@ -87,8 +87,8 @@ export class MovementAcceleration{
             // console.log('currentl');
             
             // console.log(currentLimit);
-            
-            this.previousMovements.set(node,getUnitVector(currentForce).map((value,index)=>currentLimit*value))
+            if(magnitude(currentForce)>0){
+                this.previousMovements.set(node,getUnitVector(currentForce).map((value,index)=>currentLimit*value))}
         }
         // console.log('constriant');
         

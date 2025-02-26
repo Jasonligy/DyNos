@@ -2,13 +2,14 @@ import { log } from "console";
 import {getUnitVector,getIntersection,magnitude} from "../utils/vectorOps.js"
 import { loadavg } from "os";
 export class EdgeAttraction{
-    constructor(cube,desired,temperature){
+    constructor(cube,desired,temperature,tau){
         this.cube=cube;
         this.desired=desired;
         this.initialExponent = 4;
         this.finalExponent = 2;
         this.temperature=temperature;
         this.count=0;
+        this.tau=tau;
         console.log(this.desired)
     }
     setTemperature(temperature){
@@ -80,7 +81,7 @@ export class EdgeAttraction{
     }
     // connectionTau(tau)
     computeForce(force,connection,source,target){
-        const tau=0.875;
+        const tau=this.tau;
         const connectionInterval=[connection.interval.start*tau,connection.interval.end*tau];
         // console.log(source)
         // console.log('length')
@@ -157,15 +158,17 @@ export class EdgeAttraction{
         const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
         // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));
         // console.log(this.desired);
-        // console.log('base');
+        console.log('base');
         // console.log('currentDistance');
         // console.log(currentDistance);
         // console.log(this.computeExponent());
-        // console.log(baseForce);
+        console.log(baseForce);
         
         
         const aBalance=(zPos-aInt[0])/aWidth;
         const bBalance=(zPos-bInt[0])/bWidth;
+        console.log(aWidth);
+        console.log(zPos-aInt[0]);
         // console.log(this.desired)
         // console.log(Math.pow(currentDistance / this.desired,this.computeExponent()))
         const aSourceForce=baseForce.map((value,index)=>value*aRatio*(1-aBalance));

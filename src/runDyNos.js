@@ -11,8 +11,11 @@ export class DynosRunner{
 
         this.dygraph=dyGraph
         this.delta=delta
+        this.tau=1.0
         // console.log(dyGraph)
-        this.cube=new TimeSpaceCube(dyGraph,0.875);
+        // this.cube=new TimeSpaceCube(dyGraph,2.122448979591837);
+        // this.cube=new TimeSpaceCube(dyGraph,0.875);
+        this.cube=new TimeSpaceCube(dyGraph,this.tau);
         this.iteration=number;
         this.forceList=[];
         this.desired=this.delta;
@@ -28,22 +31,22 @@ export class DynosRunner{
         this.contractDistance=1.5*this.delta;
         this.safeMovementFactor=0.9;
         this.preMovementList=[new EnsureTimeCorrectness(this.cube,this.safeMovementFactor)];
-        this.preMovementList=[];
+        // this.preMovementList=[];
     }
     getConstriantList(){
         const decreasingMaxMovement=new DecreasingMaxMovement(this.cube,this.maxMovement);
         const movementAcceleration=new MovementAcceleration(this.cube,this.maxMovement);
+        this.constraintList=[];
         this.constraintList=[decreasingMaxMovement,movementAcceleration];
-        // this.constraintList=[decreasingMaxMovement,movementAcceleration];
     }
     getForceList(){
         const gravity=new Gravity(this.cube);
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
-        const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature);
+        const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature,this.tau);
         const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
-        this.forceList=[edgeAttraction,edgeRepulsion,gravity,timeStraightning];
-        // this.forceList=[gravity,timeStraightning,edgeAttraction,edgeRepulsion];
-        // this.forceList=[gravity];
+        // this.forceList=[edgeAttraction];
+        this.forceList=[gravity,edgeAttraction,edgeRepulsion,timeStraightning];
+        // this.forceList=[edgeRepulsion];
     }
     iterate(){
         console.log('begin');
@@ -54,7 +57,7 @@ export class DynosRunner{
             console.log(value)
             
         }
-        const numberofiteration=3;
+        const numberofiteration=2;
         for(let i=0;i<numberofiteration;i++){
             console.log(i);
             
@@ -111,11 +114,11 @@ export class DynosRunner{
                 
             }
         }
-        // console.log('end');
-        // for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
-        //     console.log(value)
+        console.log('end');
+        for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
+            console.log(value)
             
-        // }
+        }
         return this.cube
     }
     computeConstriant(){

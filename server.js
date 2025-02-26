@@ -42,6 +42,7 @@ app.get('/api/data', (req, res) => {
   readFile()
   .then((fileData) => {
       graph=getOneNodeGraph();
+      // graph=getDyGraph(fileData);
      console.log(graph.nodes);
      
       const runner=new DynosRunner(graph,100,5);

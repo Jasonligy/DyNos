@@ -24,11 +24,11 @@ export class TimeStraightning{
             this.computeStraightningComponent(force, allBends);
            
         }
-        console.log('timestr');
+        // console.log('timestr');
         
         for(const[id,value] of overallForce.entries()){
             if(force.has(id)){
-                console.log(force.get(id));
+                // console.log(force.get(id));
                 
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]))
             }
@@ -62,8 +62,19 @@ export class TimeStraightning{
                 const nodeAfter = allBends[i + 1];
                 const posBefore = pos.get(nodeBefore);
                 const posAfter = pos.get(nodeAfter);
-                const centroid=posCurrent.map((value,index) => (value+posAfter[index]+posBefore[index])/3);
-                desired=centroid.map((value,index)=>value-posCurrent[index]);
+                const condition=this.cube.node2mirrorLine.get(node)==this.cube.node2mirrorLine.get(nodeBefore) && 
+                this.cube.node2mirrorLine.get(node)==this.cube.node2mirrorLine.get(nodeAfter)
+
+                if(condition){
+                    const centroid=posCurrent.map((value,index) => (value+posAfter[index]+posBefore[index])/3);
+                    desired=centroid.map((value,index)=>value-posCurrent[index]);
+                }
+                else{
+                    const factor=(posCurrent[2]-posBefore[2])/(posAfter[2]-posBefore[2]);
+                    const middlePoint=posBefore.map((value,index) => (value+(posAfter[index]-value)*factor));
+                    const centroid=middlePoint.map((value,index) => (value+(posCurrent[index]-value)/3));
+                    desired=centroid.map((value,index)=>value-posCurrent[index]);
+                }
                 
             }
             const vectorMag=magnitude(desired);
