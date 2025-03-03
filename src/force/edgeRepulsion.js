@@ -48,7 +48,7 @@ export class EdgeRepulsion{
                     const nodePos=pos.get(node);
                     const distance=distance2points(nodePos,getNearestPoint(nodePos,beginPos,endPos));
 
-                    if(distance<15*this.desired){
+                    if(distance<9*this.desired){
                        
                         
                         

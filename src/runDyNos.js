@@ -11,7 +11,7 @@ export class DynosRunner{
 
         this.dygraph=dyGraph
         this.delta=delta
-        this.tau=1.0
+        this.tau=1.0833333333333335;
         // console.log(dyGraph)
         // this.cube=new TimeSpaceCube(dyGraph,2.122448979591837);
         // this.cube=new TimeSpaceCube(dyGraph,0.875);
@@ -44,7 +44,7 @@ export class DynosRunner{
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature,this.tau);
         const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
-        // this.forceList=[edgeAttraction];
+        // this.forceList=[gravity,edgeAttraction,timeStraightning];
         this.forceList=[gravity,edgeAttraction,edgeRepulsion,timeStraightning];
         // this.forceList=[edgeRepulsion];
     }
@@ -57,7 +57,7 @@ export class DynosRunner{
             console.log(value)
             
         }
-        const numberofiteration=2;
+        const numberofiteration=50;
         for(let i=0;i<numberofiteration;i++){
             console.log(i);
             
@@ -107,12 +107,12 @@ export class DynosRunner{
                 
             }
             this.temperature=(numberofiteration-i-1)/numberofiteration;
-            console.log('after');
+            // console.log('after');
             
-            for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
-                console.log(value)
+            // for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
+            //     console.log(value)
                 
-            }
+            // }
         }
         console.log('end');
         for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){

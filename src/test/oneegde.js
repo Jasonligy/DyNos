@@ -33,8 +33,8 @@ export function getOneNodeGraph(){
 
     const edge=dyGraph.addEdge(node1,node2);
     dyGraph.edgeAttributes['appearance'].set(edge,new IntervalTree(true))
-    dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(10,80))
-
+    dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(10,40))
+    dyGraph.edgeAttributes['appearance'].get(edge).insert(new Interval(50,80))
     const edge1=dyGraph.addEdge(node2,node3);
     dyGraph.edgeAttributes['appearance'].set(edge1,new IntervalTree(true))
     dyGraph.edgeAttributes['appearance'].get(edge1).insert(new Interval(10,80))

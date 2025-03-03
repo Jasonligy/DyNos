@@ -10,7 +10,7 @@ export class Gravity{
     computeShift(){
         let sumPosition=[0,0]
         const totalNodes=this.cube.nodes.size;
-        console.log('pos');
+        // console.log('pos');
         if(this.center==null){
             for(const node of this.cube.nodes){
                 sumPosition[0]+=this.cube.nodeAttributes['nodePosition'].get(node)[0];
@@ -33,7 +33,7 @@ export class Gravity{
         
         // console.log(center);
         
-        console.log('force')
+        // console.log('force')
         for(const node of this.cube.nodes){
             
             const coordinate=this.cube.nodeAttributes['nodePosition'].get(node);
@@ -42,7 +42,7 @@ export class Gravity{
             
             const result = force.get(node).map((value, index) => value + gravity[index]);
             force.set(node,result);
-            console.log(result)
+            // console.log(result)
         }
     }
    

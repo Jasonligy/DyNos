@@ -54,7 +54,7 @@ export class EdgeAttraction{
         for(const [id,value] of force.entries()){
             // console.log(value)
         }
-        console.log('attract');
+        // console.log('attract');
         
         for(const [id,value] of overallForce.entries()){
             if(force.has(id)){
@@ -158,17 +158,17 @@ export class EdgeAttraction{
         const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
         // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));
         // console.log(this.desired);
-        console.log('base');
+        // console.log('base');
         // console.log('currentDistance');
         // console.log(currentDistance);
         // console.log(this.computeExponent());
-        console.log(baseForce);
+        // console.log(baseForce);
         
         
         const aBalance=(zPos-aInt[0])/aWidth;
         const bBalance=(zPos-bInt[0])/bWidth;
-        console.log(aWidth);
-        console.log(zPos-aInt[0]);
+        // console.log(aWidth);
+        // console.log(zPos-aInt[0]);
         // console.log(this.desired)
         // console.log(Math.pow(currentDistance / this.desired,this.computeExponent()))
         const aSourceForce=baseForce.map((value,index)=>value*aRatio*(1-aBalance));

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGL Adaptive Quad</title>
+</head>
+<body>
+<canvas id="webgl-canvas" width="500" height="500"></canvas>
+
+<script>
+    const canvas = document.getElementById("webgl-canvas");
+    const gl = canvas.getContext("webgl");
+
+    // Random 3D points (You can change these values)
+    const P1 = [-0.5, 0.7, 0.0];
+    const P2 = [0.5, 0.6, 0.0];
+    const P3 = [-0.4, -0.8, 0.0];
+    const P4 = [0.6, -0.7, 0.0];
+
+    // Function to calculate Euclidean distance
+    function distance(A, B) {
+        return Math.sqrt(
+            Math.pow(A[0] - B[0], 2) +
+            Math.pow(A[1] - B[1], 2) +
+            Math.pow(A[2] - B[2], 2)
+        );
+    }
+
+    // Compute the two possible pairings
+    const d1 = distance(P1, P3) + distance(P2, P4);
+    const d2 = distance(P1, P4) + distance(P2, P3);
+
+    let vertices;
+    if (d1 < d2) {
+        // Choose diagonal P1-P3 and P2-P4
+        vertices = new Float32Array([
+            ...P1, ...P2, ...P3,  // Triangle 1
+            ...P2, ...P3, ...P4   // Triangle 2
+        ]);
+    } else {
+        // Choose diagonal P1-P4 and P2-P3
+        vertices = new Float32Array([
+            ...P1, ...P2, ...P4,  // Triangle 1
+            ...P1, ...P3, ...P4   // Triangle 2
+        ]);
+    }
+
+    // Create and bind buffer
+    const vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+    // Vertex Shader
+    const vsSource = `
+        attribute vec3 coordinates;
+        void main(void) {
+            gl_Position = vec4(coordinates, 1.0);
+        }
+    `;
+
+    // Fragment Shader
+    const fsSource = `
+        void main(void) {
+            gl_FragColor = vec4(0.0, 0.7, 1.0, 1.0);
+        }
+    `;
+
+    // Compile shaders
+    function compileShader(gl, source, type) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.error("Shader compilation error:", gl.getShaderInfoLog(shader));
+            return null;
+        }
+        return shader;
+    }
+
+    const vertexShader = compileShader(gl, vsSource, gl.VERTEX_SHADER);
+    const fragmentShader = compileShader(gl, fsSource, gl.FRAGMENT_SHADER);
+
+    // Create shader program
+    const shaderProgram = gl.createProgram();
+    gl.attachShader(shaderProgram, vertexShader);
+    gl.attachShader(shaderProgram, fragmentShader);
+    gl.linkProgram(shaderProgram);
+    gl.useProgram(shaderProgram);
+
+    // Get attribute location and enable it
+    const coord = gl.getAttribLocation(shaderProgram, "coordinates");
+    gl.vertexAttribPointer(coord, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(coord);
+
+    // Set viewport and clear
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+
+    // Draw the surface
+    gl.drawArrays(gl.TRIANGLES, 0, 6);
+</script>
+</body>
+</html>
