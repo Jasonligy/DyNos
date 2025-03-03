@@ -9,9 +9,7 @@ function draw(edge,indexs,connections){
     //     }
     // }
     edge=new Float32Array(edge)
-    // const connections=new
-    connections=new Float32Array(surfaceCoord(connections));
-    console.log(connections)
+    // console.log(edge)
     const canvas = document.getElementById('glCanvas');
     const gl = canvas.getContext('webgl');
 
@@ -271,11 +269,6 @@ function draw(edge,indexs,connections){
     gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, edge, gl.STATIC_DRAW);
 
-
-    // const surfaceBuffer = gl.createBuffer();
-    // gl.bindBuffer(gl.ARRAY_BUFFER, surfaceBuffer);
-    // gl.bufferData(gl.ARRAY_BUFFER, connections, gl.STATIC_DRAW);
-
     // Define colors for each vertex
     const lineColors = new Float32Array([
         // Color for each vertex in sequence
@@ -334,27 +327,9 @@ function draw(edge,indexs,connections){
         gl.drawArrays(gl.LINE_STRIP, index, indexs[i]); // n+1 vertices -> n edges
         index+=indexs[i];
     }
-
-const surfaceBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, surfaceBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, connections, gl.STATIC_DRAW);
-    gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
-    gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 0.2);
-    // gl.drawArrays(gl.TRIANGLES, 0, 18);
-
-    console.log(connections);
+    console.log(index);
     console.log(edge.length);
     
-}
-function surfaceCoord(connections){
-    let surface=[]
-    for(let i=0;i<connections.length;i++){
-        if(connections[i].length!=4){
-            throw new Error('surface coordinate number is not 4')
-        }
-        surface=surface.concat([...connections[i][0],...connections[i][1],...connections[i][3],...connections[i][0],...connections[i][2],...connections[i][3]])
-    }
-    return surface;
 }
     
     

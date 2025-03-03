@@ -542,6 +542,7 @@ export class TimeSpaceCube{
     outputMatrix(){
         let lines=[];
         let mirrorIndex=[];
+        let connectionCoordinates=[];
         let getH=[]
         // for(const [id,nodeLines] of this.nodeMirrorMap.entries()){
         //     for(const nodeline of nodeLines){
@@ -570,12 +571,60 @@ export class TimeSpaceCube{
                 lines.push(...this.convertCoordinate(coordinateList,minC,maxC))
             }
         }
-        // console.log('lines');
+        for(const [edge,connections] of this.edgeMirrorMap.entries()){
+            
+            for(const connection of connections){
+                let ConnectionCoordinate=[];
+                const slot=connection.interval;
+                const sourceLine=connection.source;
+                const targetLine=connection.target;
+                const intervalStart=slot.start*this.tau;
+                const intervalEnd=slot.end*this.tau;
+                ConnectionCoordinate.push(...this.findInterpolatedPoint(sourceLine.coordinateList,[intervalStart,intervalEnd]));
+                ConnectionCoordinate.push(...this.findInterpolatedPoint(targetLine.coordinateList,[intervalStart,intervalEnd]));
+                const converted=[]
+                console.log('lllll');
+                
+                
+                
+                for(let i=0;i<ConnectionCoordinate.length;i++){
+                    console.log(ConnectionCoordinate[i]);
+                    converted.push(this.convertCoordinate([ConnectionCoordinate[i]],minC,maxC))
+                }
+                
+                // ConnectionCoordinate=this.convertCoordinate(ConnectionCoordinate,minC,maxC)
+                connectionCoordinates.push(converted);
+            }
+        }
+        console.log('lines');
         // console.log(lines.length);
         
         // console.log(lines);
+        console.log(this.surfaceCoord(connectionCoordinates));
         
-        return [lines,mirrorIndex];
+        console.log('check trajectory');
+        console.log(lines);
+        console.log(mirrorIndex);
+        console.log(connectionCoordinates);
+        
+        
+        
+        
+        return [lines,mirrorIndex,connectionCoordinates];
+    }
+    surfaceCoord(connections){
+
+        let surface=[]
+        for(let i=0;i<connections.length;i++){
+
+            if(connections[i].length!=4){
+                throw new Error('surface coordinate number is not 4')
+            }
+            console.log([...connections[i][0],...connections[i][1],...connections[i][3],...connections[i][0],...connections[i][2],...connections[i][3]]);
+            
+            surface=surface.concat([...connections[i][0],...connections[i][1],...connections[i][3],...connections[i][0],...connections[i][2],...connections[i][3]])
+        }
+        return surface;
     }
     //coordinates is a 2D array from the mirror, store the 3D coordinates of each node
     //may adjust the coordinate in the future
@@ -629,4 +678,41 @@ export class TimeSpaceCube{
         return this.dyGraph
     }
 
+    findInterpolatedPoint(points, targetZ) {
+        const interpolatedPoints=[]
+        for(let i=0;i<targetZ.length;i++){
+            let left = 0, right = points.length - 1;
+        
+            // Binary search for the closest z values
+            while (left <= right) {
+                let mid = Math.floor((left + right) / 2);
+                if (points[mid][2] === targetZ[i]) {
+                    interpolatedPoints.push(points[mid]) ; // Exact match
+                } else if (points[mid][2] < targetZ[i]) {
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            }
+        
+            // If exact match not found, interpolate between points[right] and points[left]
+            if (right < 0 || left >= points.length) {
+                throw new Error("not find interploated value"); // Target z is out of range
+            }
+        
+            let [x1, y1, z1] = points[right];
+            let [x2, y2, z2] = points[left];
+        
+            // Compute interpolation factor
+            let t = (targetZ[i] - z1) / (z2 - z1);
+        
+            // Interpolate x and y
+            let x = x1 + t * (x2 - x1);
+            let y = y1 + t * (y2 - y1);
+        
+            interpolatedPoints.push([x, y, targetZ[i]]);
+        }
+        return interpolatedPoints;
+    }
+    
 }

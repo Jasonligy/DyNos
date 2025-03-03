@@ -24,7 +24,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log('Fetched data:', data);
-                draw(data.array,data.index)
+                draw(data.array,data.index,data.connections)
                 // Use the data for rendering or logic
             })
             .catch(error => console.error('Error fetching data:', error));

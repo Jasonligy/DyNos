@@ -54,8 +54,12 @@ app.get('/api/data', (req, res) => {
     const cubeBefore=new TimeSpaceCube(graph,0.1);
     // const [lines,mirrorIndex]=generateCube();
     // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
-    const [lines,mirrorIndex]=cube.outputMatrix();
-    const data={array:lines,index:mirrorIndex};
+    const [lines,mirrorIndex,connections]=cube.outputMatrix();
+    console.log('co');
+    console.log(connections);
+    
+    
+    const data={array:lines,index:mirrorIndex,connections:connections};
     res.json(data)})
 });
 app.get('/api/datametrics', (req, res) => {

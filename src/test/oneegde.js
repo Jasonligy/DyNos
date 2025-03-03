@@ -26,6 +26,7 @@ export function getOneNodeGraph(){
     let node3=dyGraph.addNode(2);
     dyGraph.nodeAttributes['nodePosition'].set(node3,new IntervalTree([10,5]));
     dyGraph.nodeAttributes['appearance'].set(node3,new IntervalTree(true))
+
     //the interval from origin code 
     // dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(0,5))
     // dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(5,10));
