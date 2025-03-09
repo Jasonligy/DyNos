@@ -2,7 +2,12 @@
 // // main.js
 // import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";
 // import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
-function draw(edge,indexs,connections){
+let canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex;
+function draw(edge,indexs,connections,connectionIndex,angleX=0,angleZ=5){
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    if(typeof canvasedge === "undefined"){
+        [canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex]=[edge,indexs,connections,connectionIndex]
+    }
     // for(let i=0;i<edge.length;i++){
     //     if(edge[i]<-10){
     //         edge[i]=1;
@@ -71,6 +76,11 @@ function draw(edge,indexs,connections){
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
     const program = gl.createProgram();
+    // Enable blending
+gl.enable(gl.BLEND);
+
+// Set the blend mode (standard for alpha transparency)
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
@@ -179,21 +189,55 @@ function draw(edge,indexs,connections){
     const uModelViewMatrix = gl.getUniformLocation(program, 'uModelViewMatrix');
     const uProjectionMatrix = gl.getUniformLocation(program, 'uProjectionMatrix');
 
-    // Set the viewport
+
+
     gl.viewport(0, 0, canvas.width, canvas.height);
 
-    // Set up the projection and view matrices
+    const viewMatrix = mat4.create();
+    mat4.lookAt(viewMatrix, 
+        [angleX, 0, angleZ],  // Move the camera left, keeping the same depth
+        [0, 0, 0],   // Look at the center of the scene
+        [0, 1, 0]       // Up vector → Keep Y-axis as up
+    );
     const projectionMatrix = mat4.create();
     mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100);
 
+    // Apply transformations to the model
+    const modelMatrix = mat4.create();
+    mat4.translate(modelMatrix, modelMatrix, [0, -0.5, 0]); // Apply model transformation
     const modelViewMatrix = mat4.create();
-    // mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -10]);
-    // mat4.rotateX(modelViewMatrix, modelViewMatrix, Math.PI / 4); // Rotate down to look at the cube
-    mat4.translate(modelViewMatrix, modelViewMatrix, [0.5, -0.5, -5]); // Move up by 5 units
-    // mat4.rotateX(modelViewMatrix, modelViewMatrix, Math.PI / 2); // Rotate down to look at the cube
-
+    mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix); 
+    // Combine the view and model matrices
+    // const modelViewMatrix = mat4.create();
+    // mat4.translate(modelViewMatrix, modelViewMatrix, modelMatrix); // modelViewMatrix = view * model
+    
+    // Upload matrices to the shader
     gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
     gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+    
+
+    // const projectionMatrix = mat4.create();
+    // mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100);
+    // const modelViewMatrix = mat4.create();
+    // mat4.translate(modelViewMatrix, modelViewMatrix, [0.5, -0.5, -5]); // Move up by 5 units
+    // gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+    // gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+
+    // // Set the viewport
+    // gl.viewport(0, 0, canvas.width, canvas.height);
+
+    // // Set up the projection and view matrices
+    // const projectionMatrix = mat4.create();
+    // mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100);
+
+    // const modelViewMatrix = mat4.create();
+    // // mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -10]);
+    // // mat4.rotateX(modelViewMatrix, modelViewMatrix, Math.PI / 4); // Rotate down to look at the cube
+    // mat4.translate(modelViewMatrix, modelViewMatrix, [0.5, -0.5, -5]); // Move up by 5 units
+    // // mat4.rotateX(modelViewMatrix, modelViewMatrix, Math.PI / 2); // Rotate down to look at the cube
+
+    // gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+    // gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
 
 
     // Create and bind buffer for vertices
@@ -227,9 +271,9 @@ function draw(edge,indexs,connections){
     // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     // gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
-    gl.enableVertexAttribArray(aColor);
+    // gl.enableVertexAttribArray(aColor);
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
+    // gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
     gl.uniform1i(uUseFixedColor, false);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeIndexBuffer);
     gl.drawElements(gl.LINES, edgeIndices.length, gl.UNSIGNED_SHORT, 0);
@@ -336,11 +380,30 @@ function draw(edge,indexs,connections){
     }
 
 const surfaceBuffer = gl.createBuffer();
+gl.enableVertexAttribArray(aPosition);
     gl.bindBuffer(gl.ARRAY_BUFFER, surfaceBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, connections, gl.STATIC_DRAW);
     gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
-    gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 0.2);
-    // gl.drawArrays(gl.TRIANGLES, 0, 18);
+    
+    gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 0.3);
+    console.log(connections.length);
+    
+    connectionIndex.unshift(0);
+    console.log(connectionIndex);
+    let total=0;
+    for(let i=1;i<connectionIndex.length;i++){
+        // gl.drawArrays(gl.TRIANGLES, connectionIndex[i-1], connectionIndex[i]);
+        gl.drawArrays(gl.TRIANGLES, total, connectionIndex[i]);
+        gl.drawArrays(gl.TRIANGLES,total+1, connectionIndex[i]-3);
+        gl.drawArrays(gl.TRIANGLES, total+2, connectionIndex[i]-3);
+        total+=connectionIndex[i];
+        
+        // gl.drawArrays(gl.TRIANGLES, 0, 3);
+        // gl.drawArrays(gl.TRIANGLES, connectionIndex[i-1]+1, connectionIndex[i]);
+        
+        
+    }
+    
 
     console.log(connections);
     console.log(edge.length);
@@ -348,12 +411,21 @@ const surfaceBuffer = gl.createBuffer();
 }
 function surfaceCoord(connections){
     let surface=[]
+    console.log(connections);
+    
     for(let i=0;i<connections.length;i++){
-        if(connections[i].length!=4){
-            throw new Error('surface coordinate number is not 4')
+        for(let j=0;j<connections[i].length;j++){
+            surface=surface.concat([...connections[i][j]])
+            console.log(surface);
+            
         }
-        surface=surface.concat([...connections[i][0],...connections[i][1],...connections[i][3],...connections[i][0],...connections[i][2],...connections[i][3]])
+        // if(connections[i].length!=4){
+        //     throw new Error('surface coordinate number is not 4')
+        // }
+        
     }
+    console.log(surface);
+    
     return surface;
 }
     
@@ -368,3 +440,22 @@ function surfaceCoord(connections){
     //         })
     //         .catch(error => console.error('Error fetching data:', error));
 // const colorLocation = gl.getUniformLocation(shaderProgram, 'uColor');
+function updateViewMatrix(angle) {
+    const radians = angle * (Math.PI / 180); // Convert degrees to radians
+    const radius = 5; // Distance from the center
+    const eyeX = Math.sin(radians) * radius;
+    const eyeZ = Math.cos(radians) * radius;
+
+    
+    draw(canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex,eyeX,eyeZ)
+}
+
+// Handle slider input for rotation
+document.getElementById("viewControl").addEventListener("input", function(event) {
+    const angle = event.target.value;
+    console.log(angle);
+    
+    // document.getElementById("angleDisplay").innerText = angle;
+    updateViewMatrix(angle);
+    
+});

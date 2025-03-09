@@ -41,8 +41,8 @@ app.get('/api/data', (req, res) => {
   console.log('begin');
   readFile()
   .then((fileData) => {
-      graph=getOneNodeGraph();
-      // graph=getDyGraph(fileData);
+      // graph=getOneNodeGraph();
+      graph=getDyGraph(fileData);
      console.log(graph.nodes);
      
       const runner=new DynosRunner(graph,100,5);
@@ -54,12 +54,12 @@ app.get('/api/data', (req, res) => {
     const cubeBefore=new TimeSpaceCube(graph,0.1);
     // const [lines,mirrorIndex]=generateCube();
     // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
-    const [lines,mirrorIndex,connections]=cube.outputMatrix();
-    console.log('co');
-    console.log(connections);
+    const [lines,mirrorIndex,connections,connectionIndex]=cube.outputMatrix();
+    // console.log('co');
+    // console.log(connections);
     
     
-    const data={array:lines,index:mirrorIndex,connections:connections};
+    const data={array:lines,index:mirrorIndex,connections:connections,connectionIndex:connectionIndex};
     res.json(data)})
 });
 app.get('/api/datametrics', (req, res) => {

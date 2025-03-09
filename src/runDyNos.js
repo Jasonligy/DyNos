@@ -11,6 +11,7 @@ export class DynosRunner{
 
         this.dygraph=dyGraph
         this.delta=delta
+        // this.tau=2.122448979591837;
         this.tau=1.0833333333333335;
         // console.log(dyGraph)
         // this.cube=new TimeSpaceCube(dyGraph,2.122448979591837);
@@ -44,8 +45,8 @@ export class DynosRunner{
         const timeStraightning = new TimeStraightning(this.cube,this.desired);
         const edgeAttraction=new EdgeAttraction(this.cube,this.desired,this.temperature,this.tau);
         const edgeRepulsion=new EdgeRepulsion(this.cube,this.desired,this.temperature);
-        // this.forceList=[gravity,edgeAttraction,timeStraightning];
-        this.forceList=[gravity,edgeAttraction,edgeRepulsion,timeStraightning];
+        this.forceList=[gravity,edgeAttraction,edgeRepulsion,];
+        // this.forceList=[gravity,edgeAttraction,edgeRepulsion,timeStraightning];
         // this.forceList=[edgeRepulsion];
     }
     iterate(){
