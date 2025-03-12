@@ -511,7 +511,7 @@ export class TimeSpaceCube{
         }         
     }
     getMinMax(){
-        let minC=[10000,10000,10000];
+        let minC=[100000000000000,100000000000000,100000000000000];
         let maxC=[-10000,-10000,-10000];
         // console.log(this.nodeAttributes['nodePosition'].entries());
         
@@ -655,7 +655,7 @@ export class TimeSpaceCube{
             if(count==gap){
                 break
             }
-            console.log('tte');
+            // console.log('tte');
             
         }
     
@@ -673,7 +673,7 @@ export class TimeSpaceCube{
         // Resample the shorter line to match the longer one
         if (m > n) {
              convertlineB = this.interpolateLinePreservingSegments(lineB, lineA);
-        } else if (n > m) {
+        } else if (n >= m) {
              convertlineA = this.interpolateLinePreservingSegments(lineA, lineB);
         }
     

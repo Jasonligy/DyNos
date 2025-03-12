@@ -2,8 +2,13 @@
 // // main.js
 // import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";
 // import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
+let eyeX=0;
+let eyeY=0;
+let eyeZ=5;
+let angleH=0;
+let angleV=0;
 let canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex;
-function draw(edge,indexs,connections,connectionIndex,angleX=0,angleZ=5){
+function draw(edge,indexs,connections,connectionIndex,angleX=0,angleY=0,angleZ=5){
     // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     if(typeof canvasedge === "undefined"){
         [canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex]=[edge,indexs,connections,connectionIndex]
@@ -195,7 +200,7 @@ gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
     const viewMatrix = mat4.create();
     mat4.lookAt(viewMatrix, 
-        [angleX, 0, angleZ],  // Move the camera left, keeping the same depth
+        [angleX, angleY, angleZ],  // Move the camera left, keeping the same depth
         [0, 0, 0],   // Look at the center of the scene
         [0, 1, 0]       // Up vector → Keep Y-axis as up
     );
@@ -391,11 +396,17 @@ gl.enableVertexAttribArray(aPosition);
     connectionIndex.unshift(0);
     console.log(connectionIndex);
     let total=0;
+
+
     for(let i=1;i<connectionIndex.length;i++){
+        if(connectionIndex[i]==4){
+            gl.drawArrays(gl.TRIANGLES, total+1, connectionIndex[i]);
+        }
         // gl.drawArrays(gl.TRIANGLES, connectionIndex[i-1], connectionIndex[i]);
         gl.drawArrays(gl.TRIANGLES, total, connectionIndex[i]);
         gl.drawArrays(gl.TRIANGLES,total+1, connectionIndex[i]-3);
         gl.drawArrays(gl.TRIANGLES, total+2, connectionIndex[i]-3);
+        // gl.drawArrays(gl.TRIANGLES, total+3, connectionIndex[i]-3);
         total+=connectionIndex[i];
         
         // gl.drawArrays(gl.TRIANGLES, 0, 3);
@@ -440,22 +451,53 @@ function surfaceCoord(connections){
     //         })
     //         .catch(error => console.error('Error fetching data:', error));
 // const colorLocation = gl.getUniformLocation(shaderProgram, 'uColor');
-function updateViewMatrix(angle) {
+function updateViewMatrixH(angle) {
     const radians = angle * (Math.PI / 180); // Convert degrees to radians
     const radius = 5; // Distance from the center
-    const eyeX = Math.sin(radians) * radius;
-    const eyeZ = Math.cos(radians) * radius;
+    eyeX = Math.sin(radians) * radius;
+    eyeZ = Math.cos(radians) * radius;
 
     
-    draw(canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex,eyeX,eyeZ)
+    draw(canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex,eyeX,eyeY,eyeZ)
 }
+function updateViewMatrixV(angle) {
+    const radians = angle * (Math.PI / 180); // Convert degrees to radians
+    const radius = 5; // Distance from the center
+    eyeY = Math.sin(radians) * radius;
+    
 
+    
+    draw(canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex,eyeX,eyeY,eyeZ)
+}
 // Handle slider input for rotation
-document.getElementById("viewControl").addEventListener("input", function(event) {
-    const angle = event.target.value;
-    console.log(angle);
+document.getElementById("viewControl0").addEventListener("input", function(event) {
+    angleH = event.target.value;
+    console.log(angleH);
     
     // document.getElementById("angleDisplay").innerText = angle;
-    updateViewMatrix(angle);
+    updateViewMatrix(angleH,angleV);
     
 });
+document.getElementById("viewControl1").addEventListener("input", function(event) {
+    angleV = event.target.value;
+    console.log(angleV);
+    
+    // document.getElementById("angleDisplay").innerText = angle;
+    updateViewMatrix(angleH,angleV);
+    
+});
+function updateViewMatrix(angleX, angleY) {
+    if(angleY>180){
+
+    }
+    const radX = angleX * (Math.PI / 180); // Convert horizontal angle to radians
+    const radY = angleY * (Math.PI / 180); // Convert vertical angle to radians
+    const radius = 5; // Distance from the center
+
+    // Spherical coordinates
+    eyeX = Math.sin(radX) * Math.cos(radY) * radius;
+    eyeY = Math.sin(radY) * radius; // Controls vertical movement
+    eyeZ = Math.cos(radX) * Math.cos(radY) * radius;
+
+    draw(canvasedge, canvasindexs, canvasconnections, canvasconnectionIndex, eyeX, eyeY, eyeZ);
+}
