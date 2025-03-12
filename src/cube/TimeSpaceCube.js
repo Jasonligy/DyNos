@@ -1,6 +1,7 @@
-import{Node,Edge}from "../dygraph/Dygraph.js"
+import{DyGraph,Node,Edge}from "../dygraph/Dygraph.js"
 import { avgVectors, distance2points, magnitude,checkTriVectors } from "../utils/vectorOps.js";
 import {Interval,IntervalTree}from "../intervalTree/intervalTree.js"
+// import { DyGraph,Node,Edge } from '../dygraph/Dygraph.js';
 export class MirrorLine{
     constructor(dynode,appearInterval){
         this.dynode = dynode;
@@ -842,6 +843,39 @@ export class TimeSpaceCube{
     
         // Sort result points by Z to maintain correct order
         return resultPoints.sort((a, b) => a[2] - b[2]);
+    }
+    ToDyGragh(){
+        console.log('todyfraph');
+        
+        const dyGraph=new DyGraph();
+        const nodes=this.dyGraph.nodes;
+        const edges=this.dyGraph.edges;
+        for(const [id,node] of nodes.entries()){
+
+            dyGraph.nodeAttributes['nodePosition'].set(node,new IntervalTree([0,0]));
+            const tree=dyGraph.nodeAttributes['nodePosition'].get(node);
+            for(const line of this.nodeMirrorMap.get(node)){
+                const segment=line.coordinateList
+                const segmentLength=line.coordinateList.length
+                for(let i=0;i<segmentLength-1;i++){
+                    const startTime=segment[i][2]/this.tau;
+                    const endTime=segment[i+1][2]/this.tau;
+                    const startPos=[segment[i][0],segment[i][1]];
+                    const endPos=[segment[i+1][0],segment[i+1][1]];
+                    const interval=new Interval(startTime,endTime,startPos,endPos);
+                    tree.insert(interval);
+                }
+            }
+        }
+        dyGraph.edgeAttributes['appearance']=this.dyGraph.edgeAttributes['appearance'];
+        for (const [edge, tree] of dyGraph.edgeAttributes['appearance']) {
+            console.log(edge.sourceNode);
+            console.log(dyGraph.nodeAttributes['nodePosition'].get(edge.sourceNode));
+            
+            
+        }
+        return dyGraph
+
     }
     
 }

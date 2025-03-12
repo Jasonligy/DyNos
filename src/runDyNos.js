@@ -121,6 +121,7 @@ export class DynosRunner{
             console.log(value)
             
         }
+        this.cube.ToDyGragh()
         return this.cube
     }
     computeConstriant(){
