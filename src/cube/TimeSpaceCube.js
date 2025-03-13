@@ -731,6 +731,20 @@ export class TimeSpaceCube{
     
         return [mappedX, mappedZ,mappedY ];
     }
+    fmap2DCoordinates(coord,  minVals, maxVals) {
+        const [x, y] = coord;
+    
+        // Normalize each axis to 0-1 range
+        const normalizedX = (x - minVals[0]) / (maxVals[0] - minVals[0]);
+        const normalizedY = (y - minVals[1]) / (maxVals[1] - minVals[1]);
+        
+        // Map to the target ranges
+        const mappedX = normalizedX * 2 -1;
+        const mappedY = normalizedY * 2 -1;
+     
+    
+        return [mappedX, mappedY ];
+    }
     cube2DyGraph(){
         const [minC,maxC]=this.getMinMax();
         for(const [id,nodeLines] of this.nodeMirrorMap.entries()){
@@ -850,6 +864,9 @@ export class TimeSpaceCube{
         const dyGraph=new DyGraph();
         const nodes=this.dyGraph.nodes;
         const edges=this.dyGraph.edges;
+        let [minC,maxC]=this.getMinMax();
+        minC=[minC[0],minC[1]];
+        maxC=[maxC[0],maxC[1]];
         for(const [id,node] of nodes.entries()){
 
             dyGraph.nodeAttributes['nodePosition'].set(node,new IntervalTree([0,0]));
@@ -860,8 +877,10 @@ export class TimeSpaceCube{
                 for(let i=0;i<segmentLength-1;i++){
                     const startTime=segment[i][2]/this.tau;
                     const endTime=segment[i+1][2]/this.tau;
-                    const startPos=[segment[i][0],segment[i][1]];
-                    const endPos=[segment[i+1][0],segment[i+1][1]];
+                    let startPos=[segment[i][0],segment[i][1]];
+                    let endPos=[segment[i+1][0],segment[i+1][1]];
+                    startPos=this.fmap2DCoordinates(startPos,  minC, maxC);
+                    endPos=this.fmap2DCoordinates(endPos,  minC, maxC);
                     const interval=new Interval(startTime,endTime,startPos,endPos);
                     tree.insert(interval);
                 }

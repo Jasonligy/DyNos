@@ -11,13 +11,28 @@
     <!-- <script src="src/circle.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix.js"></script>
 
-    <!-- <script type="module" src="src/run.js"></script> -->
-    <script  src="src/run_copy.js">
+    <script type="module" src="src/run.js"></script>
+
+    <script>
+        // Fetch data from the server
+        console.log('cubebegin');
+        
+        fetch('/api/data')
+        // fetch('/api/datametrics')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Fetched data:', data);
+                draw(data.array,data.index,data.connections,data.connectionIndex)
+                // Use the data for rendering or logic
+            })
+            .catch(error => console.error('Error fetching data:', error));
+    </script>
+    <!-- <script  src="src/run_copy.js">
         //  requestAnimationFrame(animate);
-    </script> 
+    </script>  -->
     <!-- <script  src="src/samples/VanDeBunt.js"></script> -->
     <!-- <script  src="drawCube.js"></script> -->
-    <script>
+    <!-- <script>
         // Fetch data from the server
         fetch('/api/graph')
             .then(response => response.json())
@@ -29,7 +44,7 @@
             .catch(error => console.error('Error fetching data:', error));
 
        
-    </script>
+    </script> -->
 
     <!-- <script type="module" src="src/cube.js"></script> -->
 

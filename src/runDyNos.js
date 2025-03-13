@@ -59,7 +59,7 @@ export class DynosRunner{
             console.log(value)
             
         }
-        const numberofiteration=59;
+        const numberofiteration=1;
         for(let i=0;i<numberofiteration;i++){
             console.log(i);
             

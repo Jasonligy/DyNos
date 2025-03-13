@@ -172,7 +172,7 @@ const updateInterval = 1000;  // Update every 1000ms (1 second)
 const animationDuration = 3000;  // Stop after 10 seconds (10,000 ms)
 let startTime = null;
 
-function run(graph){
+function run(){
     console.log('test');
     
     // Function to draw nodes
@@ -227,7 +227,6 @@ function run(graph){
         requestAnimationFrame(animate);
     }
     function updateNodePositions(count) {
-        //替换为fetch从server那里取
         const nodeEdge=getNodeEdge0(graph,count);
     
         nodes=nodeEdge.position;
@@ -248,7 +247,7 @@ function run(graph){
     
     }
 
-    
+    const graph = generateGraph();
 
     const nodeEdge=getNodeEdge0(graph,0);
 
@@ -279,3 +278,4 @@ function run(graph){
     
     requestAnimationFrame(animate);
 }
+run();

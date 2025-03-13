@@ -1,4 +1,6 @@
 function animate(graph){
+    console.log('test');
+    
     const canvas = document.getElementById('glCanvas');
     const gl = canvas.getContext('webgl');
 
@@ -195,7 +197,7 @@ function animate(graph){
 
 
     let count=0;
-    function animate(timestamp) {
+    function animate0(timestamp) {
         // Set the start time on the first frame
         if (!startTime) startTime = timestamp;
         
@@ -220,8 +222,9 @@ function animate(graph){
         // drawCircle();
         console.log(count)
         // Request the next frame
-        requestAnimationFrame(animate);
+        requestAnimationFrame(animate0);
     }
+    animate()
 
     // Start the animation loop
     // requestAnimationFrame(animate);
