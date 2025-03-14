@@ -52,14 +52,14 @@ export class DynosRunner{
     }
     iterate(){
         console.log('begin');
-        for(const [id,value]of this.dygraph.nodes){
-            console.log(this.dygraph.nodeAttributes['nodePosition'].get(value));
-        }
-        for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
-            console.log(value)
+        // for(const [id,value]of this.dygraph.nodes){
+        //     console.log(this.dygraph.nodeAttributes['nodePosition'].get(value));
+        // }
+        // for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
+        //     console.log(value)
             
-        }
-        const numberofiteration=1;
+        // }
+        const numberofiteration=20;
         for(let i=0;i<numberofiteration;i++){
             console.log(i);
             
@@ -70,6 +70,7 @@ export class DynosRunner{
             this.constraintList.forEach((constraint)=>constraint.setTemperature(this.temperature));
         
             this.cube.updateForceMovement();
+            // console.log('mark0');
             this.forceList.forEach((force)=>force.computeShift());
             // console.log('force!');
             
@@ -89,7 +90,8 @@ export class DynosRunner{
             //     // console.log(c);
                 
             // }
-
+          
+            
             this.computeConstriant();
             this.cube.computeMovement();
             this.preMovementList.forEach((preMove)=>preMove.execute());
@@ -97,6 +99,8 @@ export class DynosRunner{
             this.cube.updateCube();
             this.cube.postProcessing();
             this.cube.getMirrorNode2();
+            console.log(this.cube.nodes.size);
+            
                let c=0;
             if(i==99){
                 console.log('movestart');
@@ -118,10 +122,10 @@ export class DynosRunner{
         }
         console.log('end');
         for(const[id,value]of this.cube.nodeAttributes['nodePosition'].entries()){
-            console.log(value)
+            // console.log(value)
             
         }
-        this.cube.ToDyGragh()
+        // this.cube.ToDyGragh()
         return this.cube
     }
     computeConstriant(){

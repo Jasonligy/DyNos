@@ -599,7 +599,9 @@ export class TimeSpaceCube{
                 
                 
                 for(let i=0;i<ConnectionCoordinate.length;i++){
-                    // console.log(ConnectionCoordinate[i]);
+                    // console.log(i);
+                    
+                    // console.log(ConnectionCoordinate);
                     converted.push(this.convertCoordinate([ConnectionCoordinate[i]],minC,maxC))
                 }
                 
@@ -659,16 +661,19 @@ export class TimeSpaceCube{
             // console.log('tte');
             
         }
-    
+        if(count<gap){
+            const ancher=result[result.length-1];
+            for(let j=0;j<gap-count;j++){
+                result.push(ancher)
+            }
+        }
         // Sort final points by Z to maintain order
         return result.sort((a, b) => a[2] - b[2]);
     }
     generateSurface(lineA, lineB) {
         let m = lineA.length;
         let n = lineB.length;
-        // console.log('check same before');
-        // console.log(lineA.length);
-        // console.log(lineB.length);
+        
         let convertlineA=lineA.map(innerArr => [...innerArr]);;
         let convertlineB=lineB.map(innerArr => [...innerArr]);;
         // Resample the shorter line to match the longer one
@@ -677,7 +682,9 @@ export class TimeSpaceCube{
         } else if (n >= m) {
              convertlineA = this.interpolateLinePreservingSegments(lineA, lineB);
         }
-    
+        // console.log('check same after');
+        // console.log(convertlineA.length);
+        // console.log(convertlineB.length);
         let surface = [];
         // console.log('check same');
         // console.log(convertlineA.length);
@@ -888,8 +895,8 @@ export class TimeSpaceCube{
         }
         dyGraph.edgeAttributes['appearance']=this.dyGraph.edgeAttributes['appearance'];
         for (const [edge, tree] of dyGraph.edgeAttributes['appearance']) {
-            console.log(edge.sourceNode);
-            console.log(dyGraph.nodeAttributes['nodePosition'].get(edge.sourceNode));
+            // console.log(edge.sourceNode);
+            // console.log(dyGraph.nodeAttributes['nodePosition'].get(edge.sourceNode));
             
             
         }

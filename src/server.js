@@ -1,6 +1,6 @@
 import express from 'express';
 import path from 'path';
-import {readFile,getDyGraph,discretise} from './src/samples/VanDeBunt.js';
+// import {readFile,getDyGraph,discretise} from './src/samples/VanDeBunt.js';
 import {getOneNodeGraph} from './src/test/oneegde.js';
 // import {readFile,getDyGraph} from './src/samples/newcomb.js';
 // import {readFile,getDyGraph} from './src/samples/dialog.js';
@@ -42,7 +42,7 @@ app.get('/api/data', (req, res) => {
   readFile()
   .then((fileData) => {
       // graph=getOneNodeGraph();
-      // console.log(fileData.characters);
+      // console.log(fileData.teams);
       //   throw new Error('check time')
       graph=getDyGraph(fileData);
     //  console.log(graph.nodes);

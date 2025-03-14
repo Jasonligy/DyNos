@@ -15,7 +15,7 @@ export class Gravity{
             for(const node of this.cube.nodes){
                 sumPosition[0]+=this.cube.nodeAttributes['nodePosition'].get(node)[0];
                 sumPosition[1]+=this.cube.nodeAttributes['nodePosition'].get(node)[1];
-                console.log(this.cube.nodeAttributes['nodePosition'].get(node));
+                // console.log(this.cube.nodeAttributes['nodePosition'].get(node));
                 
             }
             this.center=[sumPosition[0]/totalNodes,sumPosition[1]/totalNodes];

@@ -56,7 +56,7 @@ export async function readFile() {
                 rl.on('line', (line) => {
                     if(line.includes("\t")){
                         const tokens = line.split("\t");
-                        console.log(tokens);
+                        // console.log(tokens);
                         
                         if(tokens.length!=2){
                             throw new Error("dialog person not 2")
