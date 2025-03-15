@@ -11,9 +11,9 @@ export class DynosRunner{
 
         this.dygraph=dyGraph
         this.delta=delta
-        this.tau=2.122448979591837;
+        // this.tau=2.122448979591837;
         // this.tau=1.0833333333333335;
-        // this.tau=1.0189033488582746;
+        this.tau=1.0189033488582746;
         // console.log(dyGraph)
         // this.cube=new TimeSpaceCube(dyGraph,2.122448979591837);
         // this.cube=new TimeSpaceCube(dyGraph,0.875);
@@ -59,7 +59,7 @@ export class DynosRunner{
         //     console.log(value)
             
         // }
-        const numberofiteration=20;
+        const numberofiteration=11;
         for(let i=0;i<numberofiteration;i++){
             console.log(i);
             

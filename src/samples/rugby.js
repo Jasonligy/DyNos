@@ -65,7 +65,7 @@ export async function readFile() {
         }
         // console.log(fileData.teams);
         // throw new Error('check time')
-        fileData.firstTime=fileData.tweets[0].time;
+        fileData.firstTime=fileData.tweets[1].time;
         fileData.lastTime=fileData.tweets[fileData.tweets.length-1].time;
     } catch (error) {
         console.error('Error reading file:', error);
@@ -91,19 +91,44 @@ export function getDyGraph(fileData){
     console.log('count');
     let count=0;
     // for(let [id,value] of fileData.relations.entries()){
-    let mintime=Math.floor(fileData.tweets[1].time.getTime()/1000)-daySeconds;
-    let maxtime=Math.floor(fileData.tweets[1].time.getTime()/1000)+daySeconds;
+    let mintime=Math.floor(fileData.firstTime.getTime()/1000)-0.5*daySeconds;
+    let maxtime=Math.floor(fileData.lastTime.getTime()/1000)+0.5*daySeconds;
+    const teamtime=new Map();
     for(let i=1;i<fileData.tweets.length;i++){
 
         
+        // const tweetTIme=Math.floor(fileData.tweets[i].time.getTime()/1000);
+        // const ctimelow=tweetTIme-0.5*daySeconds;
+        // const ctimehigh=tweetTIme+0.5*daySeconds;
+        // if(mintime>ctimelow){
+        //     mintime=ctimelow
+        // }
+        // if(maxtime<ctimehigh){
+        //     maxtime=ctimehigh
+        // }
         const tweetTIme=Math.floor(fileData.tweets[i].time.getTime()/1000);
-        const ctimelow=tweetTIme-0.5*daySeconds;
-        const ctimehigh=tweetTIme+0.5*daySeconds;
-        if(mintime>ctimelow){
-            mintime=ctimelow
+        const teamA=fileData.tweets[i].from;
+        if(teamtime.has(teamA)){
+            const firsttime=teamtime.get(teamA)[0];
+            const lasttime=tweetTIme+0.5*daySeconds;
+            teamtime.set(teamA,[firsttime,lasttime])
         }
-        if(maxtime<ctimehigh){
-            maxtime=ctimehigh
+        else{
+            const firsttime=tweetTIme-0.5*daySeconds;
+            const lasttime=tweetTIme+0.5*daySeconds;
+            teamtime.set(teamA,[firsttime,lasttime])
+        }
+
+        const teamB=fileData.tweets[i].to;
+        if(teamtime.has(teamB)){
+            const firsttime=teamtime.get(teamB)[0];
+            const lasttime=tweetTIme+0.5*daySeconds;
+            teamtime.set(teamB,[firsttime,lasttime])
+        }
+        else{
+            const firsttime=tweetTIme-0.5*daySeconds;
+            const lasttime=tweetTIme+0.5*daySeconds;
+            teamtime.set(teamB,[firsttime,lasttime])
         }
 
     }
@@ -132,10 +157,24 @@ export function getDyGraph(fileData){
         }
         // dyGraph.nodeAttributes['appearance'].get(node1).insert(new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds))
         // dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds))
-        dyGraph.nodeAttributes['appearance'].get(node1).insert(new Interval(mintime,maxtime))
-        dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(mintime,maxtime))
+        const tree1=dyGraph.nodeAttributes['appearance'].get(node1);
+        if(tree1.root==null){
+           tree1.insert(new Interval(...teamtime.get(fileData.tweets[i].from)));
+        //    tree1.insert(new Interval(mintime,maxtime));
+        }
+        const tree2=dyGraph.nodeAttributes['appearance'].get(node2);
+        if(tree2.root==null){
+           tree2.insert(new Interval(...teamtime.get(fileData.tweets[i].to)));
+        //    tree2.insert(new Interval(mintime,maxtime));
+        }
+        
+        // dyGraph.nodeAttributes['appearance'].get(node2).insert(new Interval(mintime,maxtime))
 
 
+    }
+    for(const [id,node] of dyGraph.nodes.entries()){
+        console.log(dyGraph.nodeAttributes['appearance'].get(node));
+        
     }
         // break;
     
