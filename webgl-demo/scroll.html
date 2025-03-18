@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebGL Mouse Rotation</title>
+</head>
+<body>
+    <canvas id="webgl-canvas" width="500" height="500"></canvas>
+    <script>
+        const canvas = document.getElementById("webgl-canvas");
+        const gl = canvas.getContext("webgl");
+
+        let mouseDown = false;
+        let lastX, lastY;
+        let rotationX = 0, rotationY = 0;
+
+        // Vertex Shader
+        const vsSource = `
+            attribute vec3 position;
+            uniform mat4 modelViewMatrix;
+            void main(void) {
+                gl_Position = modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
+
+        // Fragment Shader
+        const fsSource = `
+            void main(void) {
+                gl_FragColor = vec4(0.0, 0.7, 1.0, 1.0);
+            }
+        `;
+
+        // Compile shaders
+        function compileShader(gl, source, type) {
+            const shader = gl.createShader(type);
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                console.error("Shader compilation error:", gl.getShaderInfoLog(shader));
+                return null;
+            }
+            return shader;
+        }
+
+        const vertexShader = compileShader(gl, vsSource, gl.VERTEX_SHADER);
+        const fragmentShader = compileShader(gl, fsSource, gl.FRAGMENT_SHADER);
+
+        // Create shader program
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+        gl.useProgram(shaderProgram);
+
+        // Create a simple square (two triangles)
+        const vertices = new Float32Array([
+            -0.5,  0.5,  0.0,  // Top-left
+             0.5,  0.5,  0.0,  // Top-right
+            -0.5, -0.5,  0.0,  // Bottom-left
+             0.5, -0.5,  0.0   // Bottom-right
+        ]);
+
+        const indices = new Uint16Array([
+            0, 1, 2,
+            1, 2, 3
+        ]);
+
+        // Create buffers
+        const vertexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+        const indexBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
+        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, indices, gl.STATIC_DRAW);
+
+        // Bind attributes
+        const positionLoc = gl.getAttribLocation(shaderProgram, "position");
+        gl.vertexAttribPointer(positionLoc, 3, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(positionLoc);
+
+        // Uniforms
+        const modelViewMatrixLoc = gl.getUniformLocation(shaderProgram, "modelViewMatrix");
+
+        // Projection and View Matrices
+        function getRotationMatrix(angleX, angleY) {
+            const radX = angleX * Math.PI / 180;
+            const radY = angleY * Math.PI / 180;
+
+            const cosX = Math.cos(radX), sinX = Math.sin(radX);
+            const cosY = Math.cos(radY), sinY = Math.sin(radY);
+
+            return new Float32Array([
+                cosY,  0, sinY,  0,
+                sinX * sinY,  cosX, -sinX * cosY,  0,
+                -cosX * sinY, sinX, cosX * cosY,  0,
+                0, 0, -2, 1  // Move back to see object
+            ]);
+        }
+
+        function drawScene() {
+            gl.clearColor(0.0, 0.0, 0.0, 1.0);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            // Compute the rotation matrix
+            const modelViewMatrix = getRotationMatrix(rotationX, rotationY);
+
+            // Set uniform matrix
+            gl.uniformMatrix4fv(modelViewMatrixLoc, false, modelViewMatrix);
+
+            gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
+        }
+
+        // Mouse Event Handlers
+        canvas.addEventListener("mousedown", (event) => {
+            mouseDown = true;
+            lastX = event.clientX;
+            lastY = event.clientY;
+        });
+
+        canvas.addEventListener("mouseup", () => {
+            mouseDown = false;
+        });
+
+        canvas.addEventListener("mousemove", (event) => {
+            if (!mouseDown) return;
+
+            let deltaX = event.clientX - lastX;
+            let deltaY = event.clientY - lastY;
+
+            rotationY += deltaX * 0.5;
+            rotationX += deltaY * 0.5;
+
+            lastX = event.clientX;
+            lastY = event.clientY;
+
+            drawScene();
+        });
+
+        drawScene();
+    </script>
+</body>
+</html>

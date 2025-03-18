@@ -2,14 +2,26 @@
 // // main.js
 // import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";
 // import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
-function draw(edge,indexs){
-    for(let i=0;i<edge.length;i++){
-        if(edge[i]<-10){
-            edge[i]=1;
-        }
+let eyeX=0;
+let eyeY=0;
+let eyeZ=5;
+let angleH=0;
+let angleV=0;
+let canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex;
+function draw(edge,indexs,connections,connectionIndex,angleX=0,angleY=0,angleZ=5){
+    // gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    if(typeof canvasedge === "undefined"){
+        [canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex]=[edge,indexs,connections,connectionIndex]
     }
+    // for(let i=0;i<edge.length;i++){
+    //     if(edge[i]<-10){
+    //         edge[i]=1;
+    //     }
+    // }
     edge=new Float32Array(edge)
-    console.log(edge)
+    // const connections=new
+    connections=new Float32Array(surfaceCoord(connections));
+    console.log(connections)
     const canvas = document.getElementById('glCanvas');
     const gl = canvas.getContext('webgl');
 
@@ -23,10 +35,15 @@ function draw(edge,indexs){
         attribute vec4 aColor;
         varying vec4 vColor;
         uniform mat4 uModelViewMatrix;
+         uniform bool uUseFixedColor;
         uniform mat4 uProjectionMatrix;
         void main() {
             gl_Position = uProjectionMatrix * uModelViewMatrix * vec4(aPosition, 1.0);
-            vColor = aColor; // Pass the color to the fragment shader
+            //vColor = aColor; // Pass the color to the fragment shader
+            // vColor = uUseFixedColor ? vec4(0.0, 0.0, 0.0, 0.0) : aColor;
+        //     if (!uUseFixedColor) {
+        //     vColor = aColor;
+        // }
         }
     `;
 
@@ -35,12 +52,13 @@ function draw(edge,indexs){
         precision mediump float;
         varying vec4 vColor;
         uniform bool uUseFixedColor;
+        uniform vec4 uFixedColor;
         void main() {
             
             if (uUseFixedColor) {
-            gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); // Black color
+            gl_FragColor = uFixedColor; // Black color
         } else {
-            gl_FragColor = vColor; // Use the vertex color
+            gl_FragColor = vec4(0.0, 0.0, 1.0, 0.5); // Use the vertex color
         }
         }
     `;
@@ -63,6 +81,11 @@ function draw(edge,indexs){
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
 
     const program = gl.createProgram();
+    // Enable blending
+gl.enable(gl.BLEND);
+
+// Set the blend mode (standard for alpha transparency)
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);
     gl.linkProgram(program);
@@ -159,6 +182,11 @@ function draw(edge,indexs){
     ]);
 
 
+    // Get the location of the fixed color uniform
+    const uFixedColor = gl.getUniformLocation(program, 'uFixedColor');
+
+    // Set the color you want (e.g., red)
+    gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 1.0); // Red color (R, G, B, A)
 
     // Get attribute and uniform locations
     const aPosition = gl.getAttribLocation(program, 'aPosition');
@@ -166,21 +194,55 @@ function draw(edge,indexs){
     const uModelViewMatrix = gl.getUniformLocation(program, 'uModelViewMatrix');
     const uProjectionMatrix = gl.getUniformLocation(program, 'uProjectionMatrix');
 
-    // Set the viewport
+
+
     gl.viewport(0, 0, canvas.width, canvas.height);
 
-    // Set up the projection and view matrices
+    const viewMatrix = mat4.create();
+    mat4.lookAt(viewMatrix, 
+        [angleX, angleY, angleZ],  // Move the camera left, keeping the same depth
+        [0, 0, 0],   // Look at the center of the scene
+        [0, 1, 0]       // Up vector → Keep Y-axis as up
+    );
     const projectionMatrix = mat4.create();
     mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100);
 
+    // Apply transformations to the model
+    const modelMatrix = mat4.create();
+    mat4.translate(modelMatrix, modelMatrix, [0, -0.5, 0]); // Apply model transformation
     const modelViewMatrix = mat4.create();
-    // mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -10]);
-    // mat4.rotateX(modelViewMatrix, modelViewMatrix, Math.PI / 4); // Rotate down to look at the cube
-    mat4.translate(modelViewMatrix, modelViewMatrix, [0.5, -0.5, -5]); // Move up by 5 units
-    // mat4.rotateX(modelViewMatrix, modelViewMatrix, Math.PI / 2); // Rotate down to look at the cube
-
+    mat4.multiply(modelViewMatrix, viewMatrix, modelMatrix); 
+    // Combine the view and model matrices
+    // const modelViewMatrix = mat4.create();
+    // mat4.translate(modelViewMatrix, modelViewMatrix, modelMatrix); // modelViewMatrix = view * model
+    
+    // Upload matrices to the shader
     gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
     gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+    
+
+    // const projectionMatrix = mat4.create();
+    // mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100);
+    // const modelViewMatrix = mat4.create();
+    // mat4.translate(modelViewMatrix, modelViewMatrix, [0.5, -0.5, -5]); // Move up by 5 units
+    // gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+    // gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
+
+    // // Set the viewport
+    // gl.viewport(0, 0, canvas.width, canvas.height);
+
+    // // Set up the projection and view matrices
+    // const projectionMatrix = mat4.create();
+    // mat4.perspective(projectionMatrix, Math.PI / 4, canvas.width / canvas.height, 0.1, 100);
+
+    // const modelViewMatrix = mat4.create();
+    // // mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -10]);
+    // // mat4.rotateX(modelViewMatrix, modelViewMatrix, Math.PI / 4); // Rotate down to look at the cube
+    // mat4.translate(modelViewMatrix, modelViewMatrix, [0.5, -0.5, -5]); // Move up by 5 units
+    // // mat4.rotateX(modelViewMatrix, modelViewMatrix, Math.PI / 2); // Rotate down to look at the cube
+
+    // gl.uniformMatrix4fv(uProjectionMatrix, false, projectionMatrix);
+    // gl.uniformMatrix4fv(uModelViewMatrix, false, modelViewMatrix);
 
 
     // Create and bind buffer for vertices
@@ -214,10 +276,10 @@ function draw(edge,indexs){
     // gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
     // gl.drawElements(gl.TRIANGLES, indices.length, gl.UNSIGNED_SHORT, 0);
 
-    gl.enableVertexAttribArray(aColor);
+    // gl.enableVertexAttribArray(aColor);
     gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
-    gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
-
+    // gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
+    gl.uniform1i(uUseFixedColor, false);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeIndexBuffer);
     gl.drawElements(gl.LINES, edgeIndices.length, gl.UNSIGNED_SHORT, 0);
 
@@ -258,6 +320,11 @@ function draw(edge,indexs){
     gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, edge, gl.STATIC_DRAW);
 
+
+    // const surfaceBuffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ARRAY_BUFFER, surfaceBuffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, connections, gl.STATIC_DRAW);
+
     // Define colors for each vertex
     const lineColors = new Float32Array([
         // Color for each vertex in sequence
@@ -273,11 +340,12 @@ function draw(edge,indexs){
     ]);
 
     // Create and bind the color buffer
-    const edgecolorBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, edgecolorBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, lineColors, gl.STATIC_DRAW);
+    // const edgecolorBuffer = gl.createBuffer();
+    // gl.bindBuffer(gl.ARRAY_BUFFER, edgecolorBuffer);
+    // gl.bufferData(gl.ARRAY_BUFFER, lineColors, gl.STATIC_DRAW);
 
     // Enable vertex attribute for position
+    gl.uniform1i(uUseFixedColor, true);
     gl.enableVertexAttribArray(aPosition);
     gl.bindBuffer(gl.ARRAY_BUFFER, lineBuffer);
     gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
@@ -286,7 +354,9 @@ function draw(edge,indexs){
     // gl.enableVertexAttribArray(aColor);
     // gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
     // gl.vertexAttribPointer(aColor, 4, gl.FLOAT, false, 0, 0);
-    gl.uniform1i(uUseFixedColor, true);
+
+
+
     // Draw lines between each consecutive vertex pair
 
     // gl.drawArrays(gl.LINE_STRIP, 0,4); // n+1 vertices -> n edges
@@ -296,16 +366,81 @@ function draw(edge,indexs){
 
     //注意color要匹配顶点个数
     let index=0;
+    console.log('overall');
+        
+        console.log(indexs.length)
+    // for(let i=0;i<indexs.length;i++){
     for(let i=0;i<indexs.length;i++){
         // if(i<6){
         //     index+=indexs[i];
         //     continue
         // }
-
-        console.log(indexs[i])
-        gl.drawArrays(gl.LINE_STRIP, index, 2); // n+1 vertices -> n edges
+        // console.log('index');
+        
+        // console.log(indexs.length)
+        gl.uniform1i(uUseFixedColor, true);
+        gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 1.0); // Red color (R, G, B, A)
+        gl.drawArrays(gl.LINE_STRIP, index, indexs[i]); // n+1 vertices -> n edges
         index+=indexs[i];
-    }}
+    }
+
+const surfaceBuffer = gl.createBuffer();
+gl.enableVertexAttribArray(aPosition);
+    gl.bindBuffer(gl.ARRAY_BUFFER, surfaceBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, connections, gl.STATIC_DRAW);
+    gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
+    
+    gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 0.3);
+    console.log(connections.length);
+    
+    connectionIndex.unshift(0);
+    console.log(connectionIndex);
+    let total=0;
+
+
+    for(let i=1;i<connectionIndex.length;i++){
+        if(connectionIndex[i]==4){
+            gl.drawArrays(gl.TRIANGLES, total+1, connectionIndex[i]);
+        }
+        // gl.drawArrays(gl.TRIANGLES, connectionIndex[i-1], connectionIndex[i]);
+        gl.drawArrays(gl.TRIANGLES, total, connectionIndex[i]);
+        gl.drawArrays(gl.TRIANGLES,total+1, connectionIndex[i]-3);
+        gl.drawArrays(gl.TRIANGLES, total+2, connectionIndex[i]-3);
+        // gl.drawArrays(gl.TRIANGLES, total+3, connectionIndex[i]-3);
+        total+=connectionIndex[i];
+        
+        // gl.drawArrays(gl.TRIANGLES, 0, 3);
+        // gl.drawArrays(gl.TRIANGLES, connectionIndex[i-1]+1, connectionIndex[i]);
+        
+        
+    }
+    
+
+    console.log(connections);
+    console.log(edge.length);
+    
+}
+function surfaceCoord(connections){
+    let surface=[]
+    console.log(connections);
+    
+    for(let i=0;i<connections.length;i++){
+        for(let j=0;j<connections[i].length;j++){
+            surface=surface.concat([...connections[i][j]])
+            console.log(surface);
+            
+        }
+        // if(connections[i].length!=4){
+        //     throw new Error('surface coordinate number is not 4')
+        // }
+        
+    }
+    console.log(surface);
+    
+    return surface;
+}
+    
+    
     // fetch('/api/data')
     //         .then(response => response.json())
     //         .then(data => {
@@ -316,3 +451,53 @@ function draw(edge,indexs){
     //         })
     //         .catch(error => console.error('Error fetching data:', error));
 // const colorLocation = gl.getUniformLocation(shaderProgram, 'uColor');
+function updateViewMatrixH(angle) {
+    const radians = angle * (Math.PI / 180); // Convert degrees to radians
+    const radius = 5; // Distance from the center
+    eyeX = Math.sin(radians) * radius;
+    eyeZ = Math.cos(radians) * radius;
+
+    
+    draw(canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex,eyeX,eyeY,eyeZ)
+}
+function updateViewMatrixV(angle) {
+    const radians = angle * (Math.PI / 180); // Convert degrees to radians
+    const radius = 5; // Distance from the center
+    eyeY = Math.sin(radians) * radius;
+    
+
+    
+    draw(canvasedge,canvasindexs,canvasconnections,canvasconnectionIndex,eyeX,eyeY,eyeZ)
+}
+// Handle slider input for rotation
+document.getElementById("viewControl0").addEventListener("input", function(event) {
+    angleH = event.target.value;
+    console.log(angleH);
+    
+    // document.getElementById("angleDisplay").innerText = angle;
+    updateViewMatrix(angleH,angleV);
+    
+});
+document.getElementById("viewControl1").addEventListener("input", function(event) {
+    angleV = event.target.value;
+    console.log(angleV);
+    
+    // document.getElementById("angleDisplay").innerText = angle;
+    updateViewMatrix(angleH,angleV);
+    
+});
+function updateViewMatrix(angleX, angleY) {
+    if(angleY>180){
+
+    }
+    const radX = angleX * (Math.PI / 180); // Convert horizontal angle to radians
+    const radY = angleY * (Math.PI / 180); // Convert vertical angle to radians
+    const radius = 5; // Distance from the center
+
+    // Spherical coordinates
+    eyeX = Math.sin(radX) * Math.cos(radY) * radius;
+    eyeY = Math.sin(radY) * radius; // Controls vertical movement
+    eyeZ = Math.cos(radX) * Math.cos(radY) * radius;
+
+    draw(canvasedge, canvasindexs, canvasconnections, canvasconnectionIndex, eyeX, eyeY, eyeZ);
+}

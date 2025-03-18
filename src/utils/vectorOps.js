@@ -28,6 +28,19 @@ export function avgVectors(vector1,vector2){
     // let newvector=[];
     return vector1.map((value, index) => (value + vector2[index]) / 2);
 }
+export function checkTriVectors(vector1,vector2,vector3){
+    for(let i=0;i<2;i++){
+        if(vector1[i]!=vector2[i]&&vector1[i]!=vector3[i]){
+            // console.log(vector1[i]);
+            // console.log(vector2[i]);
+            // console.log(vector3[i]);
+            // console.log('not same');
+            return true
+            
+        }
+    }
+    return false
+}
 export function magnitude(vector){
     return Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
 }
@@ -50,8 +63,64 @@ export function getIntersection(vector1,vector2){
     }
 
 }
+// export function getclosestPoint(point, lineStart, lineEnd) {
+//     // Decompose the inputs
+//     // console.log(lineEnd);
+//     let isProjectedInclude=false;
+//     const [px, py, pz] = point;
+//     const [x1, y1, z1] = lineStart;
+//     const [x2, y2, z2] = lineEnd;
+
+//     // Vector from lineStart to lineEnd
+//     const lineVector = [x2 - x1, y2 - y1, z2 - z1];
+
+//     // Vector from lineStart to the given point
+//     const pointVector = [px - x1, py - y1, pz - z1];
+
+//     // Dot product of lineVector and itself
+//     const lineLengthSquared = lineVector[0] ** 2 + lineVector[1] ** 2 + lineVector[2] ** 2;
+
+//     // Edge case: lineStart and lineEnd are the same point
+//     if (lineLengthSquared === 0) return lineStart;
+
+//     // Dot product of pointVector and lineVector
+//     const dotProduct = pointVector[0] * lineVector[0] +
+//                        pointVector[1] * lineVector[1] +
+//                        pointVector[2] * lineVector[2];
+
+//     // Normalized position along the line
+//     let t = dotProduct / lineLengthSquared;
+    
+//     if(t>=0 &&t<=1){
+//         isProjectedInclude=true;
+//     }
+
+
+//     // Clamp t to the range [0, 1] to handle points outside the segment
+//     t = Math.max(0, Math.min(1, t));
+
+//     // Calculate the closest point on the line segment
+//     const closestPoint = [
+//         x1 + t * lineVector[0],
+//         y1 + t * lineVector[1],
+//         z1 + t * lineVector[2],
+//     ];
+
+//     return {
+//             closestPoint:closestPoint,
+//             isIncluded:isProjectedInclude,
+//     };
+// }
+export function getNearestPoint(nodePos,beginPos,endPos){
+    if(distance2points(nodePos,beginPos)<distance2points(nodePos,endPos)){
+        return beginPos;
+    }
+    else{
+        return endPos;
+    }
+}
 export function getclosestPoint(point, lineStart, lineEnd) {
-    // Decompose the inputs
+    let isProjectedInclude = false;
     const [px, py, pz] = point;
     const [x1, y1, z1] = lineStart;
     const [x2, y2, z2] = lineEnd;
@@ -66,34 +135,44 @@ export function getclosestPoint(point, lineStart, lineEnd) {
     const lineLengthSquared = lineVector[0] ** 2 + lineVector[1] ** 2 + lineVector[2] ** 2;
 
     // Edge case: lineStart and lineEnd are the same point
-    if (lineLengthSquared === 0) return lineStart;
+    if (lineLengthSquared === 0) return { closestPoint: lineStart, isIncluded: false };
 
     // Dot product of pointVector and lineVector
     const dotProduct = pointVector[0] * lineVector[0] +
                        pointVector[1] * lineVector[1] +
                        pointVector[2] * lineVector[2];
+    // console.log('dot');
+    // console.log(dotProduct);
+    
+    
 
     // Normalized position along the line
     let t = dotProduct / lineLengthSquared;
-    let isProjectedInclude=false;
-    if(t>=0 ||t<=1){
-        isProjectedInclude=true;
-    }
 
+    // Clamp t to the range [0, 1]
+    const clampedT = Math.max(0, Math.min(1, t));
 
-    // Clamp t to the range [0, 1] to handle points outside the segment
-    t = Math.max(0, Math.min(1, t));
-
+    // Define a small epsilon to account for floating-point inaccuracies
+    const epsilon = 0.00001;
+    let projection=true;
+    isProjectedInclude = (t >= 0-epsilon && t <= 1 +epsilon);
+    // console.log('t');
+    
+    // console.log(t);
+    
+    projection = !((t >= -epsilon && t <= epsilon) ||(t >=1-epsilon && t <= 1+epsilon));
     // Calculate the closest point on the line segment
     const closestPoint = [
-        x1 + t * lineVector[0],
-        y1 + t * lineVector[1],
-        z1 + t * lineVector[2],
+        x1 + clampedT * lineVector[0],
+        y1 + clampedT * lineVector[1],
+        z1 + clampedT * lineVector[2],
     ];
 
     return {
-            closestPoint:closestPoint,
-            isIncluded:isProjectedInclude,
+        closestPoint: closestPoint,
+        isIncluded: isProjectedInclude,
+        t: t,
+        projection:projection,
     };
 }
 export function betweenAngle(vectorA, vectorB) {

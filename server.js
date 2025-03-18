@@ -1,12 +1,17 @@
 import express from 'express';
 import path from 'path';
-import {readFile,getDyGraph} from './src/samples/VanDeBunt.js';
+// import {readFile,getDyGraph,discretise} from './src/samples/VanDeBunt.js';
+import {getOneNodeGraph} from './src/test/oneegde.js';
+// import {readFile,getDyGraph} from './src/samples/newcomb.js';
+// import {readFile,getDyGraph} from './src/samples/dialog.js';
+import {readFile,getDyGraph} from './src/samples/rugby.js';
 import {IntervalTree,Interval} from './src/intervalTree/intervalTree.js';
 import generateCube from './src/generateCube.js';
 import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { DynosRunner } from './src/runDyNos.js';
+import { DynosRunnerM } from './src/runDyNosMetrics.js';
 // import { draw } from './drawCube.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -19,24 +24,83 @@ app.use(express.static(path.join(__dirname)));  // This serves all files in the 
 
 // Serve the index.html file
 app.get('/', (req, res) => {
-  read();  
+  // read();  
   console.log('test')
   res.sendFile(path.join(__dirname, 'index.html'));
 });
+app.get('/animate', (req, res) => {
+  // read();  
+  console.log('test')
+  res.sendFile(path.join(__dirname, 'index-animate.html'));
+});
 app.get('/api/data', (req, res) => {
+  // const data = { name: 'Cube', color: 'blue', size: 3 };
+  // res.json(data);
+  let graph;
+  let discreteGraph;
+  console.log('begin');
+  readFile()
+  .then((fileData) => {
+      // graph=getOneNodeGraph();
+      // console.log(fileData.characters);
+      //   throw new Error('check time')
+      graph=getDyGraph(fileData);
+    //  console.log(graph.nodes);
+     
+      const runner=new DynosRunner(graph,100,5);
+      console.log('begin');
+      
+      const cube=runner.iterate();
+    // const data=graph;
+    // console.log(fileData)
+    const cubeBefore=new TimeSpaceCube(graph,0.1);
+    // const [lines,mirrorIndex]=generateCube();
+    // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
+    const [lines,mirrorIndex,connections,connectionIndex]=cube.outputMatrix();
+    // console.log('co');
+    // console.log(connections);
+    
+    
+    const data={array:lines,index:mirrorIndex,connections:connections,connectionIndex:connectionIndex};
+    res.json(data)})
+});
+app.get('/api/datametrics', (req, res) => {
   // const data = { name: 'Cube', color: 'blue', size: 3 };
   // res.json(data);
   let graph;
   readFile()
   .then((fileData) => {
       graph=getDyGraph(fileData);
+      const discreteGraph=discretise(graph);
+      // const runner=new DynosRunner(discreteGraph,100,5);
+      const runner=new DynosRunnerM(discreteGraph,100,5);
+      const cube=runner.iterate();
     // const data=graph;
-    console.log(fileData)
+    // console.log(fileData)
     const cubeBefore=new TimeSpaceCube(graph,2.122449);
     // const [lines,mirrorIndex]=generateCube();
-    const [lines,mirrorIndex]=cubeBefore.outputMatrix();
+    // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
+    const [lines,mirrorIndex]=cube.outputMatrix();
     const data={array:lines,index:mirrorIndex};
     res.json(data)})
+});
+app.get('/api/graph', (req, res) => {
+  // const data = { name: 'Cube', color: 'blue', size: 3 };
+  // res.json(data);
+  let graph;
+  readFile()
+  .then((fileData) => {
+      graph=getDyGraph(fileData);
+      const runner=new DynosRunner(graph,100,5);
+      const cube=runner.iterate();
+    // const data=graph;
+    // console.log(fileData)
+    const cubeBefore=new TimeSpaceCube(graph,2.122449);
+    // const [lines,mirrorIndex]=generateCube();
+    // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
+    const afterGraph=cube.cube2DyGraph();
+    // const data={array:lines,index:mirrorIndex};
+    res.json(afterGraph)})
 });
 app.get('/tt', (req, res) => {
 

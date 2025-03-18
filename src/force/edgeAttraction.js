@@ -1,53 +1,92 @@
+import { log } from "console";
 import {getUnitVector,getIntersection,magnitude} from "../utils/vectorOps.js"
+import { loadavg } from "os";
 export class EdgeAttraction{
-    constructor(cube,desired,temperature){
+    constructor(cube,desired,temperature,tau){
         this.cube=cube;
         this.desired=desired;
         this.initialExponent = 4;
         this.finalExponent = 2;
         this.temperature=temperature;
         this.count=0;
+        this.tau=tau;
         console.log(this.desired)
     }
     setTemperature(temperature){
         // console.log(temperature)
         this.temperature=temperature;
     }
+    updateTemperature(iter,count){
+        // console.log(temperature)
+        this.temperature=temperature;
+    }
     computeShift(){
+        
         // console.log('begin')
         const overallForce=this.cube.nodeAttributes['force'];
         const force=new Map();
-        console.log('size')
-        console.log(this.cube.edgeMirrorMap.size)
-        for(const [edge,connection] of this.cube.edgeMirrorMap){
-            const mirrorLineSource=connection.source;
-            const mirrorLineTarget=connection.target;
-            // const mirrorLineSource=this.cube.nodeMirrorMap.get(dySourceNode);
-            // const mirrorLineTarget=this.cube.nodeMirrorMap.get(dyTargetNode);
-            this.computeForce(force,connection,mirrorLineSource,mirrorLineTarget);
+        // console.log('size')
+        // console.log(this.cube.edgeMirrorMap.size)
+        let c=0;
+        // for(const [id,value] of overallForce.entries()){
+        //     if(force.has(id)){
+        //         // console.log(force.get(id));
+        //         // console.log(force.get(id)[index]);
+                
+        //         console.log(overallForce.get(id));
+        //          ;
+        //     }
+        // }
+        for(const [edge,connections] of this.cube.edgeMirrorMap){
+            for(const connection of connections){
+                c++;
+                // console.log(connection);
+                
+                const mirrorLineSource=connection.source;
+                const mirrorLineTarget=connection.target;
+                // const mirrorLineSource=this.cube.nodeMirrorMap.get(dySourceNode);
+                // const mirrorLineTarget=this.cube.nodeMirrorMap.get(dyTargetNode);
+                this.computeForce(force,connection,mirrorLineTarget,mirrorLineSource);
+            }
         }
+        // console.log(c);
+        
         for(const [id,value] of force.entries()){
             // console.log(value)
         }
-
+        // console.log('attract');
+        
         for(const [id,value] of overallForce.entries()){
             if(force.has(id)){
                 // console.log(force.get(id));
+                // console.log(force.get(id)[index]);
                 
                 overallForce.set(id,value.map((v,index)=>v+force.get(id)[index]));
             }
         }
-        // console.log(this.temperature)
-        console.log(this.count)
-        console.log('finish')
+        for(const [id,value] of force.entries()){
         
-
+                // console.log(force.get(id));
+                // console.log(force.get(id)[index]);
+                
+                // console.log(force.get(id));
+                 
+       
+        }
+        // console.log(this.temperature)
+        // console.log(this.count)
+        // console.log('finish')
+        
+        this.count++;
     }
+    // connectionTau(tau)
     computeForce(force,connection,source,target){
-        const connectionInterval=[connection.interval.start,connection.interval.end];
+        const tau=this.tau;
+        const connectionInterval=[connection.interval.start*tau,connection.interval.end*tau];
         // console.log(source)
         // console.log('length')
         // console.log(target.segmentList.length)
+
         for(const a of source.segmentList){
             // console.log('has segment')
             const aInterval=this.segmentInterval(a);
@@ -58,8 +97,16 @@ export class EdgeAttraction{
                    
                     const bInterval=this.segmentInterval(b);         
                     const bIntersection=getIntersection(bInterval,connectionInterval);
+
                     if(bIntersection!=null){
                         const intersection=getIntersection(aIntersection,bIntersection);
+                        // console.log('inter');
+                        
+                        // console.log(intersection);
+                        // console.log(aIntersection);
+                        // console.log(bIntersection);
+                        // console.log(aInterval);
+                        // console.log(bInterval);
                         if(intersection!=null){
                             // console.log(intersection)
                             const aWidth=aInterval[1]-aInterval[0];
@@ -67,10 +114,17 @@ export class EdgeAttraction{
                             const allWidth=intersection[1]-bIntersection[0];
                             const aRatio = aWidth == 0 ? 1 : allWidth / aWidth;
                             const bRatio = bWidth == 0 ? 1 : allWidth / bWidth;
+                            // console.log('aratio');
+                          
+                            
                             const beginningVector = this.computeConnectingVector(a, b, intersection[0]);
                             const endingVector = this.computeConnectingVector(a, b, intersection[1]);
+                            // console.log(beginningVector);
+                            // console.log(endingVector);
+                            
                             this.applyVector(force,beginningVector, intersection[0], a, b, aInterval, bInterval, aRatio, bRatio);
                             this.applyVector(force,endingVector, intersection[1], a, b, aInterval, bInterval, aRatio, bRatio);
+
 
                         }
 
@@ -82,7 +136,7 @@ export class EdgeAttraction{
     }
     computeExponent(){
         // console.log('exponent '+this.temperature )
-        this.count+=1;
+        // this.count+=1;
         return this.finalExponent + (this.initialExponent - this.finalExponent) * this.temperature;
     }
     applyVector(force,vector,zPos,a,b,aInt,bInt,aRatio,bRatio){
@@ -97,14 +151,24 @@ export class EdgeAttraction{
         // console.log(this.computeExponent())
         // console.log('test')
         this.computeExponent()
-        // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
-        const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));
-        console.log(this.desired);
-        console.log('base');
+        // console.log('exponent');
+        
+        // console.log(this.computeExponent());
+        
+        const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,this.computeExponent()));
+        // const baseForce=unit.map((value,index)=>value*Math.pow(currentDistance / this.desired,1));
+        // console.log(this.desired);
+        // console.log('base');
+        // console.log('currentDistance');
+        // console.log(currentDistance);
+        // console.log(this.computeExponent());
+        // console.log(baseForce);
         
         
         const aBalance=(zPos-aInt[0])/aWidth;
         const bBalance=(zPos-bInt[0])/bWidth;
+        // console.log(aWidth);
+        // console.log(zPos-aInt[0]);
         // console.log(this.desired)
         // console.log(Math.pow(currentDistance / this.desired,this.computeExponent()))
         const aSourceForce=baseForce.map((value,index)=>value*aRatio*(1-aBalance));

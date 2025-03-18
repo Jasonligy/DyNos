@@ -44,7 +44,6 @@ if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
 gl.useProgram(shaderProgram);
 
 
-
 function getNodeEdge(graph, timeframe){
     const totalFrame=Math.floor(10000/16);
     // nodeList=[];
@@ -52,12 +51,16 @@ function getNodeEdge(graph, timeframe){
     const nodePosition=graph.nodeAttributes['nodePosition'];
     let segment = new Map();
     nodePosition.forEach((block,id) =>
-     {segment.set(id,[block.rightValue[0]-block.leftValue[0],block.rightValue[1]-block.leftValue[1]]);
+     {
+        console.log(block);
+        segment.set(id,[block.valueEnd[0]-block.valueStart[0],block.valueEnd[1]-block.valueStart[1]]);
         
     });
     let currentPosition= new Map();
     nodePosition.forEach((block,id) =>
     {
+        console.log(block);
+        
         currentPosition.set(id,[block.leftValue[0]+timeframe*segment.get(id)[0]/totalFrame,block.leftValue[1]+timeframe*segment.get(id)[1]/totalFrame])
     }
     )
@@ -89,6 +92,79 @@ function getNodeEdge(graph, timeframe){
         edges: nodelink
     }
 }
+function getNodeEdge0(graph, timeframe,totalz){
+    const totalFrame=Math.floor(10000/16);
+    const targetz=timeframe*totalz/totalFrame;
+    const nodePos=graph.nodeAttributes['nodePosition'];
+    const connection=graph.edgeAttributes['appearance'];
+    let nodes=[];
+    for(const [node,tree] of nodePos.entries()){
+        const nodeCoor=tree.valueAt(targetz);
+        nodes.push(nodeCoor[0]);
+        nodes.push(nodeCoor[1])
+
+    }
+    let nodelink=[];
+    nodes = new Float32Array(nodes);
+    for(const [edge,tree] of connection.entries()){
+        const source=edge.sourceNode;
+        const target=edge.targetNode;
+        nodelink.push(nodePos.get(source).valueAt(targetz)[0]);
+        nodelink.push(nodePos.get(source).valueAt(targetz)[1]);
+        nodelink.push(nodePos.get(target).valueAt(targetz)[0]);
+        nodelink.push(nodePos.get(target).valueAt(targetz)[1]);
+    }
+    nodelink = new Float32Array(nodelink);
+
+
+
+
+    // // nodeList=[];
+    // let edges=graph.edges;
+    // const nodePosition=graph.nodeAttributes['nodePosition'];
+    // let segment = new Map();
+    // nodePosition.forEach((block,id) =>
+    //  {
+    //     console.log(block);
+    //     segment.set(id,[block.valueEnd[0]-block.valueStart[0],block.valueEnd[1]-block.valueStart[1]]);
+        
+    // });
+    // let currentPosition= new Map();
+    // nodePosition.forEach((block,id) =>
+    // {
+    //     console.log(block);
+        
+    //     currentPosition.set(id,[block.leftValue[0]+targetz*segment.get(id)[0],block.leftValue[1]+targetz*segment.get(id)[1]])
+    // }
+    // )
+    // let nodes =[];
+    // currentPosition.forEach((p,id) =>
+    // {
+    //     nodes.push(p[0]);
+    //     nodes.push(p[1]);
+    // })
+    // console.log(nodes)
+    // nodes = new Float32Array(nodes);
+
+    // let nodelink=[];
+    // for(const edge of edges){
+    //     // const [first,second] = edge.split('-').map(v=>parseInt(v));
+    //     const first = parseInt(edge.sourceNode.id);
+    //     const second = parseInt(edge.targetNode.id);
+    //     // console.log(currentPosition);
+    //     // const lineSegment=currentPosition.get(first).concat(currentPosition.get(second))
+    //     // nodelink.concat(lineSegment);
+    //     nodelink.push(currentPosition.get(first)[0]);
+    //     nodelink.push(currentPosition.get(first)[1]);
+    //     nodelink.push(currentPosition.get(second)[0]);
+    //     nodelink.push(currentPosition.get(second)[1]);
+    // }
+    // nodelink = new Float32Array(nodelink)
+    return{
+        position:nodes,
+        edges: nodelink
+    }
+}
 
 let count=0;
 let lastUpdate = 0;
@@ -96,7 +172,9 @@ const updateInterval = 1000;  // Update every 1000ms (1 second)
 const animationDuration = 3000;  // Stop after 10 seconds (10,000 ms)
 let startTime = null;
 
-function run(){
+function run(graph){
+    console.log('test');
+    
     // Function to draw nodes
     function drawNodes() {
         gl.bindBuffer(gl.ARRAY_BUFFER, nodeBuffer);
@@ -149,7 +227,8 @@ function run(){
         requestAnimationFrame(animate);
     }
     function updateNodePositions(count) {
-        const nodeEdge=getNodeEdge(graph,count);
+        //替换为fetch从server那里取
+        const nodeEdge=getNodeEdge0(graph,count);
     
         nodes=nodeEdge.position;
         edges=nodeEdge.edges;
@@ -169,9 +248,9 @@ function run(){
     
     }
 
-    const graph = generateGraph();
+    
 
-    const nodeEdge=getNodeEdge(graph,0);
+    const nodeEdge=getNodeEdge0(graph,0);
 
     let nodes=nodeEdge.position;
     let edges=nodeEdge.edges;
@@ -200,4 +279,3 @@ function run(){
     
     requestAnimationFrame(animate);
 }
-run();

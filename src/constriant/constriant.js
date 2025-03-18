@@ -52,6 +52,12 @@ export class MovementAcceleration{
                 
                 
                 const angleDiff=betweenAngle(currentForce,previousMovement);
+                // console.log('between');
+                // console.log(currentForce);
+                // console.log(previousMovement);
+                
+                
+                
                 const previousMagnitude=magnitude(previousMovement);
                 if(angleDiff.radians<Math.PI/3){
                     // console.log('pi3')
@@ -74,10 +80,18 @@ export class MovementAcceleration{
             // console.log();
             
             this.constriant.set(node,currentLimit);
+            // this.constriant.set(node,Infinity);
+            // if(magnitude(currentForce)>0){
+            //     this.previousMovements.set(node,getUnitVector(currentForce).map((value,index)=>currentLimit*value))
+            // }
+            // console.log('currentl');
+            
+            // console.log(currentLimit);
             if(magnitude(currentForce)>0){
-                this.previousMovements.set(node,getUnitVector(currentForce).map((value,index)=>currentLimit*value))
-            }
+                this.previousMovements.set(node,getUnitVector(currentForce).map((value,index)=>currentLimit*value))}
         }
+        // console.log('constriant');
+        
         // console.log(this.constriant);
         return{defaultValue:Infinity,nodeConstriant:this.constriant};
     }
