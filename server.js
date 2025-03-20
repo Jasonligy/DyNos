@@ -1,10 +1,10 @@
 import express from 'express';
 import path from 'path';
-// import {readFile,getDyGraph,discretise} from './src/samples/VanDeBunt.js';
+import {readFile,getDyGraph,discretise} from './src/samples/VanDeBunt.js';
 import {getOneNodeGraph} from './src/test/oneegde.js';
 // import {readFile,getDyGraph} from './src/samples/newcomb.js';
 // import {readFile,getDyGraph} from './src/samples/dialog.js';
-import {readFile,getDyGraph} from './src/samples/rugby.js';
+// import {readFile,getDyGraph} from './src/samples/rugby.js';
 import {IntervalTree,Interval} from './src/intervalTree/intervalTree.js';
 import generateCube from './src/generateCube.js';
 import {TimeSpaceCube} from "./src/cube/TimeSpaceCube.js";
@@ -41,10 +41,10 @@ app.get('/api/data', (req, res) => {
   console.log('begin');
   readFile()
   .then((fileData) => {
-      // graph=getOneNodeGraph();
+      graph=getOneNodeGraph();
       // console.log(fileData.characters);
       //   throw new Error('check time')
-      graph=getDyGraph(fileData);
+      // graph=getDyGraph(fileData);
     //  console.log(graph.nodes);
      
       const runner=new DynosRunner(graph,100,5);
@@ -80,8 +80,8 @@ app.get('/api/datametrics', (req, res) => {
     const cubeBefore=new TimeSpaceCube(graph,2.122449);
     // const [lines,mirrorIndex]=generateCube();
     // const [lines,mirrorIndex]=cubeBefore.outputMatrix();
-    const [lines,mirrorIndex]=cube.outputMatrix();
-    const data={array:lines,index:mirrorIndex};
+    const [lines,mirrorIndex,connections,connectionIndex]=cube.outputMatrix();
+    const data={array:lines,index:mirrorIndex,connections:connections,connectionIndex:connectionIndex};
     res.json(data)})
 });
 app.get('/api/graph', (req, res) => {

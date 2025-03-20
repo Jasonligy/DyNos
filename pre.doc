@@ -3,3 +3,4 @@
 
 
 1. from fix desired distance to dynamic distance( relates to tau)
+2.tau会过拟合

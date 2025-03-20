@@ -37,3 +37,12 @@ safetyMovementFactor
 temperature
 
 tau 2.122448979591837
+
+seperate computation and visualization
+
+event-based how to split the time slice
+why webgl
+why challenging
+ how to solve the force 
+ live demo
+ metriics

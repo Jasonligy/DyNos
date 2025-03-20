@@ -390,7 +390,7 @@ gl.enableVertexAttribArray(aPosition);
     gl.bufferData(gl.ARRAY_BUFFER, connections, gl.STATIC_DRAW);
     gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
     
-    gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 0.3);
+    gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 0.2);
     console.log(connections.length);
     
     connectionIndex.unshift(0);

@@ -247,10 +247,18 @@ export class TimeSpaceCube{
         // console.log('begin count');
         for(const [id,node] of nodes.entries()){
             // appears is a list, ststing the appeared slots for the node
-            const appears=this.dyGraph.nodeAttributes['appearance'].get(node)
+            let appears=this.dyGraph.nodeAttributes['appearance'].get(node)
             const intervals=this.dyGraph.nodeAttributes['nodePosition'].get(node);
             // console.log(appears.getAllIntervals(appears.root))
+            // console.log('app');
+            
             // console.log(appears);
+            // if(typeof appears =="undefined"){
+            //     appears=intervals;
+            // }
+            // console.log(id);
+            
+            // console.log(intervals);
             
             for(const appearSlot of appears.getAllIntervalsWithoutValue(appears.root)){
                 let line=new MirrorLine(node,appearSlot);
@@ -296,11 +304,16 @@ export class TimeSpaceCube{
                 for(const interval of intervals.getAllIntervals(intervals.root)){
                     if(appearSlot.start<interval.end && appearSlot.end>interval.end){
                         const bendPos=interval.valueEnd;
-                        line.addBend(bendPos.concat(interval.valueEnd*this.tau));
+                        // console.log('checknan');
+                        // console.log(interval);
+                        line.addBend(bendPos.concat(interval.end*this.tau));
                     }
                 }
 
                 const endPos=intervals.valueAt(appearSlot.end);
+                
+                
+                
                 line.addBend(endPos.concat(appearSlot.end*this.tau));
                 this.mirrorLine2DyNode.set(line,node);
                 // console.log('check add node')
@@ -482,8 +495,10 @@ export class TimeSpaceCube{
             }
 
         }
-        // console.log('countconnection');
-        // console.log(countConnection)
+        console.log('countconnection');
+        console.log(this.dyGraph.nodes.size);
+        
+        console.log(countConnection)
         
     }
     postProcessing(){
@@ -588,6 +603,10 @@ export class TimeSpaceCube{
                 const targetLine=connection.target;
                 const intervalStart=slot.start*this.tau;
                 const intervalEnd=slot.end*this.tau;
+                // console.log('slot');
+                // console.log(slot.end);
+                
+                
                 const sourceSurface=this.findInterpolatedPoints(sourceLine.coordinateList,[intervalStart,intervalEnd]);
                 const targetSurface=this.findInterpolatedPoints(targetLine.coordinateList,[intervalStart,intervalEnd]);
                 ConnectionCoordinate=this.generateSurface(sourceSurface,targetSurface)
@@ -831,7 +850,11 @@ export class TimeSpaceCube{
         // Function to interpolate a point at a specific Z value
         function interpolateAtZ(target) {
             let left = 0, right = points.length - 1;
-    
+            // console.log('checkarr');
+            // console.log(target);
+            
+            // console.log(points);
+            
             // Binary search for closest z values
             while (left <= right) {
                 let mid = Math.floor((left + right) / 2);
@@ -843,7 +866,12 @@ export class TimeSpaceCube{
                     right = mid - 1;
                 }
             }
-    
+            console.log(right);
+            console.log(left);
+            console.log(target);
+            console.log(points);
+            
+            
             // Ensure indices are within range
             if (right < 0 || left >= points.length) {
                 throw new Error("Target Z is out of range");
@@ -857,7 +885,11 @@ export class TimeSpaceCube{
             let y = y1 + t * (y2 - y1);
             return [x, y, target];
         }
-    
+        // console.log('minmax');
+        
+        // console.log(zMin);
+        // console.log(zMax);
+        
         // Add interpolated points at zMin and zMax
         resultPoints.push(interpolateAtZ(zMin));
         resultPoints.push(interpolateAtZ(zMax));

@@ -43,7 +43,13 @@ export class EdgeAttraction{
                 // console.log(connection);
                 
                 const mirrorLineSource=connection.source;
+                // console.log('mirrorLineSource');
+                // console.log(mirrorLineSource);
+                
+                
                 const mirrorLineTarget=connection.target;
+                // console.log(mirrorLineTarget);
+                
                 // const mirrorLineSource=this.cube.nodeMirrorMap.get(dySourceNode);
                 // const mirrorLineTarget=this.cube.nodeMirrorMap.get(dyTargetNode);
                 this.computeForce(force,connection,mirrorLineTarget,mirrorLineSource);

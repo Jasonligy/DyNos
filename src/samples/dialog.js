@@ -113,7 +113,35 @@ export function getDyGraph(fileData){
         nodeMap.set(ch,node);
         index++;
     }
-    let count=0
+    let count=0;
+    const chartime=new Map();
+    for(let i=0;i<fileData.dialogs.length;i++){
+
+        const chara=fileData.dialogs[i].source;
+        if(chartime.has(chara)){
+            const firsttime=Math.min(chartime.get(chara)[0],fileData.dialogs[i].time-2*fileData.dialogs[i].duration*10);
+            const lasttime=Math.max(chartime.get(chara)[1],fileData.dialogs[i].time+2*fileData.dialogs[i].duration*11)
+            chartime.set(chara,[firsttime,lasttime])
+        }
+        else{
+            const firsttime=fileData.dialogs[i].time-2*fileData.dialogs[i].duration*10;
+            const lasttime=fileData.dialogs[i].time+2*fileData.dialogs[i].duration*11;
+            chartime.set(chara,[firsttime,lasttime])
+        }
+
+        const charb=fileData.dialogs[i].target;
+        if(chartime.has(charb)){
+            const firsttime=Math.min(chartime.get(charb)[0],fileData.dialogs[i].time-2*fileData.dialogs[i].duration*10);
+            const lasttime=Math.max(chartime.get(charb)[1],fileData.dialogs[i].time+2*fileData.dialogs[i].duration*11)
+
+            chartime.set(charb,[firsttime,lasttime])
+        }
+        else{
+            const firsttime=fileData.dialogs[i].time-2*fileData.dialogs[i].duration*10;
+            const lasttime=fileData.dialogs[i].time+2*fileData.dialogs[i].duration*11;
+            chartime.set(charb,[firsttime,lasttime])
+        }
+    }
     for(let i=0;i<fileData.dialogs.length;i++){
 
         const node1=nodeMap.get(fileData.dialogs[i].source);
@@ -130,11 +158,37 @@ export function getDyGraph(fileData){
         const participantP=new Interval(fileData.dialogs[i].time-2*fileData.dialogs[i].duration*10,fileData.dialogs[i].time+2*fileData.dialogs[i].duration*11);
         const dialogInter=new Interval(fileData.dialogs[i].time,fileData.dialogs[i].time+2*fileData.dialogs[i].duration)
         dyGraph.edgeAttributes['appearance'].get(edge).insert(dialogInter)
-        dyGraph.nodeAttributes['appearance'].get(node1).insert(participantP)
-        dyGraph.nodeAttributes['appearance'].get(node2).insert(participantP)
+        
 
+        // dyGraph.nodeAttributes['appearance'].get(node1).insert(participantP)
+        // dyGraph.nodeAttributes['appearance'].get(node2).insert(participantP)
+       
+       
+        const tree1=dyGraph.nodeAttributes['appearance'].get(node1);
+        if(tree1.root==null){
+            
+            
+           tree1.insert(new Interval(...chartime.get(fileData.dialogs[i].source)));
+        //    console.log('tree1');
+        //    console.log(tree1);
+           
+        //    tree1.insert(new Interval(mintime,maxtime));
+        }
+        const tree2=dyGraph.nodeAttributes['appearance'].get(node2);
+        if(tree2.root==null){
+            // console.log('checknull');
+            
+           tree2.insert(new Interval(...chartime.get(fileData.dialogs[i].target)));
+        //    console.log(tree2);
+           
+        //    console.log('tree2');
+        //    console.log(tree2);
+        //    tree2.insert(new Interval(mintime,maxtime));
+        }
+        
 
     }
+
     // console.log(fileData.students)
     scatterNode(dyGraph,200);
     return dyGraph

@@ -21,7 +21,7 @@ export class TimeStraightning{
                 
             }
             this.computeSmoothingComponent(force,allBends);
-            this.computeStraightningComponent(force, allBends);
+            // this.computeStraightningComponent(force, allBends);
            
         }
         // console.log('timestr');

@@ -215,11 +215,16 @@ export function discretise(origin){
 }
 function discretiseWithIntervals(origin, intervals){
     const data=new DiscretisationData(origin);
+    const l=intervals.length-1;
+    const left=intervals[0].start - (intervals[0].end - intervals[0].start) * 0.2;
+    const right=intervals[l].end + (intervals[l-1].end - intervals[l-1].start) * 0.2;
     for(const [id,node] of data.original.nodes){
         // if(data.isPresentInIntervalNode(node,data.originalEdgePresence.get(node))){
         //     data.discreteNodePresence.get(node).insert(outputInterval)
         // }
-        data.discreteNodePresence.set(node,data.originalEdgePresence.get(node))
+        const interval=new Interval(left,right);
+        data.discreteNodePresence.set(node,new IntervalTree(true));
+        data.discreteNodePresence.get(node).insert(interval);
        
     }
     for (let i = 0; i < intervals.length; i++) {
@@ -231,6 +236,12 @@ function discretiseWithIntervals(origin, intervals){
             ? (intervals[i].end + intervals[i + 1].start) / 2.0
             : intervals[i].end + (intervals[i].end - intervals[i].start) * 0.2;
         const outputInterval=new Interval(leftBound,rightBound);
+        if(i==intervals.length-1){
+            console.log('right');
+            console.log(rightBound);
+            
+            
+        }
         applyBlockAttributes(data, intervals[i], outputInterval);
         // Use leftBound and rightBound as needed
     }
