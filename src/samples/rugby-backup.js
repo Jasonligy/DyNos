@@ -106,28 +106,28 @@ export function getDyGraph(fileData){
         // if(maxtime<ctimehigh){
         //     maxtime=ctimehigh
         // }
-        const tweetTIme=Math.floor(fileData.tweets[i].time.getTime()/1000)/daySeconds;
+        const tweetTIme=Math.floor(fileData.tweets[i].time.getTime()/1000);
         const teamA=fileData.tweets[i].from;
         if(teamtime.has(teamA)){
             const firsttime=teamtime.get(teamA)[0];
-            const lasttime=tweetTIme+0.5;
+            const lasttime=tweetTIme+0.5*daySeconds;
             teamtime.set(teamA,[firsttime,lasttime])
         }
         else{
-            const firsttime=tweetTIme-0.5;
-            const lasttime=tweetTIme+0.5;
+            const firsttime=tweetTIme-0.5*daySeconds;
+            const lasttime=tweetTIme+0.5*daySeconds;
             teamtime.set(teamA,[firsttime,lasttime])
         }
 
         const teamB=fileData.tweets[i].to;
         if(teamtime.has(teamB)){
             const firsttime=teamtime.get(teamB)[0];
-            const lasttime=tweetTIme+0.5;
+            const lasttime=tweetTIme+0.5*daySeconds;
             teamtime.set(teamB,[firsttime,lasttime])
         }
         else{
-            const firsttime=tweetTIme-0.5;
-            const lasttime=tweetTIme+0.5;
+            const firsttime=tweetTIme-0.5*daySeconds;
+            const lasttime=tweetTIme+0.5*daySeconds;
             teamtime.set(teamB,[firsttime,lasttime])
         }
 
@@ -144,13 +144,13 @@ export function getDyGraph(fileData){
         const edge=dyGraph.queryEdge(node1,node2);
         // console.log(new Interval(id-0.5.id+0.5))
                 // console.log(dyGraph.edgeAttributes['appearance'].get(edge))
-        const tweetTIme=Math.floor(fileData.tweets[i].time.getTime()/1000)/daySeconds;
-        const t=new Interval(tweetTIme-0.5,tweetTIme+0.5)
+        const tweetTIme=Math.floor(fileData.tweets[i].time.getTime()/1000);
+        const t=new Interval(tweetTIme-0.5*daySeconds,tweetTIme+0.5*daySeconds)
         dyGraph.edgeAttributes['appearance'].get(edge).insert(t)
         if(isNaN(t.start)){
             // console.log(count);
             console.log(fileData.tweets[i].time);
-            console.log(tweetTIme+0.5);
+            console.log(tweetTIme+0.5*daySeconds);
             
             
             throw new Error('appearslot is nan')

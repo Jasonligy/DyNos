@@ -5,6 +5,21 @@ import path from 'path';
 import { DyGraph,Node,Edge } from '../dygraph/Dygraph.js';
 import { DiscretisationData } from '../dygraph/DiscretisationData.js';
 import { IntervalTree,Interval } from '../intervalTree/intervalTree.js';
+class RandomS {
+    constructor(seed) {
+        this.seed = seed;
+    }
+
+    next() {
+        // Xorshift algorithm to generate pseudorandom numbers
+        this.seed ^= this.seed << 21;
+        this.seed ^= this.seed >>> 35;
+        this.seed ^= this.seed << 4;
+        this.seed = this.seed * 2685821657736338717n; // A constant multiplier for 64-bit precision
+        return Number(this.seed >> 64n) / 0xFFFFFFFFFFFFFFFFn; // Normalize the result
+    }
+}
+const rng = new RandomS(12345)
 // const fs = require('fs');
 // const readline = require('readline');
 

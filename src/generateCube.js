@@ -27,7 +27,7 @@ export default function generateCube(){
     console.log(cube.nodeMirrorMap.size)
     console.log('finish')
     const [lines,mirrorIndex]=cube.outputMatrix();
-    console.log(lines);
-    console.log(mirrorIndex);
+    // console.log(lines);
+    // console.log(mirrorIndex);
     return [lines,mirrorIndex]
 }

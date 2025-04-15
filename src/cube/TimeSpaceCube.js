@@ -2,6 +2,7 @@ import{DyGraph,Node,Edge}from "../dygraph/Dygraph.js"
 import { avgVectors, distance2points, magnitude,checkTriVectors } from "../utils/vectorOps.js";
 import {Interval,IntervalTree}from "../intervalTree/intervalTree.js"
 // import { DyGraph,Node,Edge } from '../dygraph/Dygraph.js';
+import { writeFileSync } from 'fs';
 export class MirrorLine{
     constructor(dynode,appearInterval){
         this.dynode = dynode;
@@ -724,7 +725,7 @@ export class TimeSpaceCube{
             // if(connections[i].length!=4){
             //     throw new Error('surface coordinate number is not 4')
             // }
-            console.log([...connections[i][0],...connections[i][1],...connections[i][3],...connections[i][0],...connections[i][2],...connections[i][3]]);
+            // console.log([...connections[i][0],...connections[i][1],...connections[i][3],...connections[i][0],...connections[i][2],...connections[i][3]]);
             
             surface=surface.concat([...connections[i][0],...connections[i][1],...connections[i][3],...connections[i][0],...connections[i][2],...connections[i][3]])
         }
@@ -866,10 +867,10 @@ export class TimeSpaceCube{
                     right = mid - 1;
                 }
             }
-            console.log(right);
-            console.log(left);
-            console.log(target);
-            console.log(points);
+            // console.log(right);
+            // console.log(left);
+            // console.log(target);
+            // console.log(points);
             
             
             // Ensure indices are within range
@@ -934,6 +935,25 @@ export class TimeSpaceCube{
         }
         return dyGraph
 
+    }
+    exportJson() {
+        let graphData = {
+            nodes: {}  // Use an object instead of an array
+        };
+    
+        for (let node of this.dyGraph.nodes.values()) {
+            graphData.nodes[node.id] = []; // Initialize array for this node
+    
+            for (let mirrorLine of this.nodeMirrorMap.get(node)) {
+                graphData.nodes[node.id].push(mirrorLine.coordinateList);
+            }
+        }
+    
+        const jsonString = JSON.stringify(graphData, null, 2); // Pretty-print with 2-space indent
+    
+        // Write to a file
+        writeFileSync('graphData.json', jsonString, 'utf-8');
+        return graphData;
     }
     
 }

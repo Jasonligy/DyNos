@@ -21,7 +21,7 @@ function draw(edge,indexs,connections,connectionIndex,angleX=0,angleY=0,angleZ=5
     edge=new Float32Array(edge)
     // const connections=new
     connections=new Float32Array(surfaceCoord(connections));
-    console.log(connections)
+    // console.log(connections)
     const canvas = document.getElementById('glCanvas');
     const gl = canvas.getContext('webgl');
 
@@ -391,10 +391,10 @@ gl.enableVertexAttribArray(aPosition);
     gl.vertexAttribPointer(aPosition, 3, gl.FLOAT, false, 0, 0);
     
     gl.uniform4f(uFixedColor, 0.0, 0.0, 0.0, 0.2);
-    console.log(connections.length);
+    // console.log(connections.length);
     
     connectionIndex.unshift(0);
-    console.log(connectionIndex);
+    // console.log(connectionIndex);
     let total=0;
 
 
@@ -416,18 +416,18 @@ gl.enableVertexAttribArray(aPosition);
     }
     
 
-    console.log(connections);
-    console.log(edge.length);
+    // console.log(connections);
+    // console.log(edge.length);
     
 }
 function surfaceCoord(connections){
     let surface=[]
-    console.log(connections);
+    // console.log(connections);
     
     for(let i=0;i<connections.length;i++){
         for(let j=0;j<connections[i].length;j++){
             surface=surface.concat([...connections[i][j]])
-            console.log(surface);
+            // console.log(surface);
             
         }
         // if(connections[i].length!=4){
@@ -435,7 +435,7 @@ function surfaceCoord(connections){
         // }
         
     }
-    console.log(surface);
+    // console.log(surface);
     
     return surface;
 }
